@@ -375,7 +375,7 @@
 .fab-loopnote{display:block;margin:26px auto 0;max-width:600px;text-align:center;font-family:'Hanken Grotesk',sans-serif;font-size:14px;line-height:1.6;color:#5a6163;font-weight:300;}
 .fab-loopnote .material-symbols-outlined{font-size:18px;color:#e8853f;vertical-align:-4px;margin-right:5px;}
 @media (max-width:640px){
-  .fab-rail{flex-direction:column;align-items:stretch;max-width:340px;padding-top:0;}
+  .fab-rail:not(.mrail){flex-direction:column;align-items:stretch;max-width:340px;padding-top:0;}
   .fab-step{display:flex;align-items:center;gap:16px;text-align:left;padding:12px 0;min-width:0;}
   .fab-dot{margin:0;flex-shrink:0;}
   .fab-step-title{margin-bottom:1px;}
@@ -398,6 +398,12 @@
 
 .fab-detail{position:absolute;left:50%;bottom:100%;top:auto;margin-bottom:8px;transform:translate(-50%,-2px);width:250px;background:rgba(24,20,32,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(216,100,47,.18);border-radius:14px;padding:11px 14px;font-family:'Hanken Grotesk',sans-serif;font-size:12px;line-height:1.45;color:#dbd6de;box-shadow:0 18px 38px rgba(0,0,0,.12);opacity:0;visibility:hidden;pointer-events:none;transition:opacity .25s ease,transform .3s cubic-bezier(.16,1,.3,1);z-index:20;text-align:left;font-weight:300;}
 .fab-step:hover .fab-detail{opacity:1;visibility:visible;transform:translate(-50%,-8px);}
+/* Below the tooltip breakpoint the detail is static/in-flow, so the popover
+   transform above would shift the text 50% of its width out of the card. */
+@media (max-width:900px){
+  .fab-step:hover .fab-detail,.fab-step:focus .fab-detail,
+  .fab-step:focus-visible .fab-detail,.fab-step:active .fab-detail{transform:none !important;}
+}
 @media (max-width:640px){ .fab-detail{position:static;transform:none;width:auto;opacity:1;visibility:visible;box-shadow:none;background:transparent;border:0;backdrop-filter:none;padding:6px 0 0;margin-top:2px;} }
 @media (prefers-reduced-motion:reduce){ .fab-detail{transition:none;} }
 
@@ -486,6 +492,9 @@
 .al-tapcue .al-arrow{font-size:22px;line-height:1;animation:al-arrownudge 1.8s ease-in-out infinite;}
 .al-tapcue .al-arrow-lab{font-family:'Spectral',Georgia,serif;font-style:italic;font-size:13.5px;line-height:1.25;color:#e8b78c;letter-spacing:.01em;}
 @keyframes al-arrownudge{0%,100%{transform:translateX(0)}50%{transform:translateX(-5px)}}
+/* rotate(90deg) turns the west glyph upward; translateX then nudges along that
+   rotated axis, i.e. toward the flame */
+@keyframes al-arrow-up{0%,100%{transform:rotate(90deg) translateX(0)}50%{transform:rotate(90deg) translateX(-5px)}}
 .al-tapcue.gone{opacity:0;visibility:hidden;transition:opacity .4s;}
 @media (max-width:900px){.al-tapcue{left:50%;top:auto;bottom:-58px;transform:translateX(-50%);flex-direction:row-reverse;max-width:none;}.al-tapcue .al-arrow{transform:rotate(-90deg);}}
 @media (prefers-reduced-motion:reduce){.al-tapcue .al-arrow{animation:none;}}
@@ -600,28 +609,256 @@ body::after{content:"";position:fixed;left:50%;bottom:-10%;transform:translateX(
 p[data-i18n-html="ovFlow"] span:not([aria-hidden]){background:rgba(255,138,61,.1);border:1px solid rgba(255,138,61,.22);color:#ffb082;padding:.16rem .55rem;border-radius:6px;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:11.5px;}
 </style>
 <style id="mobile-polish">
-/* ---- Mobile polish: tap targets, label legibility, motion cost ---- */
+#math-hud-equation sub{font-size:.68em;vertical-align:-.22em;letter-spacing:.02em;}
+/* ════════ MOBILE (≤900px) — refactor ════════
+   Four failures this fixes:
+   1. sections kept 64px side padding, leaving 262px of content in 390px
+   2. long prose was centre-aligned inside that narrow column
+   3. the operator visual stacked 4 absolutely-positioned layers in a 244px box
+   4. touch devices were told to "hover"
+   ------------------------------------------------------------------ */
 @media (max-width:900px){
-  /* Legibility: raise the smallest labels, but leave tight badges alone */
+
+  /* ---- 1. Measure: reclaim the wasted gutters ---- */
+  .px-margin-desktop{padding-left:20px !important;padding-right:20px !important;}
+  .px-margin-mobile{padding-left:20px !important;padding-right:20px !important;}
+  section > .max-w-\[800px\],section > .max-w-\[820px\],section > .max-w-\[860px\],
+  .ops-princ,.ops-stepper{max-width:100% !important;}
+
+  /* ---- 2. Readability: body copy reads left, headings stay centred ---- */
+  p.font-body-lg,p.font-body-md,.ops-slide p,.ops-princ p,.fab-detail p,
+  .nn-desc,figcaption,.al-copy p{text-align:left !important;text-wrap:pretty;}
+  p.font-body-lg{font-size:15.5px !important;line-height:1.62 !important;}
+  p.font-body-md{font-size:14.5px !important;line-height:1.6 !important;}
+  h1,h2,h3{text-wrap:balance;}
+  h2[class*="text-[32px]"]{font-size:27px !important;line-height:1.16 !important;}
+
+  /* the hero copy was pinned to a container-query max-width of ~193px */
+  #hero-wrapper p{max-width:none !important;width:100% !important;margin-left:0 !important;
+    margin-right:0 !important;font-size:14.5px !important;line-height:1.58 !important;
+    text-align:left !important;}
+  /* Proportion against the aurora, not against the phone. Desktop sizes the
+     headline at 6.07cqw of a 960px column — 58px inside a 1440px glow, i.e.
+     ~4% of it — and caps the supporting line at 54cqw, so it is visibly
+     narrower than the headline. At 37px/89%-wide the mobile hero was 2.4x
+     that proportion and both lines ran the full column, flattening the
+     hierarchy. 32px with a narrower sub-line restores the desktop reading. */
+  #hero-wrapper h1{text-align:center !important;font-size:32px !important;
+    line-height:1.06 !important;letter-spacing:-.012em;}
+  #hero-wrapper p{font-size:13px !important;line-height:1.55 !important;
+    max-width:84% !important;margin-left:auto !important;margin-right:auto !important;}
+  #hero-wrapper .relative[class*="w-[94vw]"]{padding-left:20px !important;padding-right:20px !important;}
+
+  /* eyebrow / label rows stay centred and legible */
   [class*="text-[10px]"]:not(.nn-idx):not(.nn-badge):not(.op-chip){font-size:11.5px !important;}
   [class*="text-[11px]"]:not(.nn-idx):not(.nn-badge){font-size:12px !important;}
-  .op-chip{font-size:12px !important;padding:11px 13px !important;}
 
-  /* Tap targets: 44px minimum on anything you are meant to press */
-  .ops-arrowbtn{width:44px !important;height:44px !important;min-width:44px !important;min-height:44px !important;}
+  /* inline "flow" chips were stacking into blocks — make them a wrapping row */
+  p[data-i18n-html="ovFlow"]{display:flex !important;flex-wrap:wrap;align-items:center;
+    justify-content:center;gap:.4rem .5rem;text-align:center !important;}
+  p[data-i18n-html="ovFlow"] span{display:inline-flex;align-items:center;}
+
+  /* ---- 3. The operator visual: unstack it into a readable column ---- */
+  #threejs-container-OPERATOR_VISUAL{height:auto !important;overflow:visible !important;
+    display:flex !important;flex-direction:column;gap:12px;}
+  /* the 3D scene becomes a contained, square-ish stage */
+  #threejs-container-OPERATOR_VISUAL > div:nth-child(2){position:relative !important;
+    inset:auto !important;width:100% !important;height:215px !important;order:1;
+    border-radius:16px;overflow:hidden;}
+  /* Labels are back: projection is now clamped to the canvas. On a 215px stage
+     nine of them is noise, so the budget is the four operator pills — the axis
+     names and the two long state labels are already spelled out in the HUD. */
+  #threejs-container-OPERATOR_VISUAL .op3d-lab[data-lab="axis"],
+  #threejs-container-OPERATOR_VISUAL .op3d-lab[data-lab="state"],
+  #threejs-container-OPERATOR_VISUAL .op3d-lab[data-lab="proj"]{display:none !important;}
+  #threejs-container-OPERATOR_VISUAL .op3d-lab[data-lab="op"]{
+    font-size:11px !important;font-weight:600 !important;
+    padding:2px 6px;border-radius:6px;
+    background:rgba(16,13,20,.78);border:1px solid rgba(255,122,47,.34);
+    text-shadow:none !important;}
+  /* operator chips: a 2×2 grid under the stage, not an overlay */
+  #opLegend{position:static !important;order:2;transform:none !important;
+    display:grid !important;grid-template-columns:1fr 1fr;gap:8px;width:100%;left:auto;top:auto;}
+  #opLegend .op-desc{grid-column:1/-1;max-width:none !important;margin-top:2px;}
+  .op-chip{font-size:12.5px !important;padding:11px 12px !important;backdrop-filter:none;
+    justify-content:flex-start;gap:8px;}
+  .op-chip .n{display:inline !important;}
+  .op-chip .g{width:14px;font-size:14px;}
+  /* the maths read-out becomes a normal block, full width, below the chips */
+  #math-hud-overlay{position:static !important;order:3;min-width:0 !important;width:100% !important;
+    inset:auto !important;backdrop-filter:none;padding:14px 16px !important;}
+  #math-hud-equation{font-size:14px !important;line-height:1.5 !important;word-break:break-word;}
+
+  /* ---- 4. The fabrication rail: four columns did not fit 340px ---- */
+  .fab-rail:not(.mrail) .fab-step{display:grid !important;grid-template-columns:54px 1fr;column-gap:14px;row-gap:2px;
+    align-items:start;text-align:left !important;padding:14px 0 !important;}
+  .fab-dot{grid-row:1 / span 2;align-self:center;}
+  .fab-step-title{grid-column:2;align-self:end;}
+  .fab-step-sub{grid-column:2;align-self:start;width:auto !important;height:auto !important;
+    font-size:11.5px !important;opacity:.75;}
+  .fab-detail{grid-column:1 / -1;margin-top:9px !important;font-size:13.5px !important;
+    line-height:1.55 !important;}
+
+  /* The cue was pushed 58px, then 104px, below .al-scene — i.e. entirely
+     outside its own container, where it landed on the download button.
+     It belongs inside the scene, under the flame. */
+  .al-tapcue{left:50% !important;right:auto !important;top:auto !important;
+    bottom:8px !important;transform:translateX(-50%) !important;
+    flex-direction:column !important;max-width:none !important;
+    align-items:center;gap:1px;text-align:center;}
+  /* The cue now sits BELOW the flame, so the arrow has to point up at it. The
+     base nudge keyframes animate transform, which silently discarded the
+     rotation and left the arrow pointing west; rotation lives in the keyframes. */
+  .al-tapcue .al-arrow{font-size:20px !important;
+    animation:al-arrow-up 1.8s ease-in-out infinite !important;}
+  .al-tapcue .al-arrow-lab{font-size:12.5px !important;}
+
+  /* ---- 5. Closing block: side-by-side CTAs broke onto two lines each ---- */
+  #closing .flex.flex-col.sm\:flex-row,#closing [class*="gap-4"]:has(> a[class*="bg-primary"]){
+    flex-direction:column !important;align-items:stretch !important;}
+  /* Scoped to the CTA row inside the closing panel. Unscoped, this reached the
+     research marquee's cards — they are also <a class="… glass-ultra"> — and
+     blew each one out to width:100% of a 2282px flex track, so the carillon
+     scrolled a single giant card past the 330px window and looked empty. */
+  #closing .closing-card a[class*="bg-primary"],
+  #closing .closing-card a[class*="glass-ultra"]{width:100% !important;
+    justify-content:center !important;white-space:nowrap;}
+  /* feature chips read as a row, not a stack of centred pills */
+  #closing .flex.flex-wrap,#closing [class*="chip"]{gap:.45rem !important;}
+  /* The generic .glass-ultra[p-8] → 22px shrink also hit the closing panel, so
+     its translucent surface sat flush on its content and the aurora behind it
+     never read. Desktop gives it p-20 and lets the glow frame the card. */
+  #closing .closing-card{padding:36px 26px 32px !important;border-radius:34px !important;}
+  #closing .closing-card > div:first-child{margin-bottom:20px !important;}
+  #closing .closing-card h2{font-size:30px !important;line-height:1.08 !important;margin-bottom:12px !important;}
+  #closing .closing-card > p{margin-bottom:24px !important;}
+  #closing .closing-aurora{left:-7% !important;width:114% !important;
+    top:-2.5% !important;height:105% !important;}
+  /* The terminal block was desktop-sized inside a 248px column: 20px padding,
+     1.9 leading, and `whitespace-nowrap` on a 40-character command, so the
+     longest line was simply clipped. It now wraps with a hanging indent. */
+  #closing .closing-card .rounded-2xl > div:last-child{
+    padding:13px 14px !important;font-size:11px !important;line-height:1.6 !important;
+    overflow-x:hidden !important;}
+  #closing .closing-card .rounded-2xl > div:last-child > div{
+    white-space:pre-wrap !important;overflow-wrap:anywhere;
+    padding-left:1.1em;text-indent:-1.1em;}
+  #closing .closing-card .rounded-2xl > div:last-child > div.mt-3{margin-top:9px !important;}
+  #closing .closing-card .rounded-2xl > div:first-child{padding:8px 12px !important;}
+  #closing .closing-card .rounded-2xl > div:first-child .font-mono{font-size:10px !important;}
+  /* the feature chips sat on a big gap below it */
+  #closing .closing-card .flex.flex-wrap{margin-top:18px !important;margin-bottom:20px !important;}
+
+  /* ---- 6. Cards: 40px padding left only 268px of usable width ---- */
+  .interactive-card{padding:22px !important;border-radius:22px !important;}
+  #modes .interactive-card > .flex:first-child{margin-bottom:16px !important;}
+  #modes .interactive-card h3{margin-bottom:12px !important;}
+  .glass-ultra[class*="p-10"],.glass-ultra[class*="p-8"]{padding:22px !important;}
+  /* chip rows: let two sit side by side instead of one per line */
+  .flex.flex-wrap.gap-2 > span{font-size:11.5px !important;padding:.28rem .6rem !important;}
+
+  /* ---- 7. Overlap fixes ---- */
+  /* NOTE: .ops-slide-old / .ops-slide-new are SEMANTIC — "the old idea" vs
+     "the new one" — not crossfade leftovers. An earlier rule here hid
+     .ops-slide-old outright, so mobile readers saw the rebuttal without the
+     claim it rebuts, and forced .ops-slide-new into flow, breaking the
+     absolute crossfade stack. The desktop mechanism is correct; mobile only
+     needs the container to be tall enough for the taller slide. */
+  .ops-slides{min-height:300px;}
+  /* only the active layer label shows; inactive ones bled onto the band above */
+  .nn-layer-lab{opacity:0 !important;transition:opacity .45s ease;}
+  .nn-deck[data-step="0"] .nn-layer-lab:nth-of-type(1),
+  .nn-deck[data-step="1"] .nn-layer-lab:nth-of-type(2),
+  .nn-deck[data-step="2"] .nn-layer-lab:nth-of-type(3){opacity:1 !important;color:#ff9a5c;}
+
+  /* the card marquee collapsed: cards landed on top of each other */
+  .carillon-track-cards,.carillon-track-cards .carillon-group{display:flex !important;
+    flex-wrap:nowrap !important;align-items:stretch;}
+  .carillon-track-cards .carillon-card{flex:0 0 auto !important;}
+
+  /* ---- 8. Touch targets ---- */
+  .ops-arrowbtn{width:44px !important;height:44px !important;}
   .ops-dot{min-width:22px;min-height:22px;}
-  .ops-dots{gap:6px;}
   #nav-toggle{min-width:44px;min-height:44px;}
-  .hero-cta a,.doc-cta,a[href*="documentation-forge"]{min-height:44px;display:inline-flex;align-items:center;}
-  a.bg-primary,a[class*="bg-primary"]{min-height:44px;display:inline-flex;align-items:center;justify-content:center;}
-  header a[class*="group"]{min-height:40px;}
+  a.bg-primary,a[class*="bg-primary"],.doc-cta{min-height:44px;display:inline-flex;
+    align-items:center;justify-content:center;}
   footer nav a,footer a{min-height:40px;display:inline-flex;align-items:center;}
   a[target="_blank"][rel="noopener"]{min-height:40px;display:inline-flex;align-items:center;gap:6px;}
-
+  header a[class*="group"]{min-height:40px;}
 }
 @media (max-width:640px){
-  .op-chip .n{display:none;}
-  .op-legend{left:8px;gap:6px;}
+  .op-legend{left:auto;gap:8px;}
+  h2[class*="text-[32px]"]{font-size:25px !important;}
+  #opLegend{grid-template-columns:1fr 1fr;}
+  .op-chip{font-size:12px !important;padding:10px 10px !important;}
+}
+</style>
+<style id="mobile-rails">
+/* ════════ MOBILE: horizontal rails ════════
+   Groups that read as a ROW on desktop were being stacked into a tall column on
+   mobile, which buried the fact that they are peers. They stay rows here and
+   become snap carousels: same reading order, same visual grammar, one thumb. */
+.mrail-wrap{position:relative;}
+.mrail-dots{display:none;}
+@media (max-width:900px){
+  .mrail{display:flex !important;flex-wrap:nowrap !important;align-items:stretch;
+    overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;
+    -webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;
+    gap:14px !important;max-width:none !important;
+    padding:4px 20px 16px !important;margin:0 -20px !important;
+    scroll-padding-inline:20px;scrollbar-width:none;}
+  .mrail::-webkit-scrollbar{display:none;}
+  .mrail > *{flex:0 0 84% !important;min-width:0;scroll-snap-align:center;margin:0 !important;}
+  .mrail > *:last-child{margin-right:0 !important;}
+
+  /* progress dots + swipe affordance */
+  .mrail-dots{display:flex;align-items:center;justify-content:center;gap:7px;margin:-4px 0 4px;}
+  .mrail-dot{width:22px;height:22px;border:0;background:none;padding:0;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;}
+  .mrail-dot i{display:block;width:7px;height:7px;border-radius:50%;
+    background:rgba(255,150,90,.28);transition:background .3s ease,width .3s ease,border-radius .3s ease;}
+  .mrail-dot.on i{width:18px;border-radius:4px;background:#ff7a2f;}
+  .mrail-hint{display:flex;align-items:center;justify-content:center;gap:6px;
+    font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10.5px;letter-spacing:.14em;
+    text-transform:uppercase;color:#9a8b7e;margin:0 0 12px;}
+  .mrail-hint .material-symbols-outlined{font-size:15px;color:#ff8a4a;}
+  .mrail-hint.gone{opacity:0;transition:opacity .4s ease;}
+
+  /* Edge fades: the strongest "there is more" signal is content visibly
+     continuing past the edge, so the rail reports its own scroll position. */
+  .mrail-wrap{position:relative;}
+  .mrail-wrap::before,.mrail-wrap::after{content:"";position:absolute;top:0;bottom:34px;width:34px;
+    pointer-events:none;z-index:3;opacity:0;transition:opacity .35s ease;}
+  .mrail-wrap::before{left:-20px;background:linear-gradient(90deg,#100d14 20%,rgba(16,13,20,0));}
+  .mrail-wrap::after{right:-20px;background:linear-gradient(270deg,#100d14 20%,rgba(16,13,20,0));}
+  .mrail-wrap.more-left::before{opacity:.96;}
+  .mrail-wrap.more-right::after{opacity:.96;}
+  /* a chevron sits on the live edge and leaves once you have scrolled */
+  .mrail-nudge{position:absolute;top:calc(50% - 34px);right:2px;z-index:4;display:flex;
+    align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;
+    background:rgba(255,122,47,.9);color:#2a1206;pointer-events:none;
+    box-shadow:0 6px 18px -6px rgba(255,122,47,.9);animation:mrail-beckon 1.9s ease-in-out infinite;}
+  .mrail-nudge .material-symbols-outlined{font-size:19px;}
+  .mrail-wrap:not(.more-right) .mrail-nudge,.mrail-wrap.touched .mrail-nudge{opacity:0;
+    transition:opacity .35s ease;}
+  @keyframes mrail-beckon{0%,100%{transform:translateX(0)}50%{transform:translateX(-6px)}}
+  @media (prefers-reduced-motion:reduce){.mrail-nudge{animation:none;}}
+
+  /* the fabrication rail stays a timeline: horizontal, connected, swipeable */
+  .fab-rail.mrail{padding-top:8px !important;justify-content:flex-start !important;}
+  .fab-rail.mrail .fab-step{display:flex !important;flex-direction:column !important;
+    align-items:flex-start !important;text-align:left !important;
+    gap:8px;padding:18px !important;border-radius:20px !important;
+    background:rgba(26,21,31,.62);border:1px solid rgba(240,180,140,.14) !important;}
+  .fab-rail.mrail .fab-dot{grid-row:auto;margin:0 !important;align-self:flex-start !important;}
+  .fab-rail.mrail .fab-step-title{grid-column:auto;font-size:16px !important;}
+  .fab-rail.mrail .fab-step-sub{grid-column:auto;opacity:.72;}
+  .fab-rail.mrail .fab-detail{grid-column:auto;margin-top:2px !important;opacity:1 !important;
+    max-height:none !important;visibility:visible !important;}
+  .fab-rail.mrail .fab-step::before,.fab-rail.mrail .fab-step::after{display:none !important;}
+
+  /* mode + operator cards inside a rail keep their padding but lose the reset */
+  .mrail .interactive-card{height:100%;padding:20px !important;}
 }
 </style>
 </head>
@@ -1013,7 +1250,7 @@ window.addEventListener('scroll', () => {
 <button type="button" class="op-chip" data-op="SUPPRESS" data-en="Destructive interference. Filters out noise and off-domain readings." data-it="Interferenza distruttiva. Filtra il rumore e le letture fuori dominio."><span class="g">Ŝ</span><span class="n">Suppress</span></button>
 <button type="button" class="op-chip" data-op="MIX" data-en="Entangles logic. Combines several readings into a new, hybrid one." data-it="Intreccia la logica. Combina più letture in una nuova, ibrida."><span class="g">M̂</span><span class="n">Mix</span></button>
 <button type="button" class="op-chip" data-op="COLLAPSE" data-en="Measurement. Forces convergence onto a single, unambiguous reading." data-it="Misura. Forza la convergenza su una singola lettura univoca."><span class="g">B̂</span><span class="n">Collapse</span></button>
-<div class="op-desc" id="opDesc" data-en="Hover an operator to see how it acts — click to pilot the vector." data-it="Passa su un operatore per vedere come agisce — clicca per pilotare il vettore."></div>
+<div class="op-desc" id="opDesc" data-en="Tap an operator to see how it acts — tap again to pilot the vector." data-it="Passa su un operatore per vedere come agisce — clicca per pilotare il vettore."></div>
 </div>
 <div class="absolute inset-0 w-full h-full bg-transparent" style="display:block;">
 <script src="https://ajax.googleapis.com/ajax/libs/threejs/r125/three.min.js"></script>
@@ -1054,6 +1291,8 @@ window.addEventListener('scroll', () => {
 
   function createHtmlLabel(text, color, tooltipText = null, isAxis = false) {
     const el = document.createElement('div');
+    el.className = 'op3d-lab';
+    el.dataset.lab = isAxis ? 'axis' : 'op';
     el.style.position = 'absolute';
     el.style.transform = 'translate(-50%, -50%)';
     el.style.color = color;
@@ -1073,17 +1312,29 @@ window.addEventListener('scroll', () => {
     return el;
   }
 
+  let _sb = null;                      // recomputed once per frame
+  function stageBox() {
+    if (_sb) return _sb;
+    const cv = renderer.domElement;
+    const cr = cv.getBoundingClientRect(), pr = container.getBoundingClientRect();
+    _sb = { x: cr.left - pr.left, y: cr.top - pr.top,
+            w: cr.width || width, h: cr.height || height };
+    return _sb;
+  }
+
   function updateHtmlLabelPosition(el, vec3) {
     if (!el) return;
     const v = vec3.clone();
     v.project(camera);
-    if (v.z > 1) {
-      el.style.display = 'none';
-      return;
-    }
+    if (v.z > 1) { el.style.display = 'none'; return; }
     el.style.display = 'block';
-    const x = (v.x * .5 + .5) * width;
-    const y = (v.y * -.5 + .5) * height;
+    const b = stageBox();
+    let x = b.x + (v.x * .5 + .5) * b.w;
+    let y = b.y + (v.y * -.5 + .5) * b.h;
+    // keep the pill inside the stage instead of letting it fly off-canvas
+    const pad = 5, hw = (el.offsetWidth || 40) / 2, hh = (el.offsetHeight || 14) / 2;
+    if (b.w > hw * 2 + pad * 2) x = Math.min(Math.max(x, b.x + pad + hw), b.x + b.w - pad - hw);
+    if (b.h > hh * 2 + pad * 2) y = Math.min(Math.max(y, b.y + pad + hh), b.y + b.h - pad - hh);
     el.style.left = `${x}px`;
     el.style.top = `${y}px`;
   }
@@ -1096,7 +1347,7 @@ window.addEventListener('scroll', () => {
     hudElement.className = 'absolute top-5 right-5 bg-[#1b1720]/85 backdrop-blur-xl border border-[rgba(255,122,47,0.28)] rounded-2xl p-5 pointer-events-none transition-opacity duration-300 shadow-[0_12px_34px_rgba(0,100,47,0.18)] min-w-[240px] z-50';
     hudElement.innerHTML = `
       <div class="text-[10px] uppercase tracking-widest mb-3 font-semibold" style="color:#ff9a5c">Live projection</div>
-      <div id="math-hud-equation" class="font-mono text-[16px] font-bold mb-2 tracking-wide" style="color:#d8642f">⟨ψ_SE | ψ_OP⟩ = 0.00</div>
+      <div id="math-hud-equation" class="font-mono text-[16px] font-bold mb-2 tracking-wide" style="color:#d8642f">⟨ψ<sub>SE</sub> | ψ<sub>OP</sub>⟩ = 0.00</div>
       <div id="math-hud-translation" class="text-[12px] font-light leading-snug" style="color:#c7c0ca">State vector is orthogonal.</div>
     `;
     container.appendChild(hudElement);
@@ -1207,10 +1458,12 @@ window.addEventListener('scroll', () => {
   const stateArrow = new THREE.ArrowHelper(currentStateDir, axesOrigin, currentStateLength, stateColor, 0.5, 0.3);
   group.add(stateArrow);
   const stateHtmlLabel = createHtmlLabel('Ambiguous Prompt |ψ_SE⟩', '#ffb082');
+  stateHtmlLabel.dataset.lab = 'state';
 
   const projArrow = new THREE.ArrowHelper(new THREE.Vector3(1,0,0), axesOrigin, 1, projColor, 0.4, 0.2);
   group.add(projArrow);
   const projHtmlLabel = createHtmlLabel('|ψ_{int}⟩', '#d8642f');
+  projHtmlLabel.dataset.lab = 'proj';
 
   const orthGeom = new THREE.BufferGeometry().setFromPoints([axesOrigin, axesOrigin]);
   const orthMat = new THREE.LineDashedMaterial({ color: 0x9aa7a5, dashSize: 0.2, gapSize: 0.2, transparent: true, opacity: 0.8 });
@@ -1268,12 +1521,14 @@ window.addEventListener('scroll', () => {
     camera.aspect = newWidth / newHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(newWidth, newHeight);
+    _sb = null;
   });
 
   const clock = new THREE.Clock();
 
   function animate() {
     requestAnimationFrame(animate);
+    _sb = null;
     const t = clock.getElapsedTime();
 
     if (forcedOp) {
@@ -1344,7 +1599,7 @@ window.addEventListener('scroll', () => {
 
     // Update HUD translation
     if (equationElement && translationElement) {
-      equationElement.innerHTML = `⟨ψ_{SE} | ψ_{${closestSubspace.name}}⟩ = ${(actualDot).toFixed(3)}`;
+      equationElement.innerHTML = `⟨ψ<sub>SE</sub> | ψ<sub>${closestSubspace.name}</sub>⟩ = ${(actualDot).toFixed(3)}`;
       const percent = Math.round(Math.abs(actualDot) * 100);
       translationElement.innerHTML = `State vector is <strong style="color:#ff9a5c">${percent}% aligned</strong> with ${closestSubspace.name} operator space.`;
     }
@@ -1556,7 +1811,7 @@ window.addEventListener('scroll', () => {
       <div class="al-flamewrap"><svg class="al-flame" viewBox="0 0 48 64" aria-hidden="true"><defs><radialGradient id="al-flg" cx="50%" cy="74%" r="66%"><stop offset="0%" stop-color="#fff4d4"></stop><stop offset="42%" stop-color="#ffb347"></stop><stop offset="100%" stop-color="#e2551f"></stop></radialGradient></defs><path class="al-flame-body" d="M24 63 C5 53 8 31 20 19 C25 14 22 7 19 1 C35 9 43 23 38 39 C36 49 35 57 24 63 Z" fill="url(#al-flg)"></path><path class="al-flame-inner" d="M24 59 C14 52 17 39 25 32 C29 40 32 49 24 59 Z" fill="#fff2cc"></path></svg></div>
       <svg class="al-vessel" viewBox="0 0 64 36" aria-hidden="true"><ellipse class="al-vessel-rim" cx="32" cy="6" rx="27" ry="5.5"></ellipse><path class="al-vessel-body" d="M6 6 C9 24 24 33 32 33 C40 33 55 24 58 6 C48 12 16 12 6 6 Z"></path></svg>
     </div>
-    <div class="al-tapcue" id="alHint" aria-hidden="true"><span class="al-arrow material-symbols-outlined">west</span><span class="al-arrow-lab" data-i18n-html="alHint">Click to see how an agent works</span></div>
+    <div class="al-tapcue" id="alHint" aria-hidden="true"><span class="al-arrow material-symbols-outlined">west</span><span class="al-arrow-lab" data-i18n-html="alHint">See how an agent works</span></div>
     <div class="al-phase al-phase-a" data-i18n-html="alBorn">Born &mdash; from ordered operators</div>
     <div class="al-phase al-phase-b" data-i18n-html="alGrows">Grows &mdash; it runs in the world</div>
     <div class="al-phase al-phase-c" data-i18n-html="alLearns">Learns &mdash; from its own runs</div>
@@ -2025,26 +2280,28 @@ A task enters at <strong class="text-on-surface font-normal">Shape</strong>, whe
        Two cards per band stacked vertically; scroll-driven reveal, bands,
        neurons, spotlight and rail all preserved. ---- */
 @media(max-width:760px){
- .nn-deck{width:94vw;height:min(700px,84vh);perspective:900px;}
+ .nn-deck{width:94vw;height:min(730px,86vh);perspective:900px;}
  .nn-band{left:1.5%;width:97%;height:32%;border-radius:20px;}
- .nn-card{width:89%;padding:11px 14px 12px;}
- .nn-card[data-nn="0"]{--fx:50% !important;--fy:8.5% !important;--rot:-0.8deg !important;}
- .nn-card[data-nn="1"]{--fx:50% !important;--fy:23.5% !important;--rot:0.8deg !important;}
- .nn-card[data-nn="2"]{--fx:50% !important;--fy:42% !important;--rot:0.8deg !important;}
- .nn-card[data-nn="3"]{--fx:50% !important;--fy:57% !important;--rot:-0.8deg !important;}
- .nn-card[data-nn="4"]{--fx:50% !important;--fy:76.5% !important;--rot:-0.8deg !important;}
- .nn-card[data-nn="5"]{--fx:50% !important;--fy:91.5% !important;--rot:0.8deg !important;}
+ .nn-card{width:90%;padding:clamp(9px,1.3vh,13px) 15px;max-height:13.5%;overflow:hidden;}
+ .nn-card[data-nn="0"]{--fx:50% !important;--fy:10% !important;--rot:-0.8deg !important;}
+ .nn-card[data-nn="1"]{--fx:50% !important;--fy:24% !important;--rot:0.8deg !important;}
+ .nn-card[data-nn="2"]{--fx:50% !important;--fy:44% !important;--rot:0.8deg !important;}
+ .nn-card[data-nn="3"]{--fx:50% !important;--fy:58% !important;--rot:-0.8deg !important;}
+ .nn-card[data-nn="4"]{--fx:50% !important;--fy:78% !important;--rot:-0.8deg !important;}
+ .nn-card[data-nn="5"]{--fx:50% !important;--fy:92% !important;--rot:0.8deg !important;}
  /* icon moves beside the title so a full card fits inside its band */
- .nn-card .nn-ico{position:absolute;top:12px;left:15px;font-size:18px;}
- .nn-title{font-size:14.5px;margin:0 0 4px;padding-left:25px;min-height:20px;display:flex;align-items:center;}
- .nn-desc{font-size:10.5px;line-height:1.34;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
+ .nn-card .nn-ico{position:absolute;top:clamp(9px,1.3vh,13px);left:15px;font-size:clamp(15px,2vh,18px);}
+ .nn-title{font-size:clamp(13px,1.85vh,15.5px);margin:0 0 4px;padding-left:26px;
+   min-height:0;display:flex;align-items:center;}
+ .nn-desc{font-size:clamp(11px,1.48vh,12.5px);line-height:1.38;display:-webkit-box;
+   -webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
  .nn-idx{top:10px;right:12px;font-size:9.5px;}
  .nn-badge{top:-7px;left:13px;font-size:8px;padding:.18rem .45rem;}
  /* layer labels become horizontal tags at the head of each band */
  .nn-layer-lab{writing-mode:horizontal-tb;left:50%;transform:translate(-50%,-50%);font-size:9px;letter-spacing:.22em;}
- .nn-layer-lab:nth-of-type(1){--ly:1.8%;}
- .nn-layer-lab:nth-of-type(2){--ly:35.8%;}
- .nn-layer-lab:nth-of-type(3){--ly:69.8%;}
+ .nn-layer-lab:nth-of-type(1){--ly:1.8% !important;}
+ .nn-layer-lab:nth-of-type(2){--ly:35.8% !important;}
+ .nn-layer-lab:nth-of-type(3){--ly:69.8% !important;}
  /* rail stays, thumb-sized and hugging the edge */
  .nn-rail{right:5px;gap:12px;}
  .nn-tick{width:14px;height:14px;}
@@ -2362,7 +2619,7 @@ A task enters at <strong class="text-on-surface font-normal">Shape</strong>, whe
 (function(){
   var TDICT = {"Generic agents":"Agenti generici","Evaluators":"Valutatori","Create → Manage":"Crea → Gestisci","An agent, forged and kept alive":"Un agente, forgiato e mantenuto vivo","Created by Prometheus":"Creato da Prometheus","Managed by Prometheus":"Gestito da Prometheus","Manage mode":"Modalità gestione","Agents that stay alive":"Agenti che restano vivi","Observe":"Osserva","reads run evidence — how the agent really performed":"legge le evidenze delle esecuzioni — come ha agito davvero l’agente","Diagnose":"Diagnostica","locates drift and weighs candidate fixes":"individua la deriva e valuta le correzioni candidate","Adapt":"Adatta","rewrites the prompt, tools & knowledge — the control plane":"riscrive prompt, strumenti e conoscenza — il piano di controllo","Grow":"Cresce","the agent improves — then the loop repeats":"l’agente migliora — poi il ciclo si ripete","What you get":"Cosa ottieni","More than prompts and agents":"Non solo prompt e agenti","Prompts":"Prompt","System prompts and single-call instructions, drafted as ordered operators and scored before delivery.":"System prompt e istruzioni a chiamata singola, redatti come operatori ordinati e valutati prima della consegna.","Graders & evaluators":"Grader e valutatori","LLM-as-judge rubrics with explicit, checkable criteria — the shape Prometheus reaches for when the task is to score, not to generate.":"Rubriche LLM-as-judge con criteri espliciti e verificabili — la forma che Prometheus adotta quando il compito è valutare, non generare.","Agents":"Agenti","Full agentic loops — persona, tool contracts, and a memory discipline — designed to run over many turns against real tools, not a one-off reply.":"Veri loop agentici — persona, contratti degli strumenti e una disciplina di memoria — progettati per operare su molti turni con strumenti reali, non una risposta isolata.","Agentic workflows":"Flussi di lavoro agentici","Multi-step pipelines and orchestration blueprints — ordered stages, hand-offs, and stop conditions — that wire several prompts into one working system.":"Pipeline multi-step e blueprint di orchestrazione — fasi ordinate, hand-off e condizioni di arresto — che collegano più prompt in un unico sistema funzionante.","Cognitive-tool scaffolds":"Impalcature di strumenti cognitivi","For hard multi-step reasoning: a system prompt plus ready-to-register tool definitions you wire into your own tool-calling runtime.":"Per ragionamenti complessi multi-step: un system prompt più definizioni di strumenti pronte da registrare nel tuo runtime con tool calling.","Verifiers":"Verificatori","Every deliverable ships with a verifier spec across three layers, so you can prove the artifact does what it claims.":"Ogni risultato viene consegnato con una specifica di verifica su tre livelli, così puoi dimostrare che l’artefatto fa ciò che promette.","Shape":"Forma","Interview":"Intervista","Draft":"Stesura","Audit":"Verifica","Score":"Valutazione","Deliver":"Consegna","infer shape + tier":"forma + livello","runtime + done-def":"runtime + ‘fatto’","ordered operators":"operatori ordinati","structure + measurement":"struttura + misura","three honest axes":"tre assi onesti","prompt + verifier":"prompt + verificatore","Shape inference":"Inferenza della forma","Samples the raw request to classify it into one of the structural shapes and a strength tier — no routing questions asked. When the reading is clear enough, the framework commits and moves on.":"Campiona la richiesta grezza per classificarla in una delle forme strutturali e in un livello di robustezza — senza domande di instradamento. Quando la lettura è abbastanza chiara, il framework decide e prosegue.","Adaptive interview":"Intervista adattiva","A short, capped interview recovers what an operator needs — the runtime it will run on and the definition of done — and closes with a summary the author can correct.":"Un’intervista breve e limitata recupera ciò di cui un operatore ha bisogno — il runtime su cui girerà e la definizione di ‘fatto’ — e si chiude con un riepilogo che l’autore può correggere.","Operator drafting":"Stesura degli operatori","Drafts the prompt as an ordered sequence of operators from the catalog — sections that amplify, suppress, or mix readings. The order is load-bearing: a later operator depends on what an earlier one selected.":"Redige il prompt come sequenza ordinata di operatori dal catalogo — sezioni che amplificano, sopprimono o mescolano letture. L’ordine è portante: un operatore successivo dipende da ciò che uno precedente ha selezionato.","Quantum audit":"Verifica quantistica","Audits the draft against the framework’s structural and measurement checklists. A failing audit is the pipeline’s one loop back — it returns the draft to drafting for revision.":"Verifica la bozza rispetto alle checklist strutturali e di misura del framework. Una verifica fallita è l’unico ciclo all’indietro della pipeline — riporta la bozza alla stesura per la revisione.","Self-evaluation":"Autovalutazione","Scores the result honestly on three axes — token economy, task fit, and operator coherence — and confirms no unused scaffolding slipped into the draft.":"Valuta il risultato con onestà su tre assi — economia dei token, aderenza al compito e coerenza degli operatori — e conferma che nessuna impalcatura inutilizzata sia finita nella bozza.","Delivery":"Consegna","Delivers the prompt with a verifier specification and, where it applies, a ready-to-run verifier — emitted as plain blocks, changing nothing on disk.":"Consegna il prompt con la specifica di un verificatore e, dove si applica, un verificatore pronto all’uso — emessi come blocchi semplici, senza modificare nulla su disco.","MIT-licensed":"Con licenza MIT","© 2026 · MIT":"© 2026 · MIT","a meta-prompting framework":"un framework di meta-prompting","Operators":"Operatori","Modes":"Modalità","Fabrication":"Fabbricazione","Install":"Installazione","Documentation":"Documentazione","Prometheus is a prompt-engineering skill for coding agents — and more. Describe what you need and it designs a structured, audited prompt, workflow, or self-adaptive agent, shipped with a verifier that proves it works.":"Prometheus è una skill di prompt engineering per agenti di coding — e non solo. Descrivi ciò che ti serve e progetta un prompt, un workflow o un agente self-adaptive, strutturato e verificato, consegnato con un verificatore che dimostra che funziona.","Download the skill":"Scarica la skill","Read the Documentation":"Leggi la documentazione","also on GitHub":"anche su GitHub","Runs across the agentic ecosystem":"Funziona in tutto l’ecosistema agentico","What it is":"Che cos’è","A prompt is an operator, not a key":"Un prompt è un operatore, non una chiave","Most prompt-engineering advice arrives as a bag of tips: add keywords, give examples, be specific. Prometheus rejects that framing at the root.":"La maggior parte dei consigli sul prompt engineering arriva come un sacchetto di trucchi: aggiungi parole chiave, fai esempi, sii specifico. Prometheus rifiuta questa impostazione alla radice.","Under that claim a prompt section is not a hint pointing at a pre-existing answer. It is a transformation applied to the model's distribution over interpretations — an operator that amplifies some readings of the task, suppresses others, and mixes the rest. The skill's entire job is to help a designer choose those transformations deliberately, so that a prompt is assembled the way a circuit is, section by justified section, rather than tuned by superstition.":"Sotto questa premessa una sezione del prompt non è un indizio che punta a una risposta preesistente. È una trasformazione applicata alla distribuzione del modello sulle interpretazioni — un operatore che amplifica alcune letture del compito, ne sopprime altre e mescola il resto. Tutto il lavoro della skill è aiutare chi progetta a scegliere quelle trasformazioni in modo deliberato, così che un prompt si assembli come un circuito, sezione dopo sezione giustificata, invece di essere tarato per superstizione.","Watch each prompt section act as an operator on the task — amplifying some readings, filtering out others, mixing the rest — instead of just stacking strings of text.":"Osserva ogni sezione del prompt agire come operatore sul compito — amplificando certe letture, filtrandone altre, mescolando il resto — invece di limitarsi ad accatastare stringhe di testo.","An operator has a profile — the readings it amplifies, the ones it suppresses, and the ones it mixes. Collapse is set apart: it is the measurement act, where the prompt commits to a single reading.":"Un operatore ha un profilo — le letture che amplifica, quelle che sopprime e quelle che mescola. Il Collasso è a sé: è l’atto di misura, in cui il prompt si impegna su una singola lettura.","Operator profile":"Profilo operatore","Measurement":"Misura","Amplify":"Amplifica","Suppress":"Sopprimi","Mix":"Mescola","Collapse":"Collasso","Constructive interference. Amplifies a specific semantic interpretation while preserving superposition.":"Interferenza costruttiva. Amplifica una specifica interpretazione semantica preservando la sovrapposizione.","Destructive interference. Filters out noise and suppresses off-domain interpretations.":"Interferenza distruttiva. Filtra il rumore e sopprime le interpretazioni fuori dominio.","Entangles logic. Combines multiple basis states into a novel, hybrid reading.":"Intreccia la logica. Combina più stati di base in una lettura nuova e ibrida.","Measurement. Forces deterministic convergence onto a single, unambiguous interpretation.":"Misura. Forza una convergenza deterministica su una singola interpretazione univoca.","Learn More":"Scopri di più","Â PROJECTS the state":"Â PROIETTA lo stato","Ŝ FILTERS noise":"Ŝ FILTRA il rumore","M̂ ENTANGLES logic":"M̂ INTRECCIA la logica","B̂ COLLAPSES possibilities":"B̂ COLLASSA le possibilità","What It Actually Does":"Che cosa fa davvero","Three capabilities, one substrate":"Tre capacità, un solo substrato","The skill exposes three capabilities, one per mode. They share a substrate of reference knowledge but run different procedures.":"La skill espone tre capacità, una per modalità. Condividono un substrato di conoscenza di riferimento ma eseguono procedure diverse.","Mode 01 · Default":"Modalità 01 · Predefinita","From-scratch design":"Progettazione da zero","Given only a task description, the framework produces a prompt through six ordered phases: it infers which of seven structural skeletons fits, runs an adaptive interview to recover the constraints an operator needs, drafts the prompt as a sequence of named operators, audits that draft against a structural-and-quantum checklist, scores it honestly on three axes, and delivers it with a verifier. The ordering is load-bearing, because operators do not commute.":"Data solo la descrizione di un compito, il framework produce un prompt attraverso sei fasi ordinate: deduce quale dei sette scheletri strutturali si adatta, conduce un’intervista adattiva per recuperare i vincoli di cui un operatore ha bisogno, redige il prompt come sequenza di operatori nominati, verifica quella bozza rispetto a una checklist strutturale e quantistica, la valuta con onestà su tre assi e la consegna con un verificatore. L’ordine è portante, perché gli operatori non commutano.","6 ordered phases":"6 fasi ordinate","See the six phases →":"Vedi le sei fasi →","shape inference":"inferenza della forma","ships with a verifier":"consegnato con verificatore","Mode 02 · Refactor":"Modalità 02 · Refactor","Refactor an existing prompt":"Rifattorizza un prompt esistente","Given a prompt you already have, the framework recovers its intent and then takes one of three sub-modes by risk. Mode A audits only, returning a report with zero edits and near-zero risk. Mode B localizes a named symptom to its operator-level cause and proposes a surgical diff. Mode C rewrites wholesale using the from-scratch drafting machinery, preserving the original and presenting both with an explicit trade-off analysis.":"Dato un prompt che hai già, il framework ne recupera l’intento e poi adotta una di tre sotto-modalità in base al rischio. La Modalità A verifica soltanto, restituendo un report con zero modifiche e rischio quasi nullo. La Modalità B localizza un sintomo indicato alla sua causa a livello di operatore e propone una diff chirurgica. La Modalità C riscrive per intero con la macchina di stesura da zero, preservando l’originale e presentando entrambi con un’analisi esplicita dei compromessi.","A · audit":"A · verifica","B · surgical diff":"B · diff chirurgica","C · rewrite":"C · riscrittura","Mode 03 · Lifecycle":"Modalità 03 · Ciclo di vita","Manage an agent over its lifetime":"Gestisci un agente lungo il suo ciclo di vita","Given a managed-agent package — a directory that is the agent's identity — the framework runs a MAPE-K loop over it. Monitor reconstructs the distribution the current prompt induces from recent runs; Analyze keeps candidate adaptations in weighted superposition and prunes the ones the ledger says already regressed; Plan collapses to a single edit; and Execute applies it at a controlled lifecycle seam, write-ahead-logged and reversible by snapshot. It is a build-time manager that reads run evidence and rewrites prompts.":"Dato un pacchetto-agente gestito — una cartella che è l’identità dell’agente — il framework vi esegue sopra un ciclo MAPE-K. Monitor ricostruisce, dalle esecuzioni recenti, la distribuzione indotta dal prompt attuale; Analyze mantiene gli adattamenti candidati in sovrapposizione pesata ed elimina quelli che il registro dà già per regrediti; Plan collassa su una singola modifica; ed Execute la applica a una giuntura controllata del ciclo di vita, con write-ahead log e reversibile tramite snapshot. È un gestore in fase di build che legge le prove delle esecuzioni e riscrive i prompt.","From-scratch delivery is not a fixed bundle. The pipeline can emit up to eight distinct artifacts, though most runs emit far fewer, and what ships is reported to the author as a scaffold-to-trigger list — the framework is built to justify its own additions rather than pad the delivery.":"La consegna da zero non è un pacchetto fisso. La pipeline può emettere fino a otto artefatti distinti, anche se la maggior parte delle esecuzioni ne emette molti meno, e ciò che viene consegnato è riportato all’autore come una lista scaffold-to-trigger — il framework è fatto per giustificare le proprie aggiunte invece di gonfiare la consegna.","The pipeline":"La pipeline","The Fabrication Cycle":"Il Ciclo di Fabbricazione","From-scratch design compiles a raw task into a delivered prompt, workflow, or agent across six ordered phases. Each phase hands its output to the next; only one edge ever runs backward.":"La progettazione da zero compila un compito grezzo in un prompt, workflow o agente consegnato attraverso sei fasi ordinate. Ogni fase passa il suo output alla successiva; un solo arco corre all’indietro.","Figure 2. The from-scratch pipeline. Data flows forward through the six phases; a single feedback edge returns a failing audit from Phase 4 back to Phase 3 for revision — the only loop in the pipeline.":"Figura 2. La pipeline da zero. I dati scorrono in avanti attraverso le sei fasi; un solo arco di retroazione riporta una verifica fallita dalla Fase 4 alla Fase 3 per la revisione — l’unico ciclo della pipeline.","Shape inference":"Inferenza della forma","Samples the raw request to classify it into one of the structural shapes and a strength tier — no routing questions asked. When the reading is clear enough, the framework commits and moves on.":"Campiona la richiesta grezza per classificarla in una delle forme strutturali e in un livello di robustezza — senza domande di instradamento. Quando la lettura è abbastanza chiara, il framework decide e prosegue.","Adaptive interview":"Intervista adattiva","A short, capped interview recovers what an operator needs — the runtime it will run on and the definition of done — and closes with a summary the author can correct.":"Un’intervista breve e limitata recupera ciò di cui un operatore ha bisogno — il runtime su cui girerà e la definizione di ‘fatto’ — e si chiude con un riepilogo che l’autore può correggere.","Operator drafting":"Stesura degli operatori","Drafts the prompt as an ordered sequence of operators from the catalog — sections that amplify, suppress, or mix readings. The order is load-bearing: a later operator depends on what an earlier one selected.":"Redige il prompt come sequenza ordinata di operatori dal catalogo — sezioni che amplificano, sopprimono o mescolano letture. L’ordine è portante: un operatore successivo dipende da ciò che uno precedente ha selezionato.","Quantum audit":"Verifica quantistica","Audits the draft against the framework's structural and measurement checklists. A failing audit is the pipeline's one loop back — it returns the draft to drafting for revision.":"Verifica la bozza rispetto alle checklist strutturali e di misura del framework. Una verifica fallita è l’unico ciclo all’indietro della pipeline — riporta la bozza alla stesura per la revisione.","Self-evaluation":"Autovalutazione","Scores the result honestly on three axes — token economy, task fit, and operator coherence — and confirms no unused scaffolding slipped into the draft.":"Valuta il risultato con onestà su tre assi — economia dei token, aderenza al compito e coerenza degli operatori — e conferma che nessuna impalcatura inutilizzata sia finita nella bozza.","Delivery":"Consegna","Delivers the prompt with a verifier specification and, where it applies, a ready-to-run verifier — emitted as plain blocks, changing nothing on disk.":"Consegna il prompt con la specifica di un verificatore e, dove si applica, un verificatore pronto all’uso — emessi come blocchi semplici, senza modificare nulla su disco.","Grounded in the research":"Radicato nella ricerca","Prompts as operators":"Prompt come operatori","Modular reasoning scaffold":"Impalcatura di ragionamento modulare","Why structure works":"Perché la struttura funziona","Self-adaptive lifecycle":"Ciclo di vita auto-adattivo","Right altitude, examples over rules":"Giusta altitudine, esempi più che regole","Get started":"Inizia subito","Drop it in. It routes itself.":"Basta installarla. Si attiva da sola.","No build step, no dependencies. Place the skill folder on your agent’s search path and Prometheus auto-triggers the moment you describe a prompt-design task.":"Nessuna compilazione, nessuna dipendenza. Copia la cartella della skill nel percorso di ricerca del tuo agente e Prometheus si attiva da sé non appena descrivi un compito di progettazione di un prompt.","# drop the skill onto the search path":"# metti la skill nel search path","# then just describe the prompt you need":"# poi descrivi il prompt che ti serve","design a prompt for a support agent":"progetta un prompt per un agente di supporto","No build step":"Nessuna compilazione","No dependencies":"Nessuna dipendenza","Auto-triggers on intent":"Si attiva sull’intento","MIT-licensed":"Con licenza MIT","Installation Guide":"Guida all’installazione","Built for high-fidelity prompt engineering. Transforming intent into rigorous structural instructions.":"Creato per il prompt engineering ad alta fedeltà. Trasforma l’intento in istruzioni strutturali rigorose.","Resources":"Risorse","Full Documentation":"Documentazione completa","Fabrication Cycle":"Ciclo di Fabbricazione","Scaffold-to-trigger list":"Lista scaffold-to-trigger","Framework Files":"File del framework","Core System":"Sistema centrale","Shapes & Drafting":"Forme e stesura","Reasoning Patterns":"Schemi di ragionamento","Manage Mode":"Modalità gestione","Verification":"Verifica","© 2026 Prometheus. Built for high-fidelity prompt engineering.":"© 2026 Prometheus. Creato per il prompt engineering ad alta fedeltà."};
   var HTML_IT = {"nnCap":"<span class=\"nn-cap-dot\" aria-hidden=\"true\"></span>Tre strati, una sola rete &mdash; scorri per comporla. Prompt, agenti, valutatori: ogni artefatto che Prometheus produce \u00e8 un nodo nello stesso modello a operatori.",
-"alHint":"Clicca per vedere come funziona un agente","opsLabPrinc":"Quindi, in pratica","evMwA":"l’agente esegue","evMwB":"Prometheus gestisce — nello stesso momento","evEyebrow":"Omoiconicità &middot; evoluzione guidata","evH":"La natura di un agente è il suo testo","evLead":"L’idea prende <em>ispirazione</em> dall’omoiconicità &mdash; dove un programma e i suoi dati condividono una stessa forma. Qui non lo è alla lettera, ma lo è nello spirito: in un runtime agentico un agente è in larga parte il testo che lo definisce &mdash; il suo system prompt, le sue specifiche di task, la sua memoria. Prometheus lo esegue, osserva cosa è successo davvero e ne riscrive il testo tra un’esecuzione e l’altra. Ogni generazione viene selezionata per una fitness più alta: l’evoluzione applicata al codice sorgente dell’agente stesso.","evRuntime":"agente · in esecuzione","evFitLab":"fitness","evGenome":"Prometheus · gestione","evMgr":"Prometheus riscrive &uarr;","evNote":"Nessun riaddestramento. L’agente evolve perché vengono riscritti gli artefatti che lo <em>definiscono</em> &mdash; lo stesso testo che il runtime esegue è il testo che Prometheus modifica.","alBorn":"Nasce — da operatori ordinati","alGrows":"Cresce — agisce nel mondo","alLearns":"Impara — dalle proprie esecuzioni","lcHub":"un agente, in evoluzione","livingEyebrow":"Come migliora un agente","livingLead":"Un agente non viene consegnato e dimenticato. Gira; poi, <strong>tra le esecuzioni</strong>, Prometheus legge cosa è successo e lo ri-forgia — una versione alla volta.","livT1":"Esecuzione","livS1":"l’agente agisce su un compito reale, lasciando traccia di come si è comportato","livT2":"Lettura","livS2":"tra le esecuzioni legge quelle evidenze — senza mai giudicare da una sola","livT3":"Diagnosi","livS3":"individua la deriva e valuta le correzioni candidate","livT4":"Ri-forgiatura","livS4":"riscrive il piano di controllo — prompt, strumenti, conoscenza","livingReturn":"l’agente migliorato gira di nuovo — nulla va mai perso","alMyth":"Come il Titano Prometeo plasmò l’umanità e le diede il fuoco per restare viva, Prometheus forgia gli agenti &mdash; e consegna loro la struttura che li tiene vivi.","alTitle":"Un agente, forgiato e mantenuto vivo","alLead":"Prometheus <strong class=\"text-on-surface font-normal\">costruisce</strong> l’agente da operatori ordinati, poi resta come suo <strong class=\"text-on-surface font-normal\">manager</strong> &mdash; osserva ogni esecuzione e ri-forgia l’agente perché continui a crescere.","livingLead":"Prometheus non consegna un agente e se ne va. In modalità gestione veglia su un <strong class=\"text-on-surface font-normal\">agente vivo</strong> &mdash; legge come si comporta davvero attraverso le esecuzioni, diagnostica le derive e riscrive il suo stesso prompt, strumenti e memoria tra un’esecuzione e l’altra, così che l’agente diventi <strong class=\"text-on-surface font-normal\">più acuto per tutta la sua vita</strong>. Auto-adattivo, guidato dalle evidenze e in costante miglioramento.","livingFoot":"Sempre <strong class=\"text-on-surface/90 font-normal\">tra un’esecuzione e l’altra</strong>, mai guidando l’agente dal vivo: Prometheus possiede il piano di controllo; l’agente conserva la propria memoria persistente.","delLead":"Prometheus non si limita a scrivere un prompt e fermarsi. Lo stesso modello a operatori si compila in ciò di cui il compito ha davvero bisogno &mdash; ed è nato fin dall’inizio per dare vita a veri <strong class=\"text-on-surface font-normal\">agenti</strong> e <strong class=\"text-on-surface font-normal\">flussi di lavoro agentici</strong>, non solo a istruzioni singole.","fabLoop":"<span class=\"material-symbols-outlined\" aria-hidden=\"true\">u_turn_left</span> Un passo della linea corre all’indietro: quando la <strong class=\"text-on-surface font-normal\">Verifica&nbsp;(04)</strong> fallisce, la bozza rientra alla <strong class=\"text-on-surface font-normal\">Stesura&nbsp;(03)</strong> per un altro giro &mdash; l’unico arco inverso della pipeline.","opsLabOld":"La vecchia idea","opsOld":"Un prompt è una <strong class=\"text-on-surface font-normal\">chiave</strong> &mdash; le parole giuste, nell’ordine giusto, che dovrebbero sbloccare una risposta nascosta tenuta da parte dal modello. Si dà per scontato che il significato sia già dentro il modello, in attesa di essere recuperato.","opsLabNew":"Prometheus prende alla lettera l’opposto","opsNew":"Il significato è <strong class=\"font-semibold\">costruito dal contesto, non recuperato</strong>. Perciò una sezione del prompt non è un indizio &mdash; è un <strong class=\"font-semibold\">operatore</strong> che amplifica certe letture del compito, ne sopprime altre e mescola il resto.","opsSolve":"<strong class=\"text-on-surface font-normal\">Il principio dell’operatore.</strong> Tratta il prompt come un <em>operatore</em> che agisce sulla distribuzione del modello sulle interpretazioni. Ogni sezione è una trasformazione &mdash; amplifica, sopprime o mescola le letture del compito &mdash; e poiché questi operatori non commutano, l&rsquo;ordine è portante. Componile con intenzione, verifica la composizione contro i modi di fallimento noti, e l&rsquo;output diventa misurabile e riproducibile invece di un campione fortunato.","opsP1":"\n    Il problema dell’approccio a trucchi e scorciatoie è che tratta il prompt come una chiave: le parole giuste, nell’ordine giusto, dovrebbero sbloccare una risposta corretta e nascosta che il modello teneva da parte fin dall’inizio. Quell’immagine dà per scontato, in sordina, che il significato sia già dentro il modello, in attesa di essere recuperato. Prometheus prende alla lettera, e non come metafora, l’affermazione opposta — che nel modello linguistico il significato è <strong class=\"text-on-surface font-normal\">costruito dal contesto, non recuperato da esso</strong>. Non c’è una risposta dietro la porta; c’è solo la distribuzione da cui il modello sta per campionare, e il contesto che la plasma.\n","opsP3":"\n    Il problema che risolve è quindi la <strong class=\"text-on-surface font-normal\">costruzione disciplinata dei prompt</strong>: dato un compito, produrre un prompt nella forma strutturale giusta, con ogni sezione giustificata come operatore, verificata rispetto ai modi di fallimento noti, valutata con onestà e consegnata con un verificatore eseguibile. I suoi utenti sono chi costruisce agenti e sistemi di prompt e vuole rigore e tracciabilità invece che sensazioni — e accetta di sentirsi contraddire quando una richiesta produrrebbe un prompt peggiore.\n","fabBody":"\nUn compito entra in <strong class=\"text-on-surface font-normal\">Forma</strong>, dove viene classificato in una forma strutturale e in un livello di robustezza. Quei fatti confluiscono nell’<strong class=\"text-on-surface font-normal\">Intervista</strong>, che recupera il runtime e la definizione di ‘fatto’. La <strong class=\"text-on-surface font-normal\">Stesura</strong> dispone il prompt come operatori ordinati, la <strong class=\"text-on-surface font-normal\">Verifica</strong> controlla quella bozza, la <strong class=\"text-on-surface font-normal\">Valutazione</strong> la giudica con onestà e la <strong class=\"text-on-surface font-normal\">Consegna</strong> la spedisce con un verificatore. L’ordine non può essere rimescolato: il significato di un operatore successivo dipende dalla lettura che uno precedente ha già selezionato.\n"};
+"alHint":"Guarda come funziona un agente","opsLabPrinc":"Quindi, in pratica","evMwA":"l’agente esegue","evMwB":"Prometheus gestisce — nello stesso momento","evEyebrow":"Omoiconicità &middot; evoluzione guidata","evH":"La natura di un agente è il suo testo","evLead":"L’idea prende <em>ispirazione</em> dall’omoiconicità &mdash; dove un programma e i suoi dati condividono una stessa forma. Qui non lo è alla lettera, ma lo è nello spirito: in un runtime agentico un agente è in larga parte il testo che lo definisce &mdash; il suo system prompt, le sue specifiche di task, la sua memoria. Prometheus lo esegue, osserva cosa è successo davvero e ne riscrive il testo tra un’esecuzione e l’altra. Ogni generazione viene selezionata per una fitness più alta: l’evoluzione applicata al codice sorgente dell’agente stesso.","evRuntime":"agente · in esecuzione","evFitLab":"fitness","evGenome":"Prometheus · gestione","evMgr":"Prometheus riscrive &uarr;","evNote":"Nessun riaddestramento. L’agente evolve perché vengono riscritti gli artefatti che lo <em>definiscono</em> &mdash; lo stesso testo che il runtime esegue è il testo che Prometheus modifica.","alBorn":"Nasce — da operatori ordinati","alGrows":"Cresce — agisce nel mondo","alLearns":"Impara — dalle proprie esecuzioni","lcHub":"un agente, in evoluzione","livingEyebrow":"Come migliora un agente","livingLead":"Un agente non viene consegnato e dimenticato. Gira; poi, <strong>tra le esecuzioni</strong>, Prometheus legge cosa è successo e lo ri-forgia — una versione alla volta.","livT1":"Esecuzione","livS1":"l’agente agisce su un compito reale, lasciando traccia di come si è comportato","livT2":"Lettura","livS2":"tra le esecuzioni legge quelle evidenze — senza mai giudicare da una sola","livT3":"Diagnosi","livS3":"individua la deriva e valuta le correzioni candidate","livT4":"Ri-forgiatura","livS4":"riscrive il piano di controllo — prompt, strumenti, conoscenza","livingReturn":"l’agente migliorato gira di nuovo — nulla va mai perso","alMyth":"Come il Titano Prometeo plasmò l’umanità e le diede il fuoco per restare viva, Prometheus forgia gli agenti &mdash; e consegna loro la struttura che li tiene vivi.","alTitle":"Un agente, forgiato e mantenuto vivo","alLead":"Prometheus <strong class=\"text-on-surface font-normal\">costruisce</strong> l’agente da operatori ordinati, poi resta come suo <strong class=\"text-on-surface font-normal\">manager</strong> &mdash; osserva ogni esecuzione e ri-forgia l’agente perché continui a crescere.","livingLead":"Prometheus non consegna un agente e se ne va. In modalità gestione veglia su un <strong class=\"text-on-surface font-normal\">agente vivo</strong> &mdash; legge come si comporta davvero attraverso le esecuzioni, diagnostica le derive e riscrive il suo stesso prompt, strumenti e memoria tra un’esecuzione e l’altra, così che l’agente diventi <strong class=\"text-on-surface font-normal\">più acuto per tutta la sua vita</strong>. Auto-adattivo, guidato dalle evidenze e in costante miglioramento.","livingFoot":"Sempre <strong class=\"text-on-surface/90 font-normal\">tra un’esecuzione e l’altra</strong>, mai guidando l’agente dal vivo: Prometheus possiede il piano di controllo; l’agente conserva la propria memoria persistente.","delLead":"Prometheus non si limita a scrivere un prompt e fermarsi. Lo stesso modello a operatori si compila in ciò di cui il compito ha davvero bisogno &mdash; ed è nato fin dall’inizio per dare vita a veri <strong class=\"text-on-surface font-normal\">agenti</strong> e <strong class=\"text-on-surface font-normal\">flussi di lavoro agentici</strong>, non solo a istruzioni singole.","fabLoop":"<span class=\"material-symbols-outlined\" aria-hidden=\"true\">u_turn_left</span> Un passo della linea corre all’indietro: quando la <strong class=\"text-on-surface font-normal\">Verifica&nbsp;(04)</strong> fallisce, la bozza rientra alla <strong class=\"text-on-surface font-normal\">Stesura&nbsp;(03)</strong> per un altro giro &mdash; l’unico arco inverso della pipeline.","opsLabOld":"La vecchia idea","opsOld":"Un prompt è una <strong class=\"text-on-surface font-normal\">chiave</strong> &mdash; le parole giuste, nell’ordine giusto, che dovrebbero sbloccare una risposta nascosta tenuta da parte dal modello. Si dà per scontato che il significato sia già dentro il modello, in attesa di essere recuperato.","opsLabNew":"Prometheus prende alla lettera l’opposto","opsNew":"Il significato è <strong class=\"font-semibold\">costruito dal contesto, non recuperato</strong>. Perciò una sezione del prompt non è un indizio &mdash; è un <strong class=\"font-semibold\">operatore</strong> che amplifica certe letture del compito, ne sopprime altre e mescola il resto.","opsSolve":"<strong class=\"text-on-surface font-normal\">Il principio dell’operatore.</strong> Tratta il prompt come un <em>operatore</em> che agisce sulla distribuzione del modello sulle interpretazioni. Ogni sezione è una trasformazione &mdash; amplifica, sopprime o mescola le letture del compito &mdash; e poiché questi operatori non commutano, l&rsquo;ordine è portante. Componile con intenzione, verifica la composizione contro i modi di fallimento noti, e l&rsquo;output diventa misurabile e riproducibile invece di un campione fortunato.","opsP1":"\n    Il problema dell’approccio a trucchi e scorciatoie è che tratta il prompt come una chiave: le parole giuste, nell’ordine giusto, dovrebbero sbloccare una risposta corretta e nascosta che il modello teneva da parte fin dall’inizio. Quell’immagine dà per scontato, in sordina, che il significato sia già dentro il modello, in attesa di essere recuperato. Prometheus prende alla lettera, e non come metafora, l’affermazione opposta — che nel modello linguistico il significato è <strong class=\"text-on-surface font-normal\">costruito dal contesto, non recuperato da esso</strong>. Non c’è una risposta dietro la porta; c’è solo la distribuzione da cui il modello sta per campionare, e il contesto che la plasma.\n","opsP3":"\n    Il problema che risolve è quindi la <strong class=\"text-on-surface font-normal\">costruzione disciplinata dei prompt</strong>: dato un compito, produrre un prompt nella forma strutturale giusta, con ogni sezione giustificata come operatore, verificata rispetto ai modi di fallimento noti, valutata con onestà e consegnata con un verificatore eseguibile. I suoi utenti sono chi costruisce agenti e sistemi di prompt e vuole rigore e tracciabilità invece che sensazioni — e accetta di sentirsi contraddire quando una richiesta produrrebbe un prompt peggiore.\n","fabBody":"\nUn compito entra in <strong class=\"text-on-surface font-normal\">Forma</strong>, dove viene classificato in una forma strutturale e in un livello di robustezza. Quei fatti confluiscono nell’<strong class=\"text-on-surface font-normal\">Intervista</strong>, che recupera il runtime e la definizione di ‘fatto’. La <strong class=\"text-on-surface font-normal\">Stesura</strong> dispone il prompt come operatori ordinati, la <strong class=\"text-on-surface font-normal\">Verifica</strong> controlla quella bozza, la <strong class=\"text-on-surface font-normal\">Valutazione</strong> la giudica con onestà e la <strong class=\"text-on-surface font-normal\">Consegna</strong> la spedisce con un verificatore. L’ordine non può essere rimescolato: il significato di un operatore successivo dipende dalla lettura che uno precedente ha già selezionato.\n"};
   var HEADLINE = {"en":"Meaning isn’t retrieved.<br><span class=\"text-shimmer\">It’s constructed.</span><span class=\"typing-cursor\"></span>","it":"Il significato non si recupera.<br><span class=\"text-shimmer\">Si costruisce.</span><span class=\"typing-cursor\"></span>"};
   var META = {"title":{"en":"Prometheus — disciplined prompt engineering for LLM agents","it":"Prometheus — prompt engineering disciplinato per agenti LLM"},"desc":{"en":"Prometheus turns one sentence of intent into an auditable, scored prompt — shipped with a verifier. A prompt-engineering skill for LLM agents that treats every prompt section as an operator.","it":"Prometheus trasforma una frase d’intento in un prompt verificabile e valutato — consegnato con un verificatore. Una skill di prompt engineering per agenti LLM che tratta ogni sezione del prompt come un operatore."}};
   function norm(x){ return (x||'').replace(/\u00a0/g,' ').replace(/\s+/g,' ').trim(); }
@@ -2556,5 +2813,71 @@ A task enters at <strong class="text-on-surface font-normal">Shape</strong>, whe
   stage.addEventListener('click',reveal);
   stage.addEventListener('keydown',function(e){ if(e.key==='Enter'||e.key===' '){e.preventDefault();reveal();} });
 })();</script>
+<script>
+(function(){
+  var IT=function(){return window.__promLang==='it';};
+  function build(rail){
+    if(rail.dataset.mrail) return;
+    rail.dataset.mrail='1';
+    rail.classList.add('mrail');
+    var kids=[].filter.call(rail.children,function(c){return c.nodeType===1;});
+    if(kids.length<2) return;
+    var wrap=document.createElement('div'); wrap.className='mrail-wrap';
+    rail.parentNode.insertBefore(wrap,rail);
+    var dots=document.createElement('div'); dots.className='mrail-dots'; dots.setAttribute('role','tablist');
+    wrap.appendChild(rail); wrap.appendChild(dots);
+    kids.forEach(function(k,i){
+      var b=document.createElement('button'); b.type='button'; b.className='mrail-dot'+(i?'':' on');
+      b.innerHTML='<i></i>'; b.setAttribute('aria-label','Item '+(i+1));
+      b.addEventListener('click',function(){
+        rail.scrollTo({left:k.offsetLeft-rail.offsetLeft-((rail.clientWidth-k.offsetWidth)/2),behavior:'smooth'});
+      });
+      dots.appendChild(b);
+    });
+    var ds=[].slice.call(dots.children), t;
+    function edges(){
+      var max=rail.scrollWidth-rail.clientWidth;
+      wrap.classList.toggle('more-left',rail.scrollLeft>6);
+      wrap.classList.toggle('more-right',rail.scrollLeft<max-6);
+    }
+    rail.addEventListener('scroll',function(){
+      wrap.classList.add('touched'); edges();
+      clearTimeout(t); t=setTimeout(function(){
+        var mid=rail.scrollLeft+rail.clientWidth/2, best=0, bd=1e9;
+        kids.forEach(function(k,i){
+          var c=k.offsetLeft-rail.offsetLeft+k.offsetWidth/2, d=Math.abs(c-mid);
+          if(d<bd){bd=d;best=i;}
+        });
+        ds.forEach(function(d,i){d.classList.toggle('on',i===best);});
+      },60);
+    },{passive:true});
+    edges(); window.addEventListener('resize',edges);
+    // measured at boot the rail may still be 0px wide, which reads as
+    // "nothing to scroll"; re-measure when it actually gains a size
+    if('ResizeObserver' in window){ new ResizeObserver(edges).observe(rail); }
+    if('IntersectionObserver' in window){
+      var io=new IntersectionObserver(function(es){
+        es.forEach(function(e){ if(e.isIntersecting) edges(); });
+      },{threshold:.2});
+      io.observe(wrap);
+    }
+    relabel();
+  }
+  function relabel(){
+    var t=IT()?'scorri per confrontare':'swipe to compare';
+    [].forEach.call(document.querySelectorAll('.mrail-hint-t'),function(e){e.textContent=t;});
+  }
+  function boot(){
+    var sels=['.ops-cycle','.fab-rail'];
+    sels.forEach(function(s){ var el=document.querySelector(s); if(el) build(el); });
+    // the three mode cards: the grid that holds them
+    var m=document.getElementById('modes');
+    if(m){ var g=m.querySelector('.grid'); if(g) build(g); }
+    relabel();
+  }
+  if(document.readyState!=='loading') boot(); else document.addEventListener('DOMContentLoaded',boot);
+  var _al=window.__afterLang; window.__afterLang=function(l){ if(_al) try{_al(l);}catch(e){} setTimeout(relabel,80); };
+})();
+</script>
 </body>
 </html>
