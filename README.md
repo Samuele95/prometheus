@@ -10,10 +10,17 @@ each shipped with a verifier that proves it works.
 
 <p>
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-ff7a2f?style=flat-square"></a>
-  <a href="https://github.com/Samuele95/prometheus/releases/latest"><img alt="Latest release" src="https://img.shields.io/github/v/release/Samuele95/prometheus?style=flat-square&color=ff7a2f&label=release"></a>
-  <a href="https://github.com/Samuele95/prometheus/stargazers"><img alt="Stars" src="https://img.shields.io/github/stars/Samuele95/prometheus?style=flat-square&color=4a4550"></a>
+  <a href="https://github.com/Samuele95/prometheus/releases/latest"><img alt="Latest release" src="https://img.shields.io/github/v/release/Samuele95/prometheus?style=flat-square&color=ff7a2f&logo=github&label=release"></a>
+  <a href="https://github.com/Samuele95/prometheus/stargazers"><img alt="Stars" src="https://img.shields.io/github/stars/Samuele95/prometheus?style=flat-square&color=4a4550&logo=github"></a>
   <img alt="Dependencies: none" src="https://img.shields.io/badge/dependencies-none-4a4550?style=flat-square">
   <img alt="Runs at build time" src="https://img.shields.io/badge/runs-build--time-4a4550?style=flat-square">
+</p>
+
+<p><sub><b>Works with</b></sub><br>
+  <img alt="Claude Code" src="https://img.shields.io/badge/Claude_Code-3a3340?style=flat-square&logo=anthropic&logoColor=e8853f">
+  <img alt="OpenAI Codex" src="https://img.shields.io/badge/Codex-3a3340?style=flat-square&logo=openai&logoColor=e8853f">
+  <img alt="Cursor" src="https://img.shields.io/badge/Cursor-3a3340?style=flat-square&logo=cursor&logoColor=e8853f">
+  <img alt="Gemini Gem" src="https://img.shields.io/badge/Gemini_Gem-3a3340?style=flat-square&logo=googlegemini&logoColor=e8853f">
 </p>
 
 <p>
@@ -30,45 +37,46 @@ each shipped with a verifier that proves it works.
 > finding magic words — you *construct* it, section by justified section, the way you
 > build a circuit. Agents and workflows are just the largest things you build that way.
 
-<div align="center">
-  <img src="assets/card-01.png" width="32%" alt="Three modes: from-scratch, refactor, manage">
-  <img src="assets/card-02.png" width="32%" alt="Six phases: shape, interview, draft, audit, score, deliver">
-  <img src="assets/card-03.png" width="32%" alt="Always verified: static, single-run, cross-run">
-</div>
+## At a glance
 
----
-
-## Contents
+Three pillars, each with its own section below — click a card to jump.
 
 <table>
 <tr>
-<td valign="top">
+<td width="33%" valign="top" align="center">
+  <a href="#three-modes"><img src="assets/card-01.png" alt="Three modes: from-scratch, refactor, manage"></a>
+  <br><b><a href="#three-modes">Three modes →</a></b>
+  <br><sub>Build from scratch, refactor, or manage a live agent.</sub>
+</td>
+<td width="33%" valign="top" align="center">
+  <a href="#the-fabrication-cycle"><img src="assets/card-02.png" alt="Six phases: shape, interview, draft, audit, score, deliver"></a>
+  <br><b><a href="#the-fabrication-cycle">Six phases →</a></b>
+  <br><sub>Shape → interview → draft → audit → score → deliver.</sub>
+</td>
+<td width="33%" valign="top" align="center">
+  <a href="#verification"><img src="assets/card-03.png" alt="Always verified: static, single-run, cross-run"></a>
+  <br><b><a href="#verification">Always verified →</a></b>
+  <br><sub>Static, single-run, and cross-run checks on every artifact.</sub>
+</td>
+</tr>
+</table>
+
+<details>
+<summary>Contents</summary>
 
 - [⚡ Quick start](#-quick-start)
 - [What it is](#what-it-is)
 - [What it builds](#what-it-builds)
-- [Three modes](#three-modes)
-
-</td>
-<td valign="top">
-
+- [Three modes](#three-modes) · [Manage mode (MAPE-K)](#manage-mode--a-mape-k-loop-over-a-live-agent)
 - [Core idea: prompts as operators](#core-idea-prompts-as-operators)
 - [The Fabrication Cycle](#the-fabrication-cycle)
 - [Verification](#verification)
-
-</td>
-<td valign="top">
-
 - [Install](#install)
 - [Repository layout](#repository-layout)
 - [Documentation](#documentation)
 - [License](#license)
 
-</td>
-</tr>
-</table>
-
----
+</details>
 
 ## ⚡ Quick start
 
@@ -102,15 +110,13 @@ Prometheus is a portable **agent skill** and a build-time engine for **agentic
 systems**. Give it an intent and it engineers the artifact end to end — a prompt, a
 **full agent**, or a **multi-step workflow** — audits it, scores it, and ships it with
 a verifier. It runs entirely at **build time**: it designs, audits, refactors, and
-*maintains* the things your agents are made of. It does not sit in your request path
-at runtime.
+*maintains* the things your agents are made of; it never sits in your request path at
+runtime.
 
-It is deliberately **not prompt-only**. A system prompt is the smallest thing it
-produces; a self-adaptive agent kept healthy across its lifetime is the largest.
-
-It's one always-loaded `SKILL.md` router (~22&nbsp;KB) plus a corpus of companion
-knowledge files pulled into context only at the step that needs them. No build step,
-no dependencies, MIT — and there's a **Gemini Gem** port for a filesystem-free runtime.
+It is deliberately **not prompt-only**: a system prompt is the smallest thing it
+produces; a self-adaptive agent kept healthy across its lifetime is the largest. One
+always-loaded `SKILL.md` router (~22&nbsp;KB) plus a companion corpus pulled into
+context only at the step that needs it. No build step, no dependencies, MIT.
 
 ## What it builds
 
@@ -119,30 +125,14 @@ into three layers, the way a network stacks: raw instructions in, **agents in th
 middle**, judgement on the way out.
 
 <div align="center">
-  <img src="assets/readme-layers.svg" alt="What Prometheus produces, as three stacked layers: prompts, generic agents, evaluators" width="100%">
+  <img src="assets/readme-layers.svg" width="100%" alt="Three layers. 01 Prompts: system prompts and single-call instructions, plus cognitive-tool scaffolds (a system prompt with ready-to-register tool definitions). 02 Agents & workflows: full agentic loops with persona, tool contracts and a memory discipline, plus multi-step agentic workflows with ordered stages, hand-offs and stop conditions. 03 Evaluators: LLM-as-judge graders, and a verifier shipped with every deliverable.">
 </div>
-
-<table>
-<tr><th align="left">Layer</th><th align="left">Output</th><th align="left">What it is</th></tr>
-<tr><td rowspan="2"><b>01 · Prompts</b></td><td><b>Prompts</b></td><td>System prompts and single-call instructions, drafted as ordered operators and scored before delivery.</td></tr>
-<tr><td><b>Cognitive-tool scaffolds</b></td><td>For hard multi-step reasoning: a system prompt plus ready-to-register tool definitions for your tool-calling runtime.</td></tr>
-<tr><td rowspan="2"><b>02 · Agents &amp; workflows</b></td><td><b>Agents</b></td><td>Full agentic loops — persona, tool contracts, and a memory discipline — designed to run over many turns against real tools.</td></tr>
-<tr><td><b>Agentic workflows</b></td><td>Multi-step pipelines and orchestration blueprints — ordered stages, hand-offs, and stop conditions — wiring several prompts into one system.</td></tr>
-<tr><td rowspan="2"><b>03 · Evaluators</b></td><td><b>Graders &amp; evaluators</b></td><td>LLM-as-judge rubrics with explicit, checkable criteria — for when the task is to score, not to generate.</td></tr>
-<tr><td><b>Verifiers</b></td><td>Every deliverable ships with a verifier spec across three layers, so you can prove the artifact does what it claims.</td></tr>
-</table>
 
 ## Three modes
 
 <div align="center">
-  <img src="assets/readme-modes.svg" alt="Three modes: from-scratch, refactor, manage" width="100%">
+  <img src="assets/readme-modes.svg" width="100%" alt="Three modes. From-scratch: design a new prompt, agent, or workflow from a description. Refactor: improve an existing one via audit-only (A), surgical diff (B), or wholesale rewrite (C). Manage: a MAPE-K loop that keeps a deployed agent healthy over its lifetime.">
 </div>
-
-| Mode | Use it to |
-|---|---|
-| **From-scratch** | Design a new prompt, agent, or workflow from a description. |
-| **Refactor** | Improve an existing prompt/agent — audit-only (A), surgical diff (B), or wholesale rewrite (C). |
-| **Manage** | Keep a **deployed agent** healthy over its lifetime with a MAPE-K loop. |
 
 ### Manage mode — a MAPE-K loop over a live agent
 
@@ -170,31 +160,31 @@ readings of the intent, suppresses others, and mixes the rest. Order is load-bea
 a later operator's meaning depends on the reading an earlier one already selected. One
 operator is set apart — **Collapse**, the measurement act, where the prompt commits to
 a single interpretation. Agents and workflows are assembled from the same operators,
-which is why the same discipline scales from a one-line instruction to a
-lifecycle-managed system.
+which is why the discipline scales from a one-line instruction to a lifecycle-managed
+system.
 
 <div align="center">
-  <img src="assets/readme-operators.svg" alt="A prompt as a stack of operators" width="82%">
+  <img src="assets/readme-operators.svg" width="82%" alt="A prompt drawn as a stack of operators acting on the raw task: Role & framing (amplify), Context operators (mix), Constraints (suppress), Reasoning scaffold (amplify), and Collapse (measure and commit to one reading). Order is load-bearing.">
 </div>
 
 ## The Fabrication Cycle
 
 From-scratch design compiles a raw task into a delivered artifact across six ordered
 phases. Data flows forward; a single feedback edge returns a failing audit from
-Phase&nbsp;4 to Phase&nbsp;3 for revision — the only loop in the pipeline.
+Phase&nbsp;4 to Phase&nbsp;3 — the only loop in the pipeline.
 
 <div align="center">
-  <img src="assets/readme-pipeline.svg" alt="The Fabrication Cycle: six phases with one audit-to-draft feedback edge" width="100%">
+  <img src="assets/readme-pipeline.svg" width="100%" alt="The Fabrication Cycle: six phases — Shape, Interview, Draft, Audit, Score, Deliver — with a single feedback edge from Audit back to Draft.">
 </div>
 
 | # | Phase | What it does |
 |:-:|-----------|-------------------------------------------------|
-| 1 | Shape     | Infer the structural shape and strength tier |
-| 2 | Interview | Recover the runtime and the definition of done |
-| 3 | Draft     | Lay out the artifact as ordered operators |
-| 4 | Audit     | Check the draft against the failure-mode checklists |
-| 5 | Score     | Rate token economy, task fit, operator coherence |
-| 6 | Deliver   | Ship the artifact with a verifier |
+| 1 | **Shape** | Infer the structural shape and strength tier |
+| 2 | **Interview** | Recover the runtime and the definition of done |
+| 3 | **Draft** | Lay out the artifact as ordered operators |
+| 4 | **Audit** | Check the draft against the failure-mode checklists |
+| 5 | **Score** | Rate token economy, task fit, operator coherence |
+| 6 | **Deliver** | Ship the artifact with a verifier |
 
 ## Verification
 
@@ -204,7 +194,7 @@ output or trajectory, and **cross-run** properties visible only across many. Cro
 is where agent regressions hide. A scaffold-to-trigger list records which capability is
 actually tested versus merely source-backed.
 
-For hard multi-step reasoning on a tool-calling runtime, Prometheus can emit a
+For hard multi-step reasoning on a tool-calling runtime, Prometheus can also emit a
 cognitive-tools scaffold: a system prompt plus four tool definitions you register in
 your own runtime.
 
@@ -242,7 +232,7 @@ prompt", or "manage this agent".
 Gemini has no filesystem and caps a Gem's knowledge base at ten files, so the framework
 is **ported**, not copied: the twenty-four source files are consolidated into one
 standing instruction plus eight knowledge files. See
-[`gem/GEM-DESCRIPTION.md`](gem/GEM-DESCRIPTION.md) for the port details, features, and
+[`gem/GEM-DESCRIPTION.md`](gem/GEM-DESCRIPTION.md) for port details, features, and
 limitations, and [`gem/en/setup-guide.md`](gem/en/setup-guide.md) to install.
 
 In short: create a Gem named **Prometheus**, paste `gem/en/gem-instructions.md` into its
@@ -267,7 +257,7 @@ CITATIONS.md     # every technique traced to a primary source
 ```
 
 The only script, `manage/replay-verifier.py`, imports nothing outside the Python
-standard library. There is no build step and nothing to install.
+standard library.
 
 ## Documentation
 
@@ -277,7 +267,7 @@ from `docs/`:
 
 <div align="center">
 
-**→ [Read the documentation](https://samuele95.github.io/prometheus/documentation-forge.html) ←**
+### [→ Read the documentation](https://samuele95.github.io/prometheus/documentation-forge.html)
 
 </div>
 
