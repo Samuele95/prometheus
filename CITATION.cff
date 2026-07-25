@@ -3,7 +3,7 @@ title: "Prometheus: a meta-prompting framework for agentic systems"
 message: "If you use this framework in your research, please cite it."
 type: software
 authors:
-  - name: "Samuele Stronati"
+  - name: "Samuele95"
 repository-code: "https://github.com/Samuele95/prometheus"
 url: "https://samuele95.github.io/prometheus/code-forge.html"
 abstract: >-

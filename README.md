@@ -279,4 +279,4 @@ you pick, so you can read what the model will read before installing.
 [MIT](LICENSE). Every technique is traced to a primary source in
 [CITATIONS.md](CITATIONS.md).
 
-<div align="center"><sub>Built by Samuele Stronati · <a href="https://samuele95.github.io/prometheus/">samuele95.github.io/prometheus</a></sub></div>
+<div align="center"><sub>Built by Samuele95 · <a href="https://samuele95.github.io/prometheus/">samuele95.github.io/prometheus</a></sub></div>
