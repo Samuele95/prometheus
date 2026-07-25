@@ -1,0 +1,54 @@
+name: Corpus defect
+description: The framework produced a bad prompt, contradicted itself, or gave wrong guidance.
+labels: ["defect"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This project is a prompt corpus. A "bug" is text that makes a model
+        behave worse. Show us the behaviour, not just the sentence you dislike.
+  - type: dropdown
+    id: runtime
+    attributes:
+      label: Runtime
+      options:
+        - Claude Code
+        - Gemini Gem
+        - OpenAI Codex
+        - Cursor
+        - opencode
+        - Other / generic LLM
+    validations:
+      required: true
+  - type: dropdown
+    id: mode
+    attributes:
+      label: Mode
+      options:
+        - From-scratch
+        - Refactor
+        - Manage
+        - Not sure
+    validations:
+      required: true
+  - type: textarea
+    id: request
+    attributes:
+      label: What you asked for
+      description: The task description you gave the framework.
+    validations:
+      required: true
+  - type: textarea
+    id: observed
+    attributes:
+      label: What it produced
+      description: Paste the relevant part of the output. Trim it, but do not paraphrase.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What it should have produced, and why
+      description: Point at the corpus file and section you believe is responsible.
+    validations:
+      required: true

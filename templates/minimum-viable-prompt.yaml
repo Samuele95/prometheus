@@ -1,0 +1,51 @@
+# Minimum-viable-prompt scaffold
+#
+# When to use this scaffold: the task is small, well-defined, and doesn't
+# warrant full shape-catalog selection. Fill what's needed, leave the rest
+# empty (don't pad). If you find yourself adding sections beyond these six,
+# the task probably wants a real shape from templates/shape-catalog.md.
+#
+# When NOT to use this scaffold: agentic loops, multi-stage workflows, system
+# personas, LLM-as-judge graders, or anything where the prompt's structure
+# itself is load-bearing. Those need their full shape spine.
+#
+# Slot order matters. System and instructions go first (strongest operators);
+# query goes last (terminal projection). Don't reorder unless you have a
+# specific reason.
+
+system: |
+  # Identity, role, persona. Strongest operator — sets the subspace
+  # everything else operates in. One sentence is often enough.
+  # Example: "You are a senior data engineer reviewing a CSV ingestion script."
+
+instructions: |
+  # The task itself. What you want the model to do.
+  # Specific enough to act on, flexible enough to adapt to the input.
+  # Avoid brittle if-else; avoid vague hand-waving.
+  # Example: "Identify any data integrity risks. For each, name the failure
+  # mode, the trigger condition, and a one-line mitigation."
+
+examples:
+  # Few-shot examples. Optional. Only if the task is non-trivial OR if rules
+  # alone won't capture the desired behavior.
+  # Each example: input + expected output. 2–5 is the right range.
+  - input: |
+      # Example input here.
+    output: |
+      # Expected output here.
+
+constraints:
+  # Hard rules. List as bullets. Each constraint is a separate operator;
+  # too many start to interfere destructively. Keep to 5 or fewer.
+  - "Constraint 1"
+  - "Constraint 2"
+
+state: |
+  # Persistent context the model needs but isn't part of this specific query.
+  # Empty for one-shot; populated for stateful interactions.
+  # Example: "The user is on a free tier with 100 requests/day."
+
+query: |
+  # The actual input to process. Goes last — it's the terminal projection,
+  # and the model's most-attended position is the end of the prompt.
+  # Example: "Here's the script: <code>"

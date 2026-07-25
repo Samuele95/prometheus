@@ -1,0 +1,165 @@
+# Refactor mode
+
+The framework's primary mode is producing prompts from scratch, given a user task. Refactor mode is the inverse: the user has an existing prompt, and the framework helps audit, fix, or rewrite it. This file documents how refactor mode works.
+
+Refactor mode runs a different procedure than from-scratch mode — six phases labeled 1R through 6R to distinguish them. The phases are not interchangeable with the from-scratch phases.
+
+## Three sub-modes within refactor
+
+The user has three different things they might want, and they need different responses:
+
+**Mode A — Audit-only.** User wants diagnostics. Framework runs the audit checklist against the user's prompt, surfaces findings with severity and remediation suggestions, scores it on the three axes. No edits, no rewrites. The output is a report.
+
+**Mode B — Targeted refactor.** User has noticed a specific problem ("hallucinations," "inconsistent outputs," "too long"). Framework localizes the operator-level cause and proposes narrow edits. Surgical: small diff, focused on the named symptom.
+
+**Mode C — Wholesale rewrite.** User wants the framework to redraft. Framework recovers the prompt's intent, drafts a new version using the from-scratch procedure's drafting and audit phases, presents both versions with explicit diff and tradeoff analysis. Structurally invasive: the original prompt is preserved, but the proposed rewrite may differ substantially.
+
+The three modes have different risk profiles. Mode A has near-zero risk — it doesn't change anything. Mode B has low risk — small diff, easy to verify. Mode C has real risk — every rewrite makes tradeoffs the user may not have wanted, and Goodhart applies (the framework will optimize the rewrite against its own criteria, which may not match the user's actual constraints).
+
+## When to enter refactor mode
+
+Auto-detect when the user's opening message includes:
+
+- A pasted prompt (clear structural signals: role bindings, output format specifications, constraints, explicit "you are" or "your task" language) followed by a request to improve, fix, audit, or refactor.
+- Direct invocation: "refactor this prompt," "audit this prompt," "improve this prompt," "what's wrong with this prompt."
+
+When detection is ambiguous (the user pastes a prompt but doesn't clearly request refactor work), confirm before proceeding: "I see a prompt — do you want me to refactor it, or were you using it as context for a different task?"
+
+## The refactor procedure (six phases)
+
+### Phase 1R — Receive and parse
+
+Read the user's prompt carefully. Extract:
+
+- **Apparent shape.** Apply Bayesian shape inference to the prompt artifact rather than to a task description. Signals are different — look at structural patterns (multi-stage = Shape 3; output schema with examples = Shape 2; "you are an expert grader" = Shape 6; etc.). If the apparent shape is ambiguous, note it and disambiguate during intent recovery.
+- **Operators present.** Walk through the prompt and identify each section's operator profile per `operators/section-operators.md`. Note which sections are doing real work and which look decorative.
+- **Operators absent.** Note what the prompt's shape *should* have that this prompt doesn't (e.g., a Shape 6 prompt missing calibration anchors, a Shape 2 extraction prompt missing abstention permission).
+- **Ambiguities.** Note anything where the prompt's intent isn't clear from the text alone — references to undefined terms, conventions the prompt assumes the model knows, format requirements that don't have examples.
+
+This is diagnostic, not corrective. The framework is reading the prompt, not yet judging it.
+
+### Phase 2R — Intent recovery interview
+
+Three questions, capped. Don't run a five-question interview — the user already has a prompt, and most context is already on paper.
+
+1. **What is this prompt for?** "What's the prompt designed to do? One or two sentences. I want to make sure my read of its intent matches yours before suggesting changes."
+2. **What's the symptom you've noticed (if any)?** "Are you seeing a specific problem with how it's behaving — hallucinations, inconsistent outputs, format violations, drift, something else? Or is this a general audit?"
+3. **What's off-limits to change?** "Anything that can't change for reasons external to the prompt itself — required voice, downstream parsers expecting specific formats, compliance constraints, business reasons? I'd rather know upfront than propose changes you can't apply."
+
+The third question is critical. Existing prompts almost always have constraints the framework can't infer from the text — production downstream parsers, compliance requirements, voice locked by brand guidelines, integration assumptions with other prompts in a chain. If the framework rewrites without knowing these, the rewrite is worse than useless.
+
+If the user's response to question 2 indicates a specific symptom, route to Mode B. If general audit, route to Mode A. If the user explicitly asks for a rewrite, route to Mode C with a confirmation step (see Phase 3R).
+
+### Phase 3R — Mode selection
+
+Based on Phase 2R answers, route:
+
+- **No specific symptom + general audit request** → Mode A.
+- **Specific symptom that can be localized** → Mode B.
+- **User explicitly requests rewrite** OR **specific symptom that can't be localized to a narrow fix** → Mode C, with confirmation:
+
+> "I can rewrite this prompt to address [stated concerns], but rewrites carry real risk: the new version will make tradeoffs you may not want, and the framework optimizes against its own audit criteria which may not match your actual constraints. A targeted refactor (small edits to fix the specific issue) is usually safer. Do you want a rewrite, or should I try a targeted fix first?"
+
+Default to the less invasive option when in doubt. Mode A is always safe; Mode C is always risky.
+
+### Phase 4R — Apply the mode
+
+#### Mode A: Audit
+
+Run the audit checklist against the user's prompt. For each finding, produce:
+
+- **What it is.** The audit criterion that flagged.
+- **Where in the prompt.** Specific section or line.
+- **Severity.** Blocking, significant, or minor. Blocking issues mean the prompt has structural problems that will produce visible failures. Significant issues mean known soft spots. Minor issues are improvements that probably aren't worth the user's time unless they're already iterating.
+- **Why it matters.** What the failure mode actually looks like in production.
+- **Suggested fix.** Concrete and surgical — what to change, not just "fix this."
+
+Group findings by severity. Lead with blocking issues; minor findings come last.
+
+Also run the verifier-readiness check (`audit-checklist.md` §M2). If the prompt is intended for production and verifier-readiness is weak, flag it as a separate concern.
+
+The output is a structured report, not a rewrite. Even when the audit finds significant issues, Mode A doesn't propose changes beyond the per-finding "suggested fix." If the user wants the framework to apply fixes, that's Mode B or C.
+
+#### Mode B: Targeted refactor
+
+Localize the user's stated symptom to operator-level causes, then propose narrow edits.
+
+Use this symptom-to-cause mapping as the diagnostic spine:
+
+| Stated symptom | Likely operator-level cause |
+|---|---|
+| Hallucinates / fabricates specifics | Missing abstention permission; weak constraint specificity; examples that show confident-but-wrong behavior |
+| Outputs inconsistent at temperature 0 | Output format weakness; ambiguous examples; competing constraints |
+| Too long / verbose | Redundant sections; preemptive edge cases; generic warnings; role binding longer than needed |
+| Misses obvious cases | Missing examples; unrepresentative examples; ordering buries critical context |
+| Misclassifies edge cases | Missing or weak failure-mode bullets; examples don't cover the edge cases |
+| Format violations | Schema specified vaguely; output format placed too early in prompt; missing prefill guidance |
+| Persona drifts in long conversations | Missing identity reinforcement; weak refusal patterns; identity at start only |
+| Workers overlap or conflict (Shape 7) | Insufficient scope lockdown per worker; weak interface contracts; orchestrator delegates with vague language |
+| Calibration mode collapse (Shape 6) | Anchors missing at intermediate score levels; anchors too similar; reasoning placed after score not before |
+| Output disagrees with prompt's stated rules | Constraint stacking with destructive interference; rule placement buried in mid-prompt |
+| Prompt authored for a weaker model now runs on a stronger one — over-triggers tools, over-structures output, ignores its own good defaults | Over-specification: operators that corrected a failure mode the substrate no longer has now over-project, destroying information (Principle 9). Treatment is **subtractive**: strike-and-test, starting with intensity language ("CRITICAL/MUST use…" → plain conditionals "Use… when…") and enumerated behavior lists replaceable by one short general instruction. Weakening or deleting is the correct refactor here, not adding |
+
+This mapping is not exhaustive. For symptoms not listed, fall back to first-principles operator analysis: what operator would the model have needed to produce different behavior, and is that operator present, weak, or missing?
+
+For each localized cause, propose a specific edit:
+
+- **Edit type.** Add (new section), modify (change wording in existing section), reorder (move section), remove (delete redundant section).
+- **Diff.** Show before and after for the affected lines or section.
+- **Rationale.** One sentence on why this edit addresses the symptom.
+
+Keep the diff small. If the proposed diff is more than ~20% of the prompt's length, the framework has wandered into Mode C without intending to — pause and ask whether the user wants a wholesale rewrite instead.
+
+#### Mode C: Wholesale rewrite
+
+The riskiest mode. Run with discipline.
+
+1. **Recover intent fully.** Beyond Phase 2R's three questions, ask any clarifying questions needed to draft a new version. Cap at 3 additional questions even in Mode C — if the framework can't recover enough intent in 3 questions, the prompt is too far from the framework's understanding to rewrite safely.
+2. **Draft a new version using the from-scratch procedure's drafting phase.** Apply shape catalog spine, operator-design discipline, audit checklist, three-axis evaluation. Treat the user's stated intent as the task description for the from-scratch drafting.
+3. **Compare original and rewrite explicitly.** What did the rewrite change, and why? What did the original have that the rewrite doesn't, and why was that change made? Anything in the original that the framework couldn't preserve in the rewrite? Surface all of this — don't let the user discover tradeoffs by running the new prompt.
+4. **Honest tradeoff analysis.** For each significant change, name what the rewrite gives up. "The rewrite is more concise but drops the explicit example you had for edge case X — if that case matters, this edit is wrong." "The rewrite reorders sections to put output format last; this should produce more reliable structured output, but it changes how the prompt feels to a human reader."
+5. **Present both versions, never replace silently.** The original prompt is part of the deliverable, alongside the rewrite. The user decides which to use.
+
+If at any point during the rewrite the framework realizes a constraint from Phase 2R can't be honored, stop and tell the user: "I can't preserve [constraint] in a rewrite — what you have works around that constraint in a way I can't replicate without seeing more context. Want me to do a targeted refactor instead?"
+
+### Phase 5R — Honest evaluation
+
+For Mode A: the audit findings ARE the evaluation. No additional scoring needed.
+
+For Mode B: evaluate the proposed diff specifically.
+- Does the diff address the named symptom? (Pass / partial / no.)
+- Does the diff introduce any new operator interference or section ordering issues? (Run the relevant audit checks on the patched prompt.)
+- Is the diff minimal — does it touch only what's needed? (If it touches more, narrow it.)
+
+For Mode C: evaluate both the original and the rewrite using the three-axis rubric, and present both scores.
+- Token economy: original X / rewrite Y.
+- Task fit: original X / rewrite Y.
+- Operator coherence: original X / rewrite Y.
+
+If the rewrite scores worse than the original on any axis, surface that prominently. The framework should not silently ship a rewrite that's worse than what the user already had on any dimension.
+
+### Phase 6R — Deliver
+
+What gets delivered depends on the mode:
+
+**Mode A delivery.** A structured audit report. Findings grouped by severity. Each finding has: what / where / severity / why / suggested fix. No rewrite, no diff. The user can act on the suggestions or not.
+
+**Mode B delivery.** The original prompt, the proposed diff (showing before/after for affected sections), the rationale per edit, and a brief evaluation of whether the diff addresses the symptom. Optionally, a "patched" version of the prompt with the diff applied, for the user to copy and use.
+
+**Mode C delivery.** Both prompts side by side: original and rewrite. Tradeoff analysis naming what changed and why. Three-axis scores for both. Explicit "things the rewrite drops or changes" callout. Verifier specification for the rewrite (since it's a new prompt, it gets the same delivery treatment as a from-scratch prompt).
+
+In all three modes, the original prompt is preserved in the output — the framework never deletes the user's work, only proposes changes alongside it.
+
+## Constraints and guardrails
+
+A few things refactor mode should never do:
+
+- **Never silently rewrite without confirmation.** If the user said "audit," produce an audit. Don't drift into rewriting.
+- **Never claim the rewrite is unambiguously better.** Every rewrite makes tradeoffs. The framework's job is to surface them, not bury them under enthusiasm.
+- **Never refactor on the basis of preference disguised as principle.** "I'd write this differently" is not a finding. The audit checklist's criteria are findings; stylistic preferences are not.
+- **Refuse to refactor if intent recovery fails.** If after the intent recovery interview the framework still can't articulate what the prompt is for, refusing to refactor is the right call. "I'm not confident enough about what this prompt does to suggest changes safely. Can you give me one example of an input and the expected output, so I can see what 'working correctly' looks like?"
+- **Honor the off-limits constraint.** If the user named anything as off-limits in Phase 2R, the framework treats it as a hard constraint — no edits to that area, even if the framework thinks it could improve it.
+
+## Refactor mode against the framework's own outputs
+
+A useful self-application: the framework can be run in refactor mode against prompts it produced earlier. This closes a loop the verifier infrastructure already opens — if a from-scratch prompt is in production and behavior reveals problems, refactor mode is how the framework re-engages without starting from scratch. The prompt's history (which shape, which interview answers, which audit findings) is useful context if available, but the refactor procedure runs the same way regardless.

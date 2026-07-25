@@ -1,0 +1,818 @@
+# Prometheus — knowledge file: verifier-and-audit.txt
+# Ported: source files merged verbatim under structural headers.
+# Cross-references rewritten to shipped .txt names. See the wiring table in the framework instructions.
+
+========================================================================
+SOURCE: references/verifier-specification.md
+========================================================================
+
+# Verifier specification
+
+When the framework delivers a prompt, it also delivers a verifier specification — a description of how to check that the prompt is behaving correctly. The verifier spec is the language-of-record for what counts as success for this prompt, separate from the prompt itself.
+
+The spec is consumed in two ways:
+
+1. **By a human or harness writing tests.** The spec is documentation: here's what to check on each output, here's what to look for across runs.
+2. **By a Claude verifier-agent at runtime.** The spec is converted into a Shape 6 LLM-as-judge prompt that runs against the prompt's actual outputs. See `verifier-and-audit.txt` for that conversion.
+
+Both consumptions use the same spec. The spec is shape-specific, because different shapes have different correctness criteria.
+
+## Three layers of verification
+
+Every spec covers three layers, even when some layers are minimal:
+
+**Static layer.** Properties of the prompt artifact itself, evaluable without running it. Section presence, schema validity, structural coherence with the shape spine. Most of this duplicates the audit checklist; the spec exposes it as a runnable check the user can re-run when modifying the prompt.
+
+**Single-run dynamic layer.** Properties of the output on a single input. Schema compliance, constraint satisfaction, presence of required elements, absence of forbidden elements, named-failure-mode coverage.
+
+**Cross-run dynamic layer.** Properties that emerge across many inputs. Calibration drift, distributional bias, edge-case coverage, consistency on identical inputs (the regression case).
+
+For low-stakes prompts, the cross-run layer is often empty. For production prompts, it's often the most important.
+
+## Per-shape specs
+
+### Shape 1: Agentic loop
+
+**Static.** Memory file structure present (standing rules + project state). Re-read trigger specified. Suggested-next-message contract has both modes (routine + boundary). Loop completeness — answers exist for "what does the agent do at start of turn / when context fills / when decision surfaces / what stops the loop."
+
+**Single-run dynamic.** Each turn ends with a status update + suggested next message. Boundary handoffs include role refresher, state pointer, objective + why-now, acceptance criteria, resolutions, closing instruction. Memory file is updated at checkpoints. Decisions log entries are present for non-trivial decisions.
+
+**Cross-run dynamic.** Across N sessions, memory file mirror stays consistent with the seed brief (no drift). Suggested-next-message tier (routine vs boundary) is applied appropriately — boundaries trigger boundary handoffs, mid-checkpoint turns produce routine continuations. The "never delegate understanding" rule holds — handoffs include specific context, not vague delegation.
+
+### Shape 2: One-shot complex task
+
+**Static.** Output format specified concretely (schema, examples, or structural template). Constraints addressed each named failure mode from the interview. Few-shot examples present for non-trivial tasks. Examples-as-operators audit passed (no silent judgment calls in examples).
+
+**Single-run dynamic.** Output validates against the specified format (JSON schema, structural template, length bounds). Each named constraint is satisfied. No banned tokens or patterns appear. Edge cases the user described are handled correctly when they appear in input.
+
+**Cross-run dynamic.** On N representative inputs, output reliability is high (% schema-valid, % constraint-satisfying). On adversarial inputs, the prompt fails gracefully rather than producing confident-but-wrong output. On inputs near the user's named failure modes, the prompt handles them correctly more often than chance.
+
+### Shape 3: Workflow / chain
+
+**Static.** Each stage has its own input contract and output schema. Schemas align — stage N's output schema matches what stage N+1 expects. Failure handling is specified per stage. Gates between stages have defined pass/fail criteria.
+
+**Single-run dynamic.** Each stage's output validates against its schema. Gates correctly route on success/failure. Failure-handling protocol triggers when expected. End-to-end output meets the workflow's stated done criteria.
+
+**Cross-run dynamic.** Stage-level reliability across N inputs. Cumulative reliability (does the chain compound errors?). Information preservation across stages — does information needed by stage N actually survive stages 1 through N-1?
+
+### Shape 4: Sub-agent / tool prompt
+
+**Static.** Single-line purpose distinct from sibling tools. Parameters typed and exemplified. Side effects stated. Error modes documented. Output format suitable for agent consumption (greppable, aggregate-first, structured) per `manage-agent-design.txt`.
+
+**Single-run dynamic.** Output is parseable in the documented format. Side effects match what's stated. Error cases produce the documented error format. The tool's output enables the parent agent to make its next decision without needing to re-derive aggregates.
+
+**Cross-run dynamic.** Across N invocations, the tool's behavior is consistent. State changes reported in output match actual state changes (visible state transitions principle). The tool's purpose remains distinct from sibling tools — the parent agent doesn't develop ambiguity about which tool to use.
+
+### Shape 5: System persona
+
+**Static.** Identity stable. Refusal patterns explicit. Drift resistance designed in. For category-based personas, threshold definitions concrete and precedence rules for collisions explicit. For personas with destructive capability, layered lockdown present (structural + prose, repetition, explanation).
+
+**Single-run dynamic.** Persona presents consistently within a single conversation. Refusal patterns trigger correctly under user pressure. Category boundaries hold (strict-category items get strict treatment; lenient-category items get lenient). Capability lockdown holds (read-only roles don't write, even via loophole tools).
+
+**Cross-run dynamic.** Across N conversations, persona stability holds — same role, same tone, same boundaries. Drift resistance works under sustained pressure (long conversations don't degrade the persona). Refusal patterns hold against adversarial inputs (jailbreak resistance).
+
+### Shape 6: LLM-as-judge
+
+**Static.** Bias controls present (length, position, persona). Calibration anchors at each score level — or fewer with explicit interpolation guidance. Reasoning forced before scoring. Rubric specified concretely; per-score-level descriptions distinguishable from each other.
+
+**Single-run dynamic.** Output is structured (parseable scores + reasoning per dimension). Reasoning fields are non-empty and reference the rubric. Scores are within the specified range. Reasoning aligns with scores — high scores have positive reasoning, low scores have specific named flaws.
+
+**Cross-run dynamic.** Calibration holds — known-good outputs score high, known-bad outputs score low, calibration anchors land at their target scores. Bias controls work — length-controlled pairs of similar-quality outputs score similarly regardless of length. Inter-run consistency at temperature 0 is high (same input → same score). Drift over time is detectable and addressable.
+
+This is the shape where cross-run verification matters most — the judge IS the verifier for upstream agents, and Goodhart applies if the judge drifts.
+
+### Shape 7: Agent team
+
+**Static.** Topology fits the task. Per-role static checks (each role's prompt audited per its individual shape). Interface contracts align (worker output schemas match orchestrator's expectations). Capability lockdown consistent across roles. Failure handling specified.
+
+**Single-run dynamic, per role.** Each role's individual shape's single-run dynamic checks apply to its prompt's outputs. Plus: orchestrator delegates with specific context (the never-delegate-understanding rule). Workers respect scope lockdown. Interface contracts hold (orchestrator can parse worker outputs).
+
+**Single-run dynamic, cross-role.** End-to-end team output meets the team's done criteria. State transitions are visible across role boundaries. Failure handling triggers correctly when individual roles fail.
+
+**Cross-run dynamic.** Topology choice was correct — does the team behave coherently across N inputs, or does it degenerate? Worker scope leakage detection (do workers stay in scope across runs?). Synthesis quality (does the orchestrator/synthesizer produce coherent integration, or does synthesis collapse occur?). For evaluator-optimizer sub-topologies: convergence rate, regression rate, Goodhart detection.
+
+This is the shape where cross-run verification is most expensive but most valuable — multi-agent teams have the most failure modes, and many of them only show up across runs.
+
+## Manage-mode: package verifier
+
+Manage mode (`manage-core.txt`) adds one verifier class that checks a **managed-agent package** rather than a single prompt. It is the ship gate for an adaptation and is invoked by Execute's re-audit and as the `reaudit_pass` precondition. Two layers:
+
+**Static (mechanical, `manage-operators.txt`).** I4c replay: `history/v001` + the ordered ledger diffs reproduce `prompt/current/` byte-identically. I4b anti-oscillation: no proposed option equals one whose backfilled outcome was regression against the same trigger (equivalence = trigger + section + intent, not diff identity). Rollback restores a snapshot, never an inverse diff. Byte-exact, deterministic — a judgment-free check.
+
+**Static (judged, `manage-operators.txt`, Shape 6).** I2 seam: the managed prompt contains no self-modification instructions and names `memory/` as its only in-run mutable state. I3 persistence: `activate` is satisfiable from the package alone — no out-of-package resume dependency. I4a write-ahead: every adapt entry precedes its diff, every `history/` snapshot has a ledger entry. The grader delegates the mechanical checks above to the replay verifier and marks I4bc UNVERIFIED (blocking) if the replay report is absent. Evidence precedes every verdict (Check N); output is greppable and aggregate-first for the manager to consume.
+
+A package ships an adaptation only when the mechanical layer is `REPLAY PASS` and the judged layer returns `VERDICT: SHIP`.
+
+## What the verifier spec does NOT cover
+
+Three things explicitly out of scope:
+
+- **The substantive correctness of the underlying task.** The verifier checks that the empathy score is within range, has reasoning, and aligns with the rubric. It does not check whether the rubric is the right one for empathy — that's a question for the user, not the framework.
+- **Runtime infrastructure.** How tests are actually executed (pytest, custom harness, manual review) is the user's choice. The spec describes what to check, not how to run the checks.
+- **Statistical guarantees.** The spec describes properties to verify; it does not promise statistical bounds on those properties holding. Empirical verification is the user's responsibility.
+
+## Verifier spec as a cross-check on prompt design
+
+A useful diagnostic: if you're drafting a prompt and the verifier spec for it looks sparse — fewer than 5 single-run checks, no cross-run checks worth running — that's a signal the prompt may be under-specified. Either the prompt is genuinely simple (fine) or the user hasn't named enough about what "correct behavior" looks like (a gap to surface during the interview, not at delivery time).
+
+The reverse is also useful: if the verifier spec is so dense that running it would cost more than the prompt itself, the prompt may be over-engineered. Match verifier weight to the stakes of the prompt.
+
+========================================================================
+SOURCE: references/verifier-agent-patterns.md
+========================================================================
+
+# Verifier-agent patterns
+
+The verifier specification (`verifier-and-audit.txt`) describes what to check. This file describes how to turn that spec into a runnable verifier — a Claude agent that takes a prompt's outputs and judges them against the spec.
+
+The core insight: **a verifier-agent is itself a Shape 6 LLM-as-judge prompt**. The framework already has machinery for building good Shape 6 prompts (calibration anchors, bias controls, reasoning-before-scoring, the Goodhart framing). Verifier-agents inherit all of that. We're not introducing a parallel abstraction — we're applying the framework recursively to its own outputs.
+
+## Two modes of verifier-agent
+
+**Static-mode verifier.** Takes the prompt artifact itself (the text the framework produced) and audits its structural properties. Schema validity, section presence, examples-as-operators check, ordering, branch-specific requirements. Most of this is mechanical enough to be auto-generated from the verifier spec — the framework can ship a static-mode verifier prompt as a deterministic delivery artifact.
+
+**Dynamic-mode verifier.** Takes a (prompt, input, output) triple and judges whether the output meets the prompt's stated criteria. Schema compliance, constraint satisfaction, named-failure-mode coverage, reasoning quality. This requires user judgment about what "correct behavior" means for the specific task — auto-generation is a strong starting template, but the user calibrates.
+
+Both modes are Shape 6 prompts. Both inherit the Goodhart warning from Shape 6's audit: a misspecified verifier produces sharply optimized wrong outputs, not noisy outputs.
+
+## When to deploy a verifier-agent (and when not to)
+
+Deploy when:
+
+- The prompt runs at production scale (hundreds or thousands of times) and verification cost is amortized.
+- The prompt has consequential outputs where silent failures are expensive.
+- The prompt's behavior is hard to verify with code (requires LLM judgment).
+- You need cross-run analysis (drift detection, calibration validation).
+
+Don't deploy when:
+
+- The prompt is one-off or low-stakes.
+- Schema validation in code is sufficient.
+- The task is simple enough that a misspecified verifier could mislead more than help.
+- The verifier-agent's runtime cost would exceed the prompt's value.
+
+The default for the framework is **verifier spec ships always; verifier-agent prompt ships when stakes warrant**. For Shape 6 (LLM-as-judge) prompts in production, almost always. For Shape 2 (one-shot) extraction in low-volume use, often not.
+
+## Static-mode verifier-agent template
+
+The static-mode verifier-agent is auto-generatable because the audit criteria are mechanical. The framework produces this as a delivery artifact for any prompt above a stakes threshold.
+
+```
+You are a static-mode verifier for prompts produced by the Prompt Architect framework. Your job is to audit a prompt artifact against its shape's verifier specification. You do not run the prompt; you only inspect its text.
+
+## What you receive
+A prompt artifact (the text of a prompt) and the shape it was designed for (Shape 1–7).
+
+## Rubric
+
+Audit the prompt against these criteria. Each criterion is pass/fail with reasoning. If any criterion fails, the prompt should not ship.
+
+[Static-layer criteria from verifier-and-audit.txt for this shape, inserted automatically]
+
+## Output format
+
+Return a JSON object:
+{
+  "shape": "<Shape 1-7>",
+  "criteria": [
+    {
+      "name": "<criterion name>",
+      "passed": true|false,
+      "reasoning": "<one to three sentences citing the specific element of the prompt that does or does not satisfy this criterion>"
+    }
+  ],
+  "overall": "pass" | "fail" | "fail-with-warnings",
+  "blocking_issues": [],
+  "warnings": []
+}
+
+## Bias controls
+
+- Don't reward length — a longer prompt is not better-audited than a shorter one. Audit each criterion independently.
+- Don't reward sophistication — fancy vocabulary is not a substitute for meeting criteria. If a section uses elaborate language but doesn't satisfy the criterion, mark it failed.
+- Be specific in reasoning. "The role binding is unclear" is unhelpful; "The role binding spans three sentences but doesn't name a specific competence" is actionable.
+
+## Prompt to audit
+{prompt_text}
+
+## Shape
+{shape_number}
+```
+
+The framework substitutes the per-shape static criteria from `verifier-and-audit.txt` into the rubric slot. The output is structured, parseable, and the blocking_issues list determines whether the prompt should ship as-is or needs revision.
+
+## Dynamic-mode verifier-agent template
+
+Dynamic-mode is more contextual — the user knows what "correct behavior" looks like for their task, and the framework provides a starting template that the user calibrates. The template:
+
+```
+You are a dynamic-mode verifier for outputs produced by a [shape-name] prompt. Your job is to judge whether a single output meets the prompt's stated criteria.
+
+## What you receive
+- The original prompt that produced the output.
+- The input the prompt was run on.
+- The output the prompt produced.
+
+## Rubric
+
+Score the output on the following criteria. Each criterion has anchored definitions; reasoning before scoring.
+
+[Single-run dynamic criteria from verifier-and-audit.txt for this shape, with placeholders for user calibration]
+
+[For each named user-failure-mode from the interview: a criterion checking whether this output handled it correctly]
+
+## Calibration anchors
+
+[User fills in: examples of clear-pass, borderline, and clear-fail outputs for this prompt's specific task. The framework provides 1-2 starter anchors per criterion; the user adds task-specific ones.]
+
+## Bias controls
+
+- Length bias: short, correct outputs are not worse than long, correct outputs. Score on substance.
+- Position bias: when comparing outputs, randomize order; if comparing to a reference, randomize which side is reference.
+- Persona bias: don't reward outputs that sound like the prompt's role; reward outputs that satisfy the criteria.
+
+## Output format
+
+{
+  "criteria": [
+    {
+      "name": "<criterion name>",
+      "reasoning": "<one to three sentences locating the output against the anchors>",
+      "score": <1-5> | <pass|fail>,
+      "evidence": "<specific quote or reference from the output>"
+    }
+  ],
+  "overall": "pass" | "fail" | "borderline",
+  "actionable_feedback": "<if fail or borderline: what specifically would need to change>"
+}
+
+## The original prompt
+{prompt_text}
+
+## The input
+{input}
+
+## The output
+{output}
+```
+
+The actionable_feedback field is what makes this verifier useful for self-correction loops — it's what gets fed back into the next iteration.
+
+## Cross-run verifier-agent
+
+For cross-run analysis, a separate verifier-agent takes N (input, output) pairs and looks for distributional issues. Different from dynamic-mode because the focus is on patterns across runs, not on individual outputs.
+
+```
+You are a cross-run verifier for a [shape-name] prompt. You receive N (input, output) pairs from running the prompt repeatedly. Your job is to detect patterns the dynamic-mode verifier (which sees one output at a time) would miss.
+
+## What to look for
+
+[Cross-run dynamic criteria from verifier-and-audit.txt for this shape]
+
+## Specific patterns
+
+- **Calibration drift.** Are scores higher for one type of input than the rubric justifies?
+- **Distributional bias.** Do outputs systematically differ on protected categories or input characteristics that shouldn't matter?
+- **Edge-case failures.** On inputs near the named failure modes, is the prompt failing at a higher rate than on standard inputs?
+- **Consistency on identical inputs.** At temperature 0, do identical inputs produce identical outputs?
+- **Goodhart indicators.** Do outputs look like they're optimizing for the rubric's surface form rather than its intent?
+
+## Output format
+
+{
+  "patterns_detected": [
+    {
+      "pattern_type": "<from the list above>",
+      "evidence": "<specific examples from the N pairs>",
+      "severity": "low" | "medium" | "high",
+      "recommended_action": "<what to do about it>"
+    }
+  ],
+  "overall_health": "good" | "concerning" | "broken",
+  "summary": "<one paragraph>"
+}
+
+## The N (input, output) pairs
+{pairs}
+```
+
+This verifier is most valuable for Shape 6 (LLM-as-judge) prompts in production, where calibration drift over time is the dominant failure mode.
+
+## Self-correction loop pattern
+
+When a verifier-agent's output feeds back into the prompt's next iteration, you have a self-correction loop. Two common architectures:
+
+**Verifier feeds the prompt designer.** The verifier-agent runs after each batch of N outputs. Its findings go to whoever maintains the prompt — a human, or in agentic settings, the original Prompt Architect framework session. The prompt is revised based on findings. This is the standard production maintenance loop.
+
+**Verifier feeds the runtime.** In agentic-loop and evaluator-optimizer settings, the verifier-agent runs after each turn or iteration, and its findings inform the next turn's prompt directly. This is the runtime self-correction loop.
+
+For agentic loops (Shape 1):
+
+- Verifier-agent runs after each checkpoint completes.
+- Verifier output goes into the next handoff prompt's "what verification flagged from the previous checkpoint" section.
+- The agent's next iteration starts with both the seed brief and the previous turn's verification result.
+- Self-correction is structural: the agent has explicit feedback to act on, not just memory of what it did.
+
+For evaluator-optimizer topologies (Shape 7 sub-pattern):
+
+- The verifier-agent IS the evaluator in the topology.
+- Generator produces output, verifier evaluates with actionable feedback, generator iterates.
+- Convergence handling: max-iterations cap plus an evaluator instruction to approve once output meets the bar (perfectionism is itself a failure mode).
+- Regression tracking: the evaluator maintains a list of "what was approved in prior iterations" so the generator's prompt can preserve those aspects across revisions.
+
+## The recursive case — verifying judge prompts
+
+Shape 6 (LLM-as-judge) prompts can themselves be verified by Shape 6 verifier-agents. This is recursive but bounded — verifying the verifier-of-the-verifier rarely earns its cost.
+
+The pattern works because at each layer, the verifier inherits the Goodhart framing and bias controls. But each layer also adds noise — the verifier-of-the-verifier may itself be miscalibrated, and you have less ability to detect that miscalibration the further up the stack you go.
+
+Practical guidance:
+- Layer 0: the user's task prompt.
+- Layer 1: the verifier-agent for the user's prompt. Worth building for production prompts.
+- Layer 2: a meta-verifier checking the verifier-agent. Worth building only when the verifier-agent is itself a production artifact (e.g., a judge prompt used at scale to score thousands of outputs daily).
+- Layer 3+: rarely justifiable. Diminishing returns set in fast.
+
+When the layer-2 verifier disagrees with the layer-1 verifier, the right resolution is usually to revise the layer-1 verifier's calibration anchors, not to keep stacking layers.
+
+## What this means for Phase 6 delivery
+
+When Phase 6 (delivery) runs, the framework now produces:
+
+1. **The user's prompt** — the original deliverable.
+2. **Usage instruction** — where to paste, what temperature, etc.
+3. **Audit summary + 3-axis evaluation** — qualitative quality assessment.
+4. **Verifier specification** — the per-shape spec describing what to check.
+5. **Static-mode verifier prompt** — auto-generated, runnable Shape 6 prompt that audits the user's prompt artifact. Always shipped.
+6. **Dynamic-mode verifier prompt** — templated Shape 6 prompt that the user calibrates with task-specific anchors. Shipped when stakes warrant.
+7. **Cross-run verifier prompt** — templated Shape 6 prompt for distributional analysis. Shipped only on explicit request, since it's only useful at scale.
+
+For Shape 7 (agent team), the verifier set expands: per-role verifier-agents (each role's outputs verified per its individual shape's spec) plus a cross-role contract verifier (do worker outputs actually match what the orchestrator expects?).
+
+## When the framework should refuse to ship
+
+If the static-mode verifier — running on the framework's own draft — detects blocking issues, the framework should not deliver. It should report the blocking issues to the user and offer revision before shipping. This is the framework eating its own dogfood: the verifier-agent is a Shape 6 prompt, the framework knows how to evaluate Shape 6 prompts, and refusing to ship a flawed artifact is what a serious framework does.
+
+This closes the loop: the framework produces prompts, verifies them with its own machinery, and only ships when the verification passes. The user gets a stronger guarantee than "here's your prompt, audit it yourself" — they get "here's your prompt, and it's already passed the audit."
+
+========================================================================
+SOURCE: references/audit-checklist.md
+========================================================================
+
+# Audit checklist
+
+Run the drafted prompt through this checklist before declaring done. Combines classical context-engineering checks with quantum-semantic checks. Fix any failure; re-audit; only ship clean.
+
+The checklist is structural and behavioral, not stylistic.
+
+**Trust difference between modes.** When auditing a from-scratch draft (the framework's own output), assume the framework's intent — every section was added deliberately and can be evaluated against the user's stated requirements. When auditing a user-supplied prompt in refactor mode (`refactor-mode.txt`), the framework doesn't know which sections are deliberate vs. accidental, which constraints reflect external requirements vs. preferences, or which apparent weaknesses are actually load-bearing for reasons the framework can't see. Run the same checks, but treat findings as *candidates for the user's review* rather than blocking issues. The user knows things about their prompt the framework doesn't.
+
+## A. Right altitude (every directive)
+
+For every directive in the prompt, classify:
+
+- **Too brittle.** Hardcoded if-else logic, exhaustive edge case enumeration, scripts the model must follow exactly. Failure: model gets stuck when reality differs.
+- **Too vague.** Abstract goals without concrete signals. Failure: model picks something obvious that misses the intent.
+- **Right altitude.** Specific enough to act on, flexible enough to adapt. Most directives should be here.
+
+Move every too-brittle and too-vague directive toward right altitude. If you can't, ask the user for the missing context.
+
+## B. Smallest viable token set
+
+For every section, ask: what specific failure mode does this address, or what specific behavior does this enable? If the answer is unclear, strike the section.
+
+Common waste:
+- Preemptive edge cases (you imagined them; no evidence they occur)
+- Generic warnings the model already follows by default
+- Stylistic preferences nobody will check
+- Redundancy with other sections
+
+## C. Examples present where rules are load-bearing
+
+For every abstract rule that's central to the prompt's behavior, verify a concrete worked example exists. Examples teach behavior more reliably than abstract rules.
+
+Especially check:
+- Output format → at least one full example
+- Few-shot prompts → 2–5 representative examples covering the difficulty range
+- Loop-based prompts → worked example per mode (routine, boundary)
+- LLM-as-judge → calibration example per score level
+
+### Examples are themselves operators — audit them as such
+
+Every example-shaped element in the prompt acts on the model just like a section-level operator. It amplifies the patterns it demonstrates and suppresses divergent patterns. Whatever judgment calls live inside the example silently teach the model how to make those calls — including any unstated reasoning the example contains.
+
+This applies to **all example-shaped material**, not just worked input/output pairs. Specifically:
+
+- **Worked examples** (few-shot input/output pairs)
+- **Calibration anchors** in LLM-as-judge rubrics (the 1/3/5 descriptions are mini-examples of what each score looks like)
+- **Anti-examples** (demonstrate what to avoid)
+- **Inline illustrations** in rule descriptions ("e.g., names the specific situation, like 'I can see this delay has thrown off your launch timeline'")
+- **Schema field examples** ("`owner: 'Alice'` — verbatim from transcript")
+
+Apply the same audit to each:
+
+- **Edge cases inside the example.** Does it contain any judgment call that isn't explained? In an extraction prompt, did you silently decide *not* to populate an optional field — and could the model interpret that omission either way? In a calibration anchor, does the description name a quality the model can't reliably distinguish from its near-neighbors (e.g., "performative warmth" vs. "genuine warmth")?
+- **Unstated reasoning.** If the example or anchor required reasoning to produce, the model has to reverse-engineer that reasoning. Either show the reasoning explicitly or pick a less ambiguous case.
+- **Coverage of failure modes.** Each failure mode the user named during the interview should appear somewhere — in rules, examples, anchors, or anti-examples. Walk through each named failure mode and verify it's addressed.
+- **Consistency across examples.** If two examples make different judgment calls on similar cases, the model will be confused about which pattern to follow. Pick one convention and apply it consistently across all example-shaped material.
+
+If an example or anchor contains a silent judgment call that you can't or don't want to explain, replace it with a less ambiguous case. Examples and anchors that teach incorrect patterns are worse than none — the model trusts them.
+
+## D. Operator catalog complete (quantum-semantic)
+
+For every section, articulate (silently or in a comment):
+
+- What does it amplify?
+- What does it suppress?
+- Does it mix basis states?
+- Strength: strong, mid, weak?
+
+If a section is "decoration" (no clear amplify/suppress/mix profile), strike it. If two sections have the same profile, merge them.
+
+## E. Operator ordering optimized (§5.1)
+
+Confirm sections are ordered:
+
+1. Strongest operators first (identity, persona, domain — they set the subspace)
+2. Mid-strength next (task definition, constraints, contracts)
+3. Weak operators last (formatting, style, communication)
+4. Failure modes near the end (high-attention end position)
+5. Done definition / start instruction at the very end (terminal projection)
+
+Mentally swap adjacent sections. If the swap produces meaningfully different behavior, the pair is non-commuting; the current order should be the deliberately better one.
+
+**Why structure matters mechanistically.** Yang et al. (Princeton/ICML 2025, "Emergent Symbolic Mechanisms in LLMs") show that LLMs develop a three-stage attention-head circuit — symbol abstraction in early layers, symbolic induction in middle layers, retrieval in late layers — that exploits structured input. Markdown headers, named sections, and consistent ordering aren't aesthetic choices; they align with circuits the model actually uses. Random or arbitrary ordering forces the model to do extra work to recover the structure.
+
+## F. Interference check (§5.4)
+
+For every pair of adjacent sections likely to interact (multiple personas, multiple tones, constraint stacks, persona + format), confirm the combination produces the intended emergent behavior, not unwanted cancellation or mode collapse.
+
+Known interference pairs (from `quantum-core.txt`):
+- Multiple personas
+- Persona + tone
+- "Be concise" + "show reasoning"
+- Refusal patterns + warm tone
+
+If interference is unexamined, examine it. If destructive, restructure or merge sections.
+
+## G. Information preservation (§5.6)
+
+Confirm:
+- Critical context is loaded as early as possible (it survives more projections).
+- Things that should remain ambiguous are flagged as such (e.g., "two interpretations are plausible — we'll resolve at runtime") rather than pre-collapsed.
+- For multi-stage prompts (workflows, agentic loops), output formats at each stage preserve information downstream stages need.
+
+## H. Long-horizon support (loop shape only)
+
+For agentic loops, confirm:
+- Memory file is named (CLAUDE.md / GEMINI.md / AGENT.md per tool).
+- Memory file structure is described: standing rules + project state.
+- Re-read trigger is specified (start of every checkpoint + circuit breaker after N tool calls).
+- Todo list usage is described (parent todos for checkpoints, sub-todos for steps).
+- Tool-output disposal is addressed (summarize and discard, don't accumulate).
+
+If any are missing, the prompt is not resistant to context rot.
+
+## I. Loop completeness (loop shape only)
+
+Trace through the loop. Each answer should be in the prompt or follow obviously:
+- What does the agent do at the start of a turn?
+- What survives compaction within a turn?
+- What does the agent do when context fills mid-checkpoint?
+- What does the agent do when a hard decision surfaces?
+- What stops the loop?
+
+Ambiguous answers indicate gaps.
+
+## J. Tier the ceremony (loop shape only)
+
+The suggested-next-message contract should have two modes:
+- Routine continuation for mid-checkpoint turns.
+- Boundary handoff for checkpoint boundaries and decision-resolved turns.
+
+A picking-test should be present ("would I send this fresh tomorrow morning expecting it to steer the next iteration on its own?"). Without tiering, the loop taxes every turn equally.
+
+## K. Self-similar handoffs / homoiconicity (loop shape only)
+
+The seed brief should explicitly tell the agent to treat itself as the template for boundary-handoff messages. Phrasing along the lines of "treat this brief as the template — boundary-handoff messages share its spine at iteration scale."
+
+Without this, handoffs are structurally inconsistent across the loop.
+
+## L. Tool / runtime consistency
+
+If the user named a tool, confirm:
+- Memory file name matches (CLAUDE.md, GEMINI.md, etc.)
+- Tool-specific features mentioned only if relevant
+- Output filename instruction at delivery matches the tool
+
+If "generic," use AGENT.md and note the user should rename per their tool.
+
+## M. Measurement-aware (temperature considerations)
+
+Confirm:
+- If the prompt will run at temperature > 0, it's robust to distribution sampling, not just mode collapse.
+- If temperature = 0 is recommended (production / single-shot extraction), the strongest operators do the work.
+- For LLM-as-judge prompts, temperature recommendation matches use case (typically 0 for scoring).
+- For ideation prompts, temperature recommendation matches use case (typically > 0).
+
+If the prompt's behavior depends on temperature in an unexamined way, examine and document.
+
+## M2. Verifier-readiness
+
+The prompt should expose the hooks a verifier-agent needs to evaluate it. This is a soft check — not every prompt needs full verifier coverage — but for production prompts, verification readiness is part of fitness.
+
+- **Output is parseable.** Structured output (JSON, schema-validated, or consistently structured prose) is verifiable; freeform output is not. If the prompt's output is freeform, the verifier-agent has to do extra work to extract verifiable claims.
+- **Failure modes from the interview are addressable.** Each named failure mode can be checked by inspecting the output. If a user said "model invents owners on vague subjects," a verifier-agent can flag invented owners only if the prompt's output preserves enough structure to identify them.
+- **Constraints are checkable.** Stated constraints in the prompt can be verified externally. "Be helpful" is unverifiable; "do not fabricate citations" can be verified by checking citation matches.
+- **State transitions are visible.** For agent-team and agentic-loop shapes, state changes appear in output (per `manage-agent-design.txt`). A verifier can audit a trace; it can't audit silent state changes.
+
+If the prompt is intended for production use and any of these are weak, flag during evaluation. The user can choose to ship anyway, but they should know verification will be expensive or unreliable.
+
+## M3. Permission to abstain
+
+For prompts that produce factual or judgmental output (extraction, classification, scoring, retrieval), the prompt should explicitly grant the model permission to abstain rather than guess when the input doesn't support a confident answer. This is the most cost-effective anti-hallucination technique available — it costs ~1 sentence and meaningfully reduces fabrication.
+
+Most relevant for:
+- **Shape 2 (one-shot)** when extracting facts, identifying entities, or making judgments about input data.
+- **Shape 4 (sub-agent / tool)** when the tool reports findings or values — silent guessing corrupts the parent agent's downstream decisions.
+- **Shape 6 (LLM-as-judge)** when the input doesn't contain enough information to score against the rubric. A judge that always produces a confident score on inadequate input is worse than a judge that flags inadequacy.
+
+The permission needs to be explicit and concrete. "Be honest" is too vague to act on. Effective formulations:
+
+- "If the data is insufficient to draw conclusions, say so rather than speculating."
+- "If the input doesn't clearly contain [specific element], return null rather than guessing."
+- "If you cannot confidently score this against the rubric, return 'inconclusive' with reasoning."
+
+The framework's broader audit principle (the rubric is the optimization target) applies here in reverse: a prompt that *requires* an answer optimizes for confident answers, including wrong ones. Granting abstention permission shifts the optimization target toward calibrated honesty.
+
+### Clarification-seeking context-appropriateness
+
+Abstention is the floor and should be present whenever the prompt takes real-world input that can be ambiguous. Clarification-seeking is the upgrade and must match the deployment context the user stated:
+
+- **If the prompt runs unattended** (pipeline, batch, called by another agent) → confirm it does NOT instruct the agent to ask a user. A clarifying question emitted into a non-interactive context is malformed output. Under doubt, the prompt must use abstention. FAIL if the prompt tells an unattended agent to "ask the user."
+- **If the prompt is interactive AND the user requested clarification-seeking** → confirm the clarification operator is present, calibrated (asks on material forks, not on every uncertainty), and includes the bounded sufficiency self-check.
+- **If the prompt is interactive but the user wanted best-call-and-flag** → confirm abstention governs and clarification-seeking is absent, even though a user is present.
+
+When clarification-seeking is present, verify the **bounded sufficiency self-check** is included and complete:
+- The agent assesses, after each user answer, whether the material fork is actually resolved.
+- Resolution → proceed without redundant confirmation. Insufficiency → one targeted follow-up.
+- A bound (~2 rounds) after which the agent falls back to abstention rather than interrogating.
+- The abstention fallback is wired — if clarification exhausts, the agent flags and proceeds/declines, never stalls.
+
+FAIL if clarification-seeking is present without the bound (produces interrogation) or without the abstention fallback (produces stalling).
+
+Less relevant for:
+- **Shape 5 (system persona)** — persona-level abstention is usually handled by refusal patterns, not abstention permission.
+- **Shape 1 (agentic loop)** — the agent operates over many turns and has different mechanisms for handling uncertainty (raising open questions in handoffs).
+
+## M4. Cognitive-tools delivery completeness (BLOCKING)
+
+This is a blocking check: if it fails, the delivery is incomplete and must not ship.
+
+If hard-reasoning signals triggered the cognitive-tools scaffold during Phase 1, confirm that the **four tool definitions are present in the delivered artifact**, not merely referenced. The most common framework failure mode is to mention the cognitive-tools pattern in the prompt's prose ("structure your reasoning using understand_question, recall_related...") without shipping the actual tool definitions the user registers with their runtime. That produces cognitive *framing* without cognitive *tools* — the weaker monolithic variant the empirical literature specifically found inferior.
+
+Confirm all of:
+
+- The four tool definitions (`understand_question`, `recall_related`, `examine_answer`, `backtracking`) are present in the delivery as a runnable artifact, formatted for the user's named runtime (Anthropic `tools` array, OpenAI `function` definitions, etc.). Source format in `quantum-core.txt`.
+- Each tool definition carries its full per-tool system prompt as its description — not a one-line summary.
+- The main prompt's system message includes the cognitive-tools orchestration prompt (the verbatim system prompt) that tells the model the tools exist and when to call them.
+- The usage instruction tells the user how to wire the definitions into their runtime, including the common-failure-mode warning (registering tools without passing the per-tool system prompts to the tool execution).
+
+If the scaffold was triggered but any of the above is missing, the delivery is incomplete. Either complete it (ship the definitions) or, if cognitive tools were triggered in error (the task is actually compliance/checklist, not hard-reasoning per the sharpened signals in `shapes-and-build.txt` and `quantum-core.txt`), remove the cognitive-tools framing entirely so the prompt doesn't reference tools it doesn't ship. A prompt that references the pattern without shipping the tools is the one outcome to never deliver.
+
+## M5. Scaffold restraint (the Claude Code discipline)
+
+The framework offers many optional scaffolds: cognitive tools, dynamic-mode and cross-run verifiers, clarification-seeking with the sufficiency self-check, prefill guidance, architectural-decision enumeration, trace structures. Each is individually justified by source evidence. **None of them is free**, and their cumulative weight is the framework's most likely failure mode: a prompt that carries every capability the framework had on the shelf rather than the smallest set the task demands.
+
+Production prompt engineering (Claude Code's style guide) holds a harder line than "smallest viable token set" applied section-by-section: every scaffold exists because of a *specific, named* reason — a debugged failure, a stated user requirement, a measured risk. Apply that discipline to the framework's own outputs.
+
+For **each optional scaffold present in the draft**, the audit must be able to name its trigger:
+
+- **Cognitive tools** → which two-or-more hard-reasoning signals fired? Name them.
+- **Dynamic-mode / cross-run verifiers** → did the user state production stakes / scale, or explicitly request them? Cite the interview answer.
+- **Clarification-seeking + self-check** → did the user confirm an interactive deployment and request it? Cite the deployment-context answer.
+- **Architectural-decision enumeration, trace structure, identity reinforcement, lockdown layers** → which stated risk or shape requirement demands it?
+
+The test question for each: **"Would a Claude Code engineer hand-writing this prompt for this specific task include this scaffold — or is it here because the framework offers it?"** If the honest answer is the latter, strike the scaffold. A trigger of "it might help" or "it's best practice" is not a trigger; it's the preemptive-complexity failure mode with better branding.
+
+Two directions, both checked:
+
+- **No untriggered scaffolds.** Every optional scaffold traces to a named signal, a cited user answer, or a stakes statement. The audit summary lists each included scaffold with its one-line trigger, so the user can see what they're paying for and why.
+- **No stripped essentials.** Restraint is not minimalism for its own sake. If the task genuinely fires the trigger (real hard-reasoning signals, stated production stakes, confirmed interactive deployment), the scaffold belongs — removing it to look lean is the opposite failure. The discipline is *trigger-traceability*, not smallness.
+
+This check runs at Phase 5 evaluation time, and its output (the scaffold-to-trigger list) ships in the delivery's audit summary. A delivery whose scaffolds can't all be traced to triggers should be slimmed before shipping.
+
+## M6. Reasoning-channel separation
+
+Instructions that tell the model to **echo, transcribe, or reveal its internal reasoning as response text** ("show your thinking", "reproduce your chain of thought in the answer", "explain what you were thinking when...") are a defect. On some runtimes they trigger a refusal category and elevated fallbacks; on all runtimes they conflate two channels — the model's internal reasoning channel and its task-output channel — and the transcription is unreliable even when permitted. Reasoning visibility must target the runtime's sanctioned channel: structured thinking blocks, tool inputs (which arrive unsummarized), or a dedicated send-to-user tool for verbatim mid-run surfacing.
+
+The distinction that keeps this check precise: **task-mandated justification is not reasoning transcription.** A judge prompt requiring a written `reasoning` field before the score, a reviewer required to argue its findings, an abstention that must state why — these ask the model to *produce* justification as deliberate task output, which is fine on every runtime. The defect is specifically instructing the model to *reveal or reproduce its internal thinking* as if the response were a window onto it.
+
+Audit every draft (and, in refactor mode, every user prompt) for show-your-thinking instructions; replace them with either a task-mandated justification field or a pointer to the runtime's sanctioned reasoning channel. This check applies with extra force to Shape 1 seed briefs and Shape 5 personas, where "narrate your reasoning" instructions tend to accumulate.
+
+## N. Branch-specific checks
+
+**Engineering shapes.** Stack versions concrete; failure modes specific to the stack; contracts framed as revisable.
+
+**Research shapes.** Source quality rules present; citation format specified; synthesis target concrete.
+
+**Writing shapes.** Voice / register described concretely with at least one exemplar; outline initialized; length anchor present.
+
+**Ops shapes.** Safety boundaries explicit; destructive actions require approval; audit trail requirements specified.
+
+**LLM-as-judge.** Bias controls present (length, position, persona). Calibration anchors at each score level — OR fewer anchors (typically 3 for a 1–5 scale, at the endpoints and midpoint) with explicit interpolation guidance for the model. Three-anchor structures are defensible for token economy on continuous-feeling dimensions; binary "anchor at every level" is the conservative default. Reasoning forced before scoring, not after.
+
+The rubric is the optimization target for any upstream agent that uses this judge for feedback. A misspecified rubric doesn't produce noisy scores — it produces sharply optimized wrong outputs. Calibration anchors and bias controls are load-bearing for this reason, not stylistic polish. If a known-good reference output exists for the input, structure the rubric as "compare candidate against reference; flag deviations and score severity" rather than absolute scoring; differential comparison is more reliable than rubric-anchor calibration when a reference is available.
+
+**Sub-agent / tool.** Single-line purpose distinct from sibling tools. Parameters typed and exemplified. Side effects stated.
+
+**System persona.** Identity stable. Refusal patterns explicit. Drift resistance designed in.
+
+**Agent team.** Topology fits the task — orchestrator-workers for dynamic decomposition, parallelization-sectioning for independent aspects, parallelization-voting for high-stakes confidence, evaluator-optimizer for revision-driven tasks. Don't pick a topology because it sounds sophisticated; pick the simplest one that fits.
+
+Per-role checks:
+- Orchestrator delegates with specific context, never with vague "based on your findings" language. Each worker dispatch includes the *what specifically* (file paths, exact criteria, concrete expected output) — the orchestrator does the synthesis, not the worker.
+- Worker scopes don't overlap destructively. If two workers could plausibly handle the same input, the topology is wrong (this is orchestrator-workers with poor decomposition, or parallelization-sectioning with hidden dependencies).
+- Each worker prompt has scope-lockdown language. "You do not work on X, that's another agent's responsibility" is louder than implicit boundaries.
+- Roles with destructive capability have the layered lockdown pattern from Shape 5 (structural + prose, repetition, explicit handling of loophole tools). The audit's per-role check should walk through Shape 5's lockdown criteria for each such role.
+
+Cross-role checks:
+- Interface contracts align. Worker output schemas match what the orchestrator's prompt expects to parse. A schema field the orchestrator references should be a schema field the worker actually produces.
+- Output formats are agent-consumable per `manage-agent-design.txt`: structured, greppable failure markers, aggregate-first, visible state transitions. Workers' outputs feed another agent; they're not for human display.
+- Capability lockdown is consistent. If the orchestrator says "Worker A is read-only," Worker A's prompt enforces that. Inconsistency between orchestrator's belief and worker's actual capability is a fault line.
+- Failure handling is specified. When a worker fails, what happens? Retry? Fallback? Partial results? The orchestrator's prompt addresses this explicitly rather than hoping it doesn't come up.
+
+## O. Optional: empirical tests for high-stakes prompts
+
+For prompts where behavior must be reliable and the cost of being wrong is high, run:
+
+- **Fidelity test** (commutativity test): apply two key sections in opposite orders, compare outputs. Fidelity < 0.99 ⇒ ordering matters; current order should be the deliberately better one.
+- **Interference test**: apply pairs of sections separately and combined, confirm intended emergent behavior.
+- **Permutation test**: try 3 orderings of the strongest operators, score each, pick the best.
+
+These tests cost LLM calls; reserve for production prompts.
+
+## Failure handling
+
+For any failed check:
+- **Can fix without user input** → fix and re-audit.
+- **Need user input** → ask one specific question, not a generic one.
+- **Significant rework** → fix, re-audit affected sections.
+
+Never ship a prompt with a known failed audit. Either fix it, or surface the gap honestly so the user ships with eyes open.
+
+========================================================================
+SOURCE: references/evaluation-rubric.md
+========================================================================
+
+# Evaluation rubric
+
+After audit catches structural failures, evaluation scores the prompt on three axes that the audit doesn't cover. Goal: give the user calibrated information about what they're getting.
+
+**Hard rule: be honest, not generous.** Inflated scores hurt the user. A 7/10 with a named gap helps them decide whether to iterate or ship.
+
+## Axis 1: Token economy (1–10)
+
+Are the tokens spent buying behaviors that matter?
+
+### Scoring
+
+- **9–10.** Every section addresses a specific failure mode or enables a concrete behavior. Examples are load-bearing. No preemptive edge cases. No ritual structure.
+- **7–8.** Solid mostly, with 1–2 sections that could be tightened or merged.
+- **5–6.** Several sections have thematic overlap or unnecessary duplication. Loop ceremony (if applicable) taxes every turn equally without tiering.
+- **3–4.** Significant redundancy. Generic warnings. Sections without clear purpose.
+- **1–2.** Mostly noise. Brittle or vague directives dominate.
+
+### Common deductions
+
+- Two sections covering the same theme: -1
+- Failure modes that don't address specific sharp edges: -1
+- No worked examples for load-bearing rules: -1
+- More than 10 failure mode bullets (likely over-warning): -0.5
+- Style rules describing model defaults: -0.5
+
+### Common credits
+
+- Operator profiling visible in section design: +0.5
+- Examples per mode in tiered contracts: +0.5
+- Section ordering reflects operator strength: +0.5
+
+## Axis 2: Task fit (1–10)
+
+Does the prompt cover what the user actually needs delivered?
+
+### Scoring
+
+- **9–10.** Captures both the immediate task and downstream needs (reviewer audience, audit trail, calibration data, etc.). Audience and time budget acknowledged where relevant.
+- **7–8.** Captures the build well; one or two downstream deliverables possibly missing.
+- **5–6.** Captures the build only. Downstream needs silent. Audience assumed.
+- **3–4.** Build coverage partial or off-spec.
+- **1–2.** Significant misalignment.
+
+### Common deductions per shape
+
+**Agentic loop.**
+- No design-rationale log alongside state log: -1
+- No grader/reviewer audience awareness if academic: -1
+- No metrics capture for runs: -0.5
+
+**One-shot.**
+- No few-shot examples on a non-trivial task: -1
+- Output format unspecified or vague: -1.5
+- No edge-case handling for cases the user described: -1
+
+**Workflow.**
+- Inter-stage output schemas missing: -1
+- No failure handling between stages: -0.5
+
+**Sub-agent / tool.**
+- Tool description overlaps ambiguously with sibling tools: -1
+- Side effects not stated: -0.5
+
+**System persona.**
+- No refusal patterns: -1
+- No drift resistance for long conversations: -0.5
+
+**LLM-as-judge.**
+- No calibration examples per score level: -1.5
+- No bias controls (length, position): -1
+- Score-before-reasoning ordering: -1
+
+**Agent team.**
+- Topology more complex than the task demands (e.g., orchestrator-workers where sectioning suffices): -1
+- Orchestrator delegates understanding — vague worker dispatches without specific context: -1
+- Interface contracts missing or unverified between roles (worker output schema vs. orchestrator expectation): -1.5
+- Worker scope-lockdown language absent: -1
+- Roles with destructive capability lacking the Shape 5 layered lockdown: -1.5
+- No failure handling for worker failure, on a production-bound team: -0.5
+
+### Common credits
+
+- Captures a downstream deliverable the user didn't mention but obviously needs: +1
+- Distinguishes session-level from project-level success: +0.5
+- Acceptance criteria are checkable: +0.5
+
+## Axis 3: Operator coherence (1–10) [quantum-semantic]
+
+Do the sections work as a coordinated transformation, or are they a loose collection?
+
+### Scoring
+
+- **9–10.** Section ordering reflects operator strength. Interference pairs examined and resolved. Each section has a clear amplify/suppress/mix profile. No "decoration" sections.
+- **7–8.** Mostly coherent; one or two ordering choices feel arbitrary or one section's role is unclear.
+- **5–6.** Sections present without operator awareness. Ordering is by tradition rather than design. Some interference effects unexamined.
+- **3–4.** Sections appear randomly ordered. Multiple personas or constraint pairs likely producing destructive interference.
+- **1–2.** Fundamentally incoherent — sections work against each other.
+
+### Common deductions
+
+- Strong operators placed late: -1
+- Multiple unexamined personas: -1
+- Output format placed first when it's not the dominant operator: -0.5
+- Failure modes scattered through prompt instead of grouped: -0.5
+- Constraints stacking destructively (concise + thorough, etc.): -1.5
+
+### Common credits
+
+- Visible operator-design reasoning in choice of structure: +1
+- Interference checked for adjacent pairs: +0.5
+- Ordering deliberately deviates from default with clear rationale: +0.5
+
+## Reporting format
+
+After scoring, report:
+
+> **Token economy: X/10.** [One sentence: what's strong.] [If <8: one sentence on what would move it to 9.]
+>
+> **Task fit: X/10.** [One sentence: what's strong.] [If <8: one sentence on what's missing and how it'll bite if not addressed.]
+>
+> **Operator coherence: X/10.** [One sentence: what's strong.] [If <8: which section pairs are likely interfering or mis-ordered.]
+>
+> **Overall.** [Two sentences max — is the prompt ready to use, what to watch in the first run, anything that needs the user's eyes before shipping.]
+
+## When to refuse to ship
+
+If any score is below 6, name the gap and offer a fix before declaring done.
+
+If two or more scores are below 7, propose a brief revision pass before delivering. The user can decline, but they should see the recommendation.
+
+If all scores are 6+, deliver the prompt with the evaluation attached. Let the user decide whether to iterate.
+
+## Sycophancy resistance
+
+The temptation to award high scores grows with effort spent. Resist deliberately:
+
+- After 5+ revisions, your perception is upward-biased by sunk cost. Adjust down.
+- User satisfaction during drafting doesn't change the prompt's quality. Score the artifact, not the mood.
+- When tempted to write 9, ask: "what would 10 look like?" If the answer is concrete and reachable, you're not at 9 yet.
+
+The user benefits from accurate calibration. Sycophancy costs them downstream sessions.
+
+## Empirical extension (optional, high-stakes only)
+
+For production prompts where the cost of being wrong is high, offer the user a measured score in addition to the heuristic one:
+
+- Run the prompt twice with two key-section orderings; compute output fidelity. Low fidelity → ordering matters → audit confirmed.
+- Run the prompt at three temperatures (0, 0.5, 1.0) and inspect variance. Excess variance at low temperature → operator weakness; excess at high → mode-collapse risk.
+
+This costs LLM calls. Worth it for prompts that will run thousands of times. Skip for one-off tasks.
+

@@ -1,0 +1,889 @@
+# Prometheus — knowledge file: quantum-core.txt
+# Ported: source files merged verbatim under structural headers.
+# Cross-references rewritten to shipped .txt names. See the wiring table in the framework instructions.
+
+========================================================================
+SOURCE: references/quantum-principles.md
+========================================================================
+
+# Quantum semantic principles — operational mapping
+
+This document distills the quantum semantic framework into the operational principles the architect uses during drafting and audit. Each principle is paired with concrete actions.
+
+## Principle 1: Prompts are operators, not keys
+
+**Source:** §5.3 — "Context creates meaning—it does not reveal it."
+
+**Implication:** You are not extracting answers from a model. You are constructing them by transforming the model's semantic state. The operator framing changes design from "find the right words" to "design the right transformation."
+
+**Operational actions:**
+- For every section, ask: what does this amplify, suppress, mix? (See `quantum-core.txt`.)
+- When a prompt isn't working, don't ask "what keyword am I missing?" Ask "what's the wrong projection in my operator sequence?"
+- Treat sections as matrices. Their order matters; their combination produces interference.
+
+## Principle 2: Ordering is structural, not cosmetic
+
+**Source:** §5.1, §2.3 — "Prompt operations don't commute. [A,B] ≠ 0."
+
+**Implication:** "You are X, do Y" ≠ "Do Y, you are X." First operators dominate; they set the subspace within which later operators act.
+
+**Operational actions:**
+- Always order: broadest framing first (persona, domain), narrowing next (constraints), format last.
+- For high-stakes prompts, run the **commutativity test** (Prompt D from the library): apply key sections in two orders, compare outputs. Fidelity < 0.99 ⇒ ordering matters; pick the better one.
+- When debugging a prompt, try swapping section order before adding more content.
+
+## Principle 3: Ambiguity is a feature, not a bug
+
+**Source:** §5.2, §1.1 — Expressions are in superposition until measurement.
+
+**Implication:** Premature collapse to a single interpretation destroys information. For ambiguous user requirements, enumerate interpretations with weights before defaulting.
+
+**Operational actions:**
+- During the interview, preserve superposition where the cost of asking is low and the cost of being wrong is high.
+- For architectural decisions in drafted prompts, use the boundary-handoff enumeration pattern: list 2–3 plausible readings with weights, name the collapse condition, propose a default. (See Prompt I from the library.)
+- For one-shot prompts where input is ambiguous, design output formats that preserve ambiguity (multiple weighted interpretations) rather than forcing a single answer.
+
+## Principle 4: Combination is non-additive (interference)
+
+**Source:** §5.4, §2.1 — "Combining contexts produces interference, not addition."
+
+**Implication:** Two sections combined don't produce the sum of their effects. Constructive interference creates emergent behavior; destructive interference cancels behavior that either section alone would produce.
+
+**Operational actions:**
+- When stacking multiple personas, multiple tones, or constraint pairs, check for interference. (See `quantum-core.txt` for known pairs.)
+- For multi-domain prompts, expect emergent behavior — don't assume "expert A + expert B = both perspectives."
+- The audit checklist includes an interference check: for every adjacent pair of sections, is the combination producing the intended emergent behavior?
+
+## Principle 5: Every interpretation step destroys information
+
+**Source:** §5.6, §3.2 — Projection is irreversible. Information orthogonal to the context is lost.
+
+**Implication:** Each prompt section, each interview question, each agent action is a measurement. Information lost early can't be recovered later.
+
+**Operational actions:**
+- Load critical context as early as possible — it survives more projections.
+- Don't ask interview questions whose answers are already in the user's request — that's an information-destroying repetition.
+- In agentic loops, design the suggested-next-message contract to preserve state across turns (memory file, structured handoffs).
+- In workflow chains, design intermediate output formats to preserve information that downstream stages need.
+
+## Principle 6: Sample, don't always pick the mode
+
+**Source:** §5.5, §2.4 — Temperature is a measurement parameter. Mode vs distribution.
+
+**Implication:** When the goal is exploration or discovery (auditing, testing, brainstorming), sampling at temperature > 0 reveals the full distribution. When the goal is determinism (production, single-shot extraction), temperature = 0 collapses to the most probable interpretation.
+
+**Operational actions:**
+- For shape inference during the interview, mentally sample multiple plausible shapes from the user's request before collapsing to one.
+- For LLM-as-judge prompts that score a single artifact, recommend temperature = 0 to the user.
+- For ideation prompts, recommend temperature > 0 and possibly multiple samples.
+- For audit and testing of any prompt, recommend running at higher temperature and inspecting variance.
+
+## Principle 7: Prompt engineering is empirical, not metaphysical
+
+**Source:** §5.7 — Three measurable quantities: fidelity, interference, CHSH.
+
+**Implication:** Prompt design has measurable structural properties. Don't rely on intuition when data is cheap.
+
+**Operational actions for high-stakes prompts:**
+- **Fidelity test** (Prompt D): swap section order, measure output similarity. If fidelity < 0.99, ordering matters.
+- **Interference test** (Prompt F): apply two sections separately and combined, check whether combination produces emergent or cancelled behavior.
+- For ambiguous cases, recommend the user run permutation tests (Prompt L) before committing to a final ordering.
+
+## Principle 8: Observer-dependent meaning
+
+**Source:** §1.2, Prompt N — Same expression, different observers, different meanings.
+
+**Implication:** The same prompt produces different behavior in different LLMs (the LLM itself is part of the operator). The same memory file works differently for Claude Code vs Gemini CLI.
+
+**Operational actions:**
+- During the interview, ask which tool / runtime the prompt will run in. This shapes operator design.
+- For prompts that may run in multiple runtimes, design for the lowest-common-denominator capabilities, then add tool-specific extensions.
+- For LLM-as-judge prompts, account for the judge model's biases as part of the operator. Two different judge substrates score the same rubric differently — the rubric-plus-judge pair, not the rubric alone, is the measurement apparatus.
+
+## Principle 9: Operator strength is substrate-relative
+
+Operator strength is not intrinsic to a section; it is relative to the substrate it acts on. On a high-instruction-following substrate, a prescriptive operator over-projects — it collapses states the model's own defaults would have resolved better than the prescription. The same enumerated behavior list that corrected a weaker model's drift becomes, on a stronger model, an information-destroying constraint on a state that no longer needed collapsing.
+
+Operationally: calibrate default operator strength *down* as substrate capability rises. Intensity language ("CRITICAL", "MUST", repeated prohibitions) and exhaustive enumeration are strong projections justified only when the substrate demonstrably fails without them. On stronger substrates, prefer brief general instructions and let the substrate's own priors resolve the residual superposition. (Primary evidence: Anthropic's cross-model best practices document that instructions written to correct under-triggering on older models cause over-triggering on newer ones, and that general instructions often outperform prescriptive step-by-step plans there. Scope: measured on that vendor's model families; adopted here as a design principle because it follows directly from Principles 1 and 5.)
+
+The framework infers a **substrate capability tier** (frontier / strong / legacy; unknown → assume strong) from the runtime answer in Phase 1, and conditions default operator strength, scaffold-triggering thresholds, and delivery guidance on it.
+
+## Selected library prompts (for reference)
+
+These prompts from the source library are directly useful when designing or auditing meta-prompts:
+
+- **Prompt A — Ambiguity Preservation.** YAML output with weighted interpretations. Use when an ambiguous user requirement should not be collapsed yet.
+- **Prompt D — Commutativity Test.** Apply two contexts in opposite orders, compare. Use during the audit step for high-stakes prompts.
+- **Prompt G — Bayesian Interpretation Audit.** Generate diverse interpretations, cluster, report distribution. Use when the user's task description is itself ambiguous.
+- **Prompt I — Superposition Requirement Analysis.** Decompose vague requirements into weighted basis states with collapse criteria. Use during interview Phase 1 if the user's task description is unusually ambiguous.
+- **Prompt L — System Prompt Ordering Optimizer.** Test multiple orderings, self-evaluate. Use as the optional permutation test in Phase 6.
+- **Prompt N — Observer-Aware Communication Drafting.** Same message, multiple observers, controlled collapse. Use when designing prompts whose outputs will be read by multiple audiences.
+
+Full text of these prompts is in the source paper's Appendix B.1. The framework's audit and evaluation steps incorporate their logic; users running the framework don't need to invoke them directly unless designing especially high-stakes prompts.
+
+## Summary table
+
+| Principle | Action in framework |
+|---|---|
+| Prompts are operators | Design sections by amplify/suppress/mix profile |
+| Ordering matters | Strongest operators first, format last |
+| Ambiguity is a feature | Preserve in interview; enumerate in handoffs |
+| Combination is non-additive | Audit adjacent section pairs for interference |
+| Steps destroy information | Load critical context early; preserve across stages |
+| Temperature is measurement | Recommend per use case; sample for exploration |
+| Empirical, not metaphysical | Optional permutation tests for high stakes |
+| Observer-dependent | Account for tool/runtime as part of operator design |
+
+========================================================================
+SOURCE: operators/section-operators.md
+========================================================================
+
+# Operators catalog
+
+Each section of a prompt is an operator that transforms the model's semantic state. This catalog describes each common section in operator terms: what it amplifies, suppresses, mixes; its strength; its commutation properties.
+
+When drafting, consult this catalog to make conscious operator-design choices rather than treating sections as decoration.
+
+## Strong operators (apply early, high information loss)
+
+These set the Hilbert subspace within which all subsequent operators act (§5.1).
+
+### Role / persona
+
+- **Amplifies:** interpretations consistent with the role's expertise, vocabulary, and norms.
+- **Suppresses:** off-domain interpretations, generic-helper-style outputs.
+- **Mixes:** rare; persona is mostly a projection operator.
+- **Strength:** strong. Among the strongest operators in any prompt.
+- **Place first** unless a different section needs to dominate (rare).
+- **Commutation:** highly non-commutative with most other operators. "You are a security engineer, be concise" ≠ "Be concise, you are a security engineer."
+- **Failure mode:** persona that's too specific overconstrains; too generic ("helpful assistant") wastes the operator slot.
+
+### Domain / context framing
+
+- **Amplifies:** vocabulary, conventions, and reasoning patterns of the domain.
+- **Suppresses:** cross-domain analogies and irrelevant frames.
+- **Mixes:** when domain is intentionally hybrid (e.g., "biomedical engineer" mixes biology and engineering operators).
+- **Strength:** strong, often near-equal to persona.
+- **Place near front**, after or merged with persona.
+- **Commutation:** non-commutative with persona; commutes loosely with formatting.
+
+### Identity / "you are X" lines for system personas
+
+- **Amplifies:** personality traits, communication style, behavioral norms.
+- **Suppresses:** drift toward generic chat-assistant defaults.
+- **Mixes:** rare.
+- **Strength:** strong, especially for ongoing assistants where stability matters.
+- **Place first.** Identity reinforcement may also appear later for drift resistance.
+
+## Mid-strength operators (apply in middle of prompt)
+
+These are projections within the subspace set by the strong operators.
+
+### Task definition
+
+- **Amplifies:** patterns associated with the task type (classify, extract, transform, generate).
+- **Suppresses:** tangential outputs, conversational filler.
+- **Mixes:** sometimes — when the task is genuinely novel or hybrid.
+- **Strength:** mid to strong, depending on how well-defined the task is.
+- **Place after persona/domain**, before constraints.
+
+### Constraints / rules
+
+- **Amplifies:** outputs that satisfy the constraint.
+- **Suppresses:** outputs that violate it.
+- **Mixes:** rarely.
+- **Strength:** mid. Each constraint is its own operator; total strength scales with count.
+- **Place after task definition.** Order constraints by importance (more important first).
+- **Commutation:** constraints often commute with each other when independent; cross-cutting constraints (e.g., "be concise" vs "show your reasoning") don't.
+
+### Initial contracts (engineering) / outline (writing) / methodology (research)
+
+- **Amplifies:** structural choices the agent should adopt.
+- **Suppresses:** structural drift away from the planned shape.
+- **Mixes:** mid-frequency — contracts can mix domains when interfaces span them.
+- **Strength:** mid. Stronger when framed as "do not deviate," weaker when framed as "initial — revisable."
+- **Place after task definition.**
+
+### Procedure / checkpoints (agentic loops)
+
+- **Amplifies:** progress-oriented, checkpoint-aware behavior.
+- **Suppresses:** unbounded exploration, sprinting past checkpoints.
+- **Strength:** mid. Each checkpoint is itself a small operator.
+- **Place after contracts.**
+
+## Weak operators (commute with most, place late)
+
+### Format / output structure
+
+- **Amplifies:** outputs in the specified format.
+- **Suppresses:** outputs in other formats.
+- **Mixes:** essentially never.
+- **Strength:** weak with respect to content (the model adapts content to format), strong with respect to format itself.
+- **Place near the end.** Commutes with most content-shaping operators.
+- **Exception:** for one-shot extraction tasks, output format becomes a strong operator — it dominates everything.
+
+### Style rules
+
+- **Amplifies:** stylistic choices.
+- **Suppresses:** off-style output.
+- **Mixes:** rarely.
+- **Strength:** weak. Easily overridden by stronger operators.
+- **Place late** unless they're load-bearing for the use case (e.g., legal writing where style is the deliverable).
+
+### How to talk to me / communication contract
+
+- **Amplifies:** specific communication patterns (asking before deciding, formatting commands, etc.).
+- **Suppresses:** undesired communication patterns.
+- **Strength:** weak to mid.
+- **Place late.** These are conversation-shaping, not task-shaping.
+
+## High-leverage operators (special cases)
+
+### Few-shot examples
+
+- **Amplifies:** patterns demonstrated in the examples — including unstated patterns the example contains by accident.
+- **Suppresses:** patterns absent from the examples.
+- **Mixes:** subtly — examples can teach behaviors that no rule explicitly states.
+- **Strength:** very high for the specific patterns shown, weak for everything else.
+- **Place where they're most relevant** — after the rules they exemplify, before the actual task.
+- **Failure mode:** unrepresentative examples teach the wrong patterns. Quality of examples > quantity.
+- **Critical: examples have their own ambiguity surface.** Any silent judgment call inside an example becomes a rule the model has to reverse-engineer. If your example populates an optional field one way, the model assumes that's the convention. If two examples make different calls on similar cases, the model gets confused. Audit examples for unstated reasoning before shipping (see audit checklist §C).
+
+### Anti-examples
+
+- **Amplifies:** awareness of failure modes.
+- **Suppresses:** the demonstrated failures.
+- **Strength:** mid to high for the specific failures shown.
+- **Use sparingly** — they consume tokens and can have unintended priming effects.
+- **Place after positive examples** so the model knows what good looks like first.
+
+### Failure modes (DO NOT bullets)
+
+- **Amplifies:** awareness of and avoidance of named failures.
+- **Suppresses:** the named failures themselves.
+- **Strength:** mid.
+- **Place near end** of prompt — high-attention position.
+- **Failure mode:** generic warnings ("don't make mistakes") waste tokens. Each DO NOT must address a specific known sharp edge.
+
+### Permission to abstain
+
+- **Amplifies:** calibrated honesty about the limits of the input. The model becomes willing to return null, "inconclusive," or "insufficient information" rather than fabricating a confident answer.
+- **Suppresses:** hallucination, fabricated specifics, confident answers on inadequate input.
+- **Mixes:** rarely.
+- **Strength:** mid — small in tokens, high in effect when the alternative is hallucination.
+- **Place near constraints**, not buried at the end. The model should know early that abstention is allowed.
+- **Critical for Shape 2 (extraction), Shape 4 (tool output), and Shape 6 (judging)**. Less relevant for Shape 5 (persona) where refusal patterns handle abstention differently.
+- **Failure mode:** vague abstention permission ("be honest about uncertainty") doesn't work. Concrete formulations do — name what abstention looks like ("return null", "return 'inconclusive'", "say 'the input does not contain enough information'").
+
+### Clarification-seeking (the interactive sibling of abstention)
+
+Abstention and clarification-seeking are the two responses to doubt, split by deployment context. Abstention is the floor — it works in every context and is always baked in. Clarification-seeking is the upgrade — it only applies when a user is present to answer, which is information the *generating user* supplies at build time, never something the runtime agent infers for itself.
+
+- **Amplifies:** resolution of material forks by asking the present user, before committing to an output that a wrong assumption would spoil.
+- **Suppresses:** silent guessing on material ambiguity when a human could have resolved it cheaply.
+- **Strength:** mid. High value on genuine forks; negative value if over-applied (an agent that won't commit).
+- **Place near constraints**, paired with the abstention permission it upgrades.
+- **Only for contexts the generating user has confirmed are interactive.** Default-relevant for Shape 1 (agentic loop) and Shape 5 (conversational persona). Never added to a non-interactive deployment (one-shot pipeline, sub-agent called by an orchestrator, batch grader) — there, abstention governs and the agent must never be told to ask a user who isn't there.
+- **Calibration is load-bearing.** The instruction is "ask on a *material* fork where the readings diverge in the output AND asking is cheap relative to guessing wrong" — not "ask whenever uncertain." Uncalibrated, this produces the over-questioning failure mode. One question at a time, with a recommended default, so the user confirms cheaply rather than authoring from scratch.
+- **Abstention remains the fallback.** If clarification fails (no answer, ambiguous answer, or the bounded self-check below exhausts), the agent falls back to abstention — flag the residual uncertainty and proceed with the best reading or decline. Clarification never replaces abstention; it sits on top of it.
+
+#### Bounded sufficiency self-check
+
+When clarification-seeking is active, the agent needs a self-check to know whether the user's feedback actually resolved the fork — otherwise it either proceeds on a still-ambiguous answer or interrogates endlessly. The self-check is a small, bounded loop:
+
+1. **After each user answer, assess sufficiency.** Did this answer resolve the specific material fork that prompted the question? State (to itself) what was uncertain, what the user said, and whether the gap is now closed.
+2. **If sufficient → proceed.** Acknowledge the resolution briefly and continue. Do not ask redundant confirmation questions once the fork is closed; over-confirmation is its own failure mode.
+3. **If insufficient → one targeted follow-up.** The answer was itself ambiguous or revealed a deeper gap. Ask one more precise question, naming exactly what's still unresolved.
+4. **Bounded.** After ~2 rounds on the same fork without resolution, stop asking. Fall back to abstention: state the best available reading, flag the residual uncertainty explicitly, and proceed or decline. Endless clarification is a failure mode; the cap prevents it.
+
+The self-check is `examine_answer` applied to the conversation rather than to a reasoning trace — it asks "is the gathered context sufficient for the task?" rather than "is this solution correct?". Phrase it concretely in the prompt: "Before proceeding, confirm the user's answer resolved [the specific fork]. If it did, continue. If it left a material gap, ask one targeted follow-up. After two rounds without resolution, proceed with your best reading and flag what remains uncertain."
+
+- **Failure modes:** (a) no self-check → agent proceeds on a half-answer or loops forever; (b) unbounded self-check → interrogation; (c) self-check without abstention fallback → agent stalls when the user can't resolve the fork. All three are caught by the bounded-loop-plus-abstention-floor structure above.
+
+### Long-horizon operators (Shape 1; some apply to Shape 4 workers on long tasks)
+
+Six compact operators for long-autonomy prompts, adapted from vendor guidance on long-run agent behavior. Each earns its place only when the run is genuinely long (M5 applies); a two-checkpoint task needs none of them.
+
+**Progress-claim grounding.**
+- **Amplifies:** evidence-backed status reporting — every progress claim auditable against a tool result from the session; unverified work reported as unverified; failures reported with output.
+- **Suppresses:** fabricated status reports, optimistic summaries of skipped steps. Vendor testing reports this instruction nearly eliminated fabricated status even on tasks designed to elicit them.
+- **Strength:** strong on long runs. **Place with the status-update contract.** Commutes with format operators; does not commute with "report concisely" (grounding constrains *what* may be claimed before brevity compresses it — apply grounding first).
+
+**Checkpoint policy.**
+- **Amplifies:** pausing only where the human is genuinely required — destructive or irreversible actions, real scope changes, input only the user can provide.
+- **Suppresses:** permission-seeking on reversible actions that follow from the original request; enumerating every pause case (a brief policy outperforms enumeration on high-instruction-following substrates).
+- **Strength:** mid. **Place in the loop-contract section.** Pairs with anti-early-stopping below; on lower tiers may need the enumerated form.
+
+**Anti-early-stopping.**
+- **Amplifies:** finishing the turn's actual work — if the drafted ending is a plan, a question the agent can answer itself, or a promise ("I'll now run X"), the instruction converts it into the tool calls that do X now.
+- **Suppresses:** text-only statements of intent without the corresponding action; turn-ending permission requests the checkpoint policy doesn't sanction.
+- **Strength:** mid; rises on very long sessions where the failure mode concentrates. **Place adjacent to the checkpoint policy** — they are two halves of one contract: stop only at real checkpoints, and never stop on a promise.
+
+**Memory-file conventions.**
+- **Amplifies:** durable, deduplicated lessons — one lesson per file/entry with a one-line summary on top; corrections and confirmed approaches recorded with *why they mattered*; existing notes updated rather than duplicated; wrong notes deleted.
+- **Suppresses:** memory bloat, stale contradictory notes, re-recording what the repo or conversation history already holds.
+- **Strength:** weak per turn, compounding across sessions. **Place in the memory-file specification** of the seed brief.
+
+**Deviations log.**
+- **Amplifies:** a disciplined rule for how the agent collapses ambiguity it discovers itself mid-run: when an edge case forces departure from the plan, take the conservative option, record it under a "Deviations" heading in an implementation-notes file, and continue.
+- **Suppresses:** silent plan divergence (no audit trail) and its opposite failure, halting on every discovered unknown. This is the runtime complement of the interview: unknowns found *during* the work get collapsed conservatively and logged for the next planning pass.
+- **Strength:** mid. **Place with the memory-file conventions**; the notes file is where the next session's plan revision starts.
+
+**Verbatim user-channel (send-to-user pattern) — harness-dependent.**
+- **Amplifies:** mid-run delivery of content the user must see exactly as written (a partial deliverable, a direct answer to a mid-loop question, a progress update with specific numbers) via a dedicated tool whose input renders verbatim — tool inputs are never summarized.
+- **Suppresses:** burying verbatim-critical content inside summarizable narration.
+- **Strength:** weak-to-mid; only meaningful when the harness defines the tool. **Two-part operator:** the tool definition alone under-fires — pair it with elicitation language in the prompt ("when you have content the user must read verbatim, call send_to_user with it; not for narration or reasoning"). Flag as harness-dependent in delivery; omit entirely when the runtime has no such tool.
+
+**Lead-with-outcome (final summaries to humans).**
+- **Amplifies:** re-grounding the reader — the first sentence answers "what happened / what did you find"; supporting detail after; selectivity over compression (drop details that don't change what the reader does next, rather than compressing everything into fragments); session-local shorthand, arrow chains, and made-up labels dropped or re-introduced in plain language.
+- **Suppresses:** working-thread continuations delivered as summaries — dense shorthand, references to reasoning the user never saw, vocabulary the agent built up mid-run.
+- **Strength:** weak; commutes with most operators. Applies to the *final agent-to-human message* of Shapes 1 and 4, not to inter-agent output (that's `manage-agent-design.txt`, which optimizes for the opposite reader) and not to mid-run narration.
+- **Place in the status-update / final-report contract.** One sentence of it is usually enough on high-instruction-following substrates.
+
+### Worked examples (for loop-based prompts)
+
+- **Amplifies:** the canonical shape of expected behavior.
+- **Suppresses:** divergent shapes.
+- **Strength:** very high for shape; weak for content.
+- **Place at the end of the contract sections** they exemplify.
+
+## Section combinations: interference effects (§5.4)
+
+Some pairs produce emergent behavior beyond the sum of their parts. Watch for these:
+
+### Persona + tone
+
+- Constructive: "expert + dry tone" produces a recognizable Stack-Overflow voice.
+- Destructive: "warm assistant + brutally honest" can cancel — model defaults to neither.
+
+### Format + reasoning visibility
+
+- Constructive: structured output with reasoning field forces visible reasoning that's parseable.
+- Destructive: "JSON output" + "show your reasoning" without a reasoning field in the JSON produces inconsistent structure.
+
+### Multiple personas
+
+- Always interferes. "You are a security engineer AND a UX designer" is not "two reviews concatenated" — it's a different operator entirely. May be desired (cross-cutting reviews) or undesired (mode collapse).
+
+### Constraint stacking
+
+- "Be concise" + "be thorough" cancels.
+- "Be concise" + "but cover all error cases" creates mode collapse — the model picks one.
+
+### Refusal patterns + warm tone
+
+- Often destructive. The warmth softens the refusal until it stops being a refusal.
+
+## Designing the operator sequence
+
+When drafting a prompt, lay out the operators in this order and audit for interference:
+
+1. **Identity / persona** (strongest; sets the subspace)
+2. **Domain / context** (often merged with identity)
+3. **Task definition** (the projection within the subspace)
+4. **Constraints** (further narrowing)
+5. **Few-shot examples** (high-leverage; place near the rules they teach)
+6. **Procedure / checkpoints** (for loop-based)
+7. **Failure modes** (high-attention end position)
+8. **Output format** (last unless dominant)
+9. **Worked examples** (anchor the structure)
+10. **Done definition / start instruction** (terminal projection)
+
+This ordering reflects §5.1's principle: broadest framing first, narrowing constraints next, format last. Departures from this ordering should be deliberate, with a clear reason.
+
+========================================================================
+SOURCE: references/reasoning-patterns.md
+========================================================================
+
+# Reasoning patterns
+
+Some prompts need more than a single instruction-and-example shape — they need to scaffold the model's reasoning into discrete steps. This file documents reasoning-step patterns that cut across the seven prompt shapes. They're not shapes themselves; they're sub-patterns invoked *inside* a shape (typically inside a one-shot, a workflow stage, a sub-agent prompt, an LLM-as-judge, or a checkpoint of an agentic loop).
+
+## Cognitive tools
+
+**Source.** Ebouky, Bartezzaghi, Rigotti, IBM Research Zurich, "Eliciting Reasoning in Language Models with Cognitive Tools" (arXiv:2506.12115, 2025).
+
+**Empirical result.** Across mathematical reasoning benchmarks (AIME2024, MATH500, AMC, Smolbenchmark), cognitive tools produce consistent and substantial gains over baseline prompting:
+
+- **GPT-4.1 on AIME2024: 26.7% → 43.3% pass@1.** Near-parity with o1-preview (44.6%), achieved without any post-training.
+- **Llama 3.3-70B on AIME2024: 13.1% → 29.8%.** On Smolbenchmark, the same model goes from 52.8% to 80% with cognitive tools enabled — a +27.2% absolute jump.
+- **Qwen 2.5-32B on AMC: 52.6% → 62.7%.** Gains hold across model families (Qwen, Llama, GPT).
+
+The pattern's strength is that it works without RL fine-tuning and without changing model weights. It's pure prompt engineering, but a specific kind that depends on tool-calling infrastructure.
+
+**Scope of the empirical claim, stated honestly.** The published gains were measured on the model generations available at publication (2024–2025-era GPT, Llama, and Qwen families) — what the framework's substrate axis calls the **legacy and strong tiers**. The result has not been demonstrated on frontier-tier substrates, and vendor guidance for those substrates points the other way: general instructions often outperform prescriptive step-by-step decomposition there, and over-prescriptive scaffolds can degrade output quality (Principle 9, substrate relativity — a prescriptive operator over-projects on a substrate whose own defaults would have resolved the states better).
+
+**Tier gating, accordingly:** on legacy and strong tiers, the two-signal structural default stands — hard-reasoning signals plus tool-calling runtime → ship the scaffold. On the **frontier tier**, the scaffold is downgraded to an M5-triggered option: include it only when the user reports a demonstrated first-try failure on that substrate, or explicitly requests it; otherwise prefer a brief general reasoning instruction ("think thoroughly, verify before answering") and let the substrate decompose for itself. If shipped on a frontier substrate, note in the delivery that the empirical evidence does not cover that tier.
+
+**Reasoning-channel note (audit M6).** The scaffold passes the reasoning-channel check: each tool produces structured intermediate output as *tool results* (a sanctioned channel), and nothing in it instructs the model to transcribe internal thinking as response text. One clause deserves per-runtime attention: the system prompt's "describe your reasoning and clearly call it using their name" is tool-choice narration, not thinking transcription — acceptable everywhere; on runtimes with reasoning-extraction refusal categories, keep it as-is but do not strengthen it into "explain your full reasoning."
+
+**Per-model variability matters.** Different cognitive tools help different models differently. From the paper's Table 1 on Smolbenchmark:
+
+| Tool | Qwen 7B Δ | Qwen 32B Δ | Llama 8B Δ | Llama 70B Δ |
+|---|---|---|---|---|
+| understand_question | +2.8 | +2.9 | +10.7 | +26.7 |
+| recall_related | +0.3 | +4.6 | +4.5 | +22.3 |
+| examine_answer | +2.0 | +4.4 | +2.2 | +22.1 |
+| backtracking | +4.7 | +3.3 | +8.5 | +25.4 |
+
+For Llama 70B, every tool gives 20+ point gains. For Qwen 7B, gains are modest but consistent. The right interpretation: enable all four tools by default; if you're optimizing for token economy on a strong reasoner, you can test which subset suffices.
+
+## The pattern
+
+Define a small set of cognitive operations as **modular tool calls**. Each tool is an LLM invocation with a specific role-prompt that isolates one cognitive operation. The main reasoning LLM decides when to invoke which tool. The tool's output is structured intermediate work that flows back into the main reasoning loop.
+
+Four canonical tools, validated empirically:
+
+- **`understand_question`** — restate what's being asked, identify the goal, surface assumptions, name the unknowns, extract relevant symbols and variables.
+- **`recall_related`** — surface 2–3 similar problems with their full solutions as analogical examples. Does NOT solve the current problem.
+- **`examine_answer`** — given the current reasoning trace, verify it against the problem's constraints. Identify miscalculations, wrong assumptions, missing edge cases. Does NOT provide the answer; only critiques.
+- **`backtracking`** — given a flawed reasoning trace, identify where the first error occurred, propose a revision from that point, or suggest a new strategy.
+
+Modularity is the load-bearing property. The paper compares modular cognitive tools against monolithic cognitive prompting (the Kramer/Baumann variant where all operations live in one big system prompt) and finds **the modular version consistently wins**. The mechanism: each tool runs in a sandboxed context with only the inputs it needs, reducing interference from the rest of the reasoning trace. Monolithic prompts force the model to juggle all operations in one shot, and the operations interfere.
+
+**Why this works (mechanistically).** Discrete named operations align with the symbolic-induction circuits Yang et al. identified — the model's middle-layer heads do better with explicit decomposition than with implicit chained reasoning. Naming the operations also gives the model permission to backtrack, which monolithic CoT discourages structurally (the model is biased toward forward continuation, and an unbroken trace makes revision feel disruptive). When backtracking is a named tool, invoking it is "doing the right thing," not "admitting failure."
+
+## When to use it
+
+The cognitive-tools pattern adds tokens, latency, and infrastructure complexity (the runtime must support tool calling). It's worth the cost when:
+
+- **Hard multi-step reasoning** — math, logic, code analysis, multi-constraint planning, theorem proving, debugging.
+- **Tasks where backtracking matters** — the answer space has dead ends; first-attempt reasoning often fails.
+- **Tasks where verifying the answer is significantly easier than producing it** — `examine_answer` becomes a strong filter.
+- **High-stakes single-shot tasks** — when you can't run the prompt twice and need the first attempt to be robust.
+- **You have tool-calling infrastructure** — this is a hard requirement; the pattern degenerates to cognitive prompting (which is weaker) without it.
+
+It's *not* worth the cost for:
+
+- Simple extraction or classification (the overhead exceeds the benefit).
+- Creative or open-ended generation (`backtracking` makes no sense without a verifiable target).
+- Latency-sensitive production paths (the pattern roughly doubles to triples output length).
+- Runtimes without tool calling — the pattern's empirical advantage comes from modularity, which requires the sandboxed tool execution.
+
+## How it composes inside the seven shapes
+
+- **Shape 2 (one-shot complex task).** Primary fit. For hard-reasoning Shape 2 prompts (math, logic, code analysis, multi-constraint planning), cognitive tools should be the default structural choice, not an optional extension. The hard-reasoning signals trigger inclusion automatically during drafting.
+- **Shape 3 (workflow / chain).** Use cognitive tools inside a single hard-reasoning stage — typically the synthesis or decision stage. Don't use them in every stage; the overhead compounds.
+- **Shape 1 (agentic loop).** Cognitive tools belong inside individual checkpoints where reasoning is hard, not in the loop scaffolding itself. The checkpoint description should mention: "for this checkpoint, structure your reasoning using the cognitive-tools pattern."
+- **Shape 4 (sub-agent / tool).** Use when the sub-agent's job is itself reasoning-heavy. A "code reviewer sub-agent" benefits from cognitive tools; a "extract author from citation" sub-agent does not.
+- **Shape 5 (system persona).** Generally don't fit. Personas are about behavior over time, not single reasoning episodes. Exception: a persona specifically designed for hard-reasoning work (a tutor, a code reviewer, a research assistant) can reference the pattern in its scope description.
+- **Shape 6 (LLM-as-judge).** Fit depends on the kind of judge. **Evaluative judges** — open-ended quality assessment where the score requires genuine reasoning ("rate this essay's persuasiveness," "how well does this code handle edge cases") — are a strong fit. `understand_question` maps to rubric internalization, `recall_related` to anchoring on calibration examples, `examine_answer` to self-critique of the score, `backtracking` to revising a flawed initial judgment. **Checklist verifiers** — predefined items each directly checkable against the artifact ("does the table use Hit Policy U," "does the abstract state assumptions A1–A5") — are NOT a fit. The decomposition is already done (it's the checklist); each item is a direct lookup against evidence, not a reasoning problem with a search space. Adding cognitive tools to a checklist verifier is ceremony. The test is the same as for Shape 2: does scoring each item require *discovering* a judgment (evaluative → cognitive tools help), or just *checking* presence/correctness against the artifact (checklist → skip them)? A single Shape 6 prompt can be mixed — mostly checklist with one or two genuinely evaluative items — in which case scope cognitive tools to the evaluative items only, not the whole verifier.
+- **Shape 7 (agent team).** Cognitive tools work at the per-role level (a specific worker uses them) rather than at the team level. Apply per-role using the relevant shape's guidance above.
+
+## Operator profile
+
+In the framework's operator vocabulary, the cognitive-tools pattern as a whole is:
+
+- **Strength:** strong for hard-reasoning tasks; mid otherwise.
+- **Amplifies:** structured decomposition, explicit verification, willingness to backtrack, alignment with the model's symbolic-induction circuits.
+- **Suppresses:** premature commitment, monolithic forward-only reasoning, "looks confident but wrong" outputs.
+- **Mixes:** rarely — each tool has a discrete role.
+- **Place after constraints, before output format.** The model needs to know what it's solving (constraints) before it knows how to decompose, but the output format (where the answer goes) comes last.
+- **Commutation:** non-commutative with output format. If output format is placed before cognitive tools, the model often jumps to the format and skips the reasoning structure.
+
+## The verbatim scaffold (production-ready)
+
+The paper publishes the exact prompts that produced the empirical results above. The framework ships these verbatim because the empirical claim depends on them. Adapt the domain framing (the published prompts target math; the structure generalizes) but preserve the operational specifics.
+
+### System prompt
+
+```
+You are an expert assistant who solves problems thoughtfully and effectively. You have access to a list of tools — these are functions that you can call to help you reason through or solve the problem more efficiently.
+
+You are encouraged to use tools when they make the task easier, clearer or more robust — especially for complex, elaborated or ambiguous questions.
+
+Use your best judgment to decide when to call tools.
+
+You may call tools at any point in your reasoning process. Only use the tools listed below. If you choose to use a tool, describe your reasoning and clearly call it using their name.
+
+You can solve problems however you find most appropriate.
+
+When you are ready to provide the final answer to the problem or the question always follow the syntax: 'ANSWER: answer'.
+
+You only have access to these tools, do not use any others:
+{{cognitive_tools_signature}}
+
+Here are the rules you should always follow to solve your task:
+1. **Call a tool when needed.** If you call a tool, only use the available ones and use its full name to do so.
+2. **Don't give up!** You're in charge of solving the problem.
+3. Do not give an answer without reasoning about it.
+4. **Never hallucinate results.** Wait for tool responses before continuing.
+5. **Only write your final answer** after you are confident, and always in the form: 'ANSWER: your final answer here'.
+
+If the question is already clear, you may skip the 'understand_question' step when the corresponding tool is available. But when unsure, it's good practice to use it.
+
+Now Begin!
+```
+
+Domain adaptation notes: For non-math tasks, replace "problem" with the task noun ("query", "case", "document") and adjust the ANSWER format if the user's output schema demands something other than `ANSWER: ...` (e.g., JSON). Keep the rules section intact — its structure is load-bearing.
+
+### Tool prompt: understand_question
+
+```
+You are an expert reasoning assistant designed to analyze and break down complex problems into structured steps to help the system that actually solves problems. Your goal is to:
+
+1. Identify the core concepts involved.
+2. Extract and categorize relevant symbols, variables, functions, or entities from the problem.
+3. Rephrase the problem into a step-by-step sequence that makes solving easier.
+4. Highlight any known theorems, techniques, or principles that might be useful in solving the problem.
+5. DO NOT provide any answer to the question, only provide instructions which will guide the upstream system.
+```
+
+The "DO NOT provide any answer" line is critical. Without it, the tool drifts into solving the problem itself, which collapses the modularity benefit. The original paper's math-specific framing ("mathematical reasoning assistant") can be generalized as shown — the operational discipline (decompose, do not solve) is what transfers.
+
+### Tool prompt: recall_related
+
+```
+You are a retrieval assistant whose purpose is to help solve new problems by providing solved examples of analogous problems.
+
+Given a new problem, your task is to:
+1. Identify 2 or 3 similar problems from your knowledge that require comparable concepts or reasoning steps.
+2. For each similar problem:
+   - Provide the full problem statement.
+   - Provide a complete step-by-step solution, including relevant formulas, simplifications, or code.
+   - Highlight the final answer.
+
+Do NOT solve the current problem. Instead, present only useful analogous examples that could help someone reason through it.
+
+Output Format:
+Analogous Example 1:
+Q: [Similar Problem 1]
+A: [Step-by-step solution...]
+Final Answer: ....
+
+Analogous Example 2:
+Q: [Similar Problem 2]
+A: [Step-by-step solution...]
+Final Answer: ....
+
+Notes:
+- Select examples with strong structural or conceptual similarity, not just keyword overlap.
+- Variation in surface details (numbers, variable names, specific entities) is acceptable as long as the underlying logic aligns.
+```
+
+### Tool prompt: examine_answer
+
+```
+You are an expert assistant tasked with verifying and improving solutions to complex problems. Your role is NOT to solve the problem but to critically analyze the provided solution for correctness, clarity, and completeness. You will be given a problem/question and the current reasoning that has been produced so far.
+
+Your Task:
+
+1. Understanding the Problem
+   - Ensure the proposed solution correctly interprets the given problem.
+   - Identify the core concepts involved.
+   - Extract and categorize relevant symbols, variables, functions, or entities.
+   - Identify any implicit assumptions or missing constraints.
+
+2. Verifying the Given Solution
+   - Clearly state what the current proposed answer is.
+   - Break the provided solution down into distinct logical steps.
+   - Check for logical consistency, correctness, and proper justification.
+   - Identify any miscalculations, incorrect assumptions, or unjustified leaps in reasoning.
+   - Analyze the edge cases or conditions where the solution may fail.
+
+3. Testing and Validation (Problem-Derived Checks)
+   - Extract any constraints, conditions, identities, or testable properties from the problem.
+   - Derive test cases or evaluation criteria based on those constraints.
+   - Test the proposed answer against each derived test.
+   - State whether the answer passes all derived problem-based tests.
+
+4. Suggesting Improvements
+   - If an error is found, explain precisely what is wrong and why.
+   - Suggest possible fixes or improvements WITHOUT directly solving the problem.
+   - Propose alternative methods where relevant.
+
+5. Providing a Judgment
+   - Clearly state whether the proposed solution is correct or incorrect.
+   - Justify your judgment with a concise explanation.
+   - If incorrect, recommend corrections without providing a direct answer.
+
+Guidelines:
+- DO NOT provide the actual answer to the problem.
+- Focus only on verifying and critiquing the given solution.
+- Be rigorous in checking correctness but also constructive in suggesting improvements.
+- Explicitly state whether the answer is correct or incorrect.
+
+Now, critically analyze the solution, highlight any mistakes, and suggest improvements where necessary.
+```
+
+### Tool prompt: backtracking
+
+```
+You are a careful problem-solving assistant with the ability to backtrack from flawed logic.
+
+You will be given a problem and a reasoning trace. Your task is to:
+
+1. Analyze the reasoning and summarize it into distinct steps.
+2. Identify where the first error, bad assumption, or confusion occurs (if any).
+3. Propose how to revise the approach from that point onward, using the steps that you have defined.
+4. If the entire approach was invalid, suggest a better strategy from scratch.
+
+Use the following format for your response:
+
+**Identified Issues:**
+- Step X: Explain what is incorrect or suboptimal.
+- (Repeat for any additional steps if needed.)
+
+**Backtrack Point:**
+- Indicate the step where reasoning was still valid and you can continue from.
+
+**Revised Strategy (from backtrack point or new):**
+- Present a step-by-step strategy to solve the problem correctly from this point.
+
+Be precise and critical. Avoid vague judgments. Always backtrack to the most recent correct step, unless no step is valid.
+```
+
+## Shipping the tool definitions (runtime-specific formats)
+
+The verbatim system prompt and per-tool prompts above are the substance. To make them runnable, they must be wrapped in the tool-definition format that the user's runtime expects. Below are the two most common formats; adapt to other runtimes by following the same pattern.
+
+The pattern is constant across runtimes: each tool has a name, a description (which is the per-tool system prompt above), and an input schema describing what the calling model passes when it invokes the tool. The calling model passes the relevant context — typically the original problem and, for `examine_answer` and `backtracking`, the current reasoning trace.
+
+### Anthropic API format
+
+```python
+COGNITIVE_TOOLS = [
+    {
+        "name": "understand_question",
+        "description": """You are an expert reasoning assistant designed to analyze and break down complex problems into structured steps to help the system that actually solves problems. Your goal is to:
+
+1. Identify the core concepts involved.
+2. Extract and categorize relevant symbols, variables, functions, or entities from the problem.
+3. Rephrase the problem into a step-by-step sequence that makes solving easier.
+4. Highlight any known theorems, techniques, or principles that might be useful in solving the problem.
+5. DO NOT provide any answer to the question, only provide instructions which will guide the upstream system.""",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "question": {
+                    "type": "string",
+                    "description": "The problem or question to analyze."
+                }
+            },
+            "required": ["question"]
+        }
+    },
+    {
+        "name": "recall_related",
+        "description": """You are a retrieval assistant whose purpose is to help solve new problems by providing solved examples of analogous problems.
+
+Given a new problem, your task is to:
+1. Identify 2 or 3 similar problems from your knowledge that require comparable concepts or reasoning steps.
+2. For each similar problem:
+   - Provide the full problem statement.
+   - Provide a complete step-by-step solution, including relevant formulas, simplifications, or code.
+   - Highlight the final answer.
+
+Do NOT solve the current problem. Instead, present only useful analogous examples that could help someone reason through it.
+
+Output Format:
+Analogous Example 1:
+Q: [Similar Problem 1]
+A: [Step-by-step solution...]
+Final Answer: ....
+
+Analogous Example 2:
+Q: [Similar Problem 2]
+A: [Step-by-step solution...]
+Final Answer: ....
+
+Notes:
+- Select examples with strong structural or conceptual similarity, not just keyword overlap.
+- Variation in surface details is acceptable as long as the underlying logic aligns.""",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "question": {
+                    "type": "string",
+                    "description": "The problem or question for which to retrieve analogous examples."
+                }
+            },
+            "required": ["question"]
+        }
+    },
+    {
+        "name": "examine_answer",
+        "description": """You are an expert assistant tasked with verifying and improving solutions to complex problems. Your role is NOT to solve the problem but to critically analyze the provided solution for correctness, clarity, and completeness. You will be given a problem/question and the current reasoning that has been produced so far.
+
+Your Task:
+
+1. Understanding the Problem
+   - Ensure the proposed solution correctly interprets the given problem.
+   - Identify the core concepts involved.
+   - Extract and categorize relevant symbols, variables, functions, or entities.
+   - Identify any implicit assumptions or missing constraints.
+
+2. Verifying the Given Solution
+   - Clearly state what the current proposed answer is.
+   - Break the provided solution down into distinct logical steps.
+   - Check for logical consistency, correctness, and proper justification.
+   - Identify any miscalculations, incorrect assumptions, or unjustified leaps in reasoning.
+   - Analyze the edge cases or conditions where the solution may fail.
+
+3. Testing and Validation
+   - Extract any constraints, conditions, identities, or testable properties from the problem.
+   - Derive test cases or evaluation criteria based on those constraints.
+   - Test the proposed answer against each derived test.
+   - State whether the answer passes all derived problem-based tests.
+
+4. Suggesting Improvements
+   - If an error is found, explain precisely what is wrong and why.
+   - Suggest possible fixes or improvements WITHOUT directly solving the problem.
+
+5. Providing a Judgment
+   - Clearly state whether the proposed solution is correct or incorrect.
+   - Justify your judgment with a concise explanation.
+
+Guidelines:
+- DO NOT provide the actual answer to the problem.
+- Focus only on verifying and critiquing the given solution.
+- Be rigorous in checking correctness but also constructive in suggesting improvements.
+- Explicitly state whether the answer is correct or incorrect.""",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "question": {
+                    "type": "string",
+                    "description": "The original problem or question."
+                },
+                "current_reasoning": {
+                    "type": "string",
+                    "description": "The reasoning trace produced so far, including the proposed answer if present."
+                }
+            },
+            "required": ["question", "current_reasoning"]
+        }
+    },
+    {
+        "name": "backtracking",
+        "description": """You are a careful problem-solving assistant with the ability to backtrack from flawed logic.
+
+You will be given a problem and a reasoning trace. Your task is to:
+
+1. Analyze the reasoning and summarize it into distinct steps.
+2. Identify where the first error, bad assumption, or confusion occurs (if any).
+3. Propose how to revise the approach from that point onward, using the steps that you have defined.
+4. If the entire approach was invalid, suggest a better strategy from scratch.
+
+Use the following format for your response:
+
+**Identified Issues:**
+- Step X: Explain what is incorrect or suboptimal.
+- (Repeat for any additional steps if needed.)
+
+**Backtrack Point:**
+- Indicate the step where reasoning was still valid and you can continue from.
+
+**Revised Strategy (from backtrack point or new):**
+- Present a step-by-step strategy to solve the problem correctly from this point.
+
+Be precise and critical. Avoid vague judgments. Always backtrack to the most recent correct step, unless no step is valid.""",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "question": {
+                    "type": "string",
+                    "description": "The original problem or question."
+                },
+                "current_reasoning": {
+                    "type": "string",
+                    "description": "The reasoning trace that needs to be backtracked over."
+                }
+            },
+            "required": ["question", "current_reasoning"]
+        }
+    }
+]
+```
+
+Usage with the Anthropic SDK:
+
+```python
+response = client.messages.create(
+    model="claude-...",
+    system=COGNITIVE_TOOLS_SYSTEM_PROMPT,  # the verbatim system prompt from earlier in this file
+    tools=COGNITIVE_TOOLS,
+    messages=[{"role": "user", "content": problem_statement}]
+)
+```
+
+The runtime handles the tool-call loop: when the model invokes a tool, the runtime extracts the tool name and inputs, calls another model with the tool's description as the system prompt and the inputs as the user message, and returns the result to the main reasoning loop.
+
+### OpenAI API format
+
+```python
+COGNITIVE_TOOLS = [
+    {
+        "type": "function",
+        "function": {
+            "name": "understand_question",
+            "description": "Analyzes and breaks down complex problems into structured steps. Identifies core concepts, extracts variables, rephrases the problem into solvable steps, and highlights useful theorems or techniques. Does NOT provide an answer.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "question": {
+                        "type": "string",
+                        "description": "The problem or question to analyze."
+                    }
+                },
+                "required": ["question"]
+            }
+        }
+    },
+    # ... (recall_related, examine_answer, backtracking follow the same pattern)
+]
+```
+
+OpenAI's function-calling format puts the description in the `function.description` field. For the per-tool system prompts to actually be passed to the tool's LLM call, the implementing code needs to use those prompts when constructing the sub-call — the `function.description` field is only for the orchestrating model to decide *when* to call the tool, not for the tool's execution. This means OpenAI's runtime requires slightly more wiring code than Anthropic's: when the orchestrator calls a cognitive tool, the wrapper code makes a separate OpenAI call using the per-tool system prompt and returns the result.
+
+```python
+def execute_cognitive_tool(tool_name, tool_args):
+    system_prompts = {
+        "understand_question": UNDERSTAND_QUESTION_PROMPT,
+        "recall_related": RECALL_RELATED_PROMPT,
+        "examine_answer": EXAMINE_ANSWER_PROMPT,
+        "backtracking": BACKTRACKING_PROMPT,
+    }
+    response = client.chat.completions.create(
+        model="gpt-...",
+        messages=[
+            {"role": "system", "content": system_prompts[tool_name]},
+            {"role": "user", "content": str(tool_args)}
+        ]
+    )
+    return response.choices[0].message.content
+```
+
+### Other runtimes
+
+For tool-calling runtimes not listed above (Gemini, Mistral, local models with function-calling fine-tunes), follow the same pattern: each tool gets a name, a description (the per-tool system prompt), and an input schema declaring `question` plus `current_reasoning` where applicable. The orchestrator's system prompt references the four tools by name.
+
+The constant across all runtimes: the per-tool system prompts must be passed to the LLM that executes the tool. If the runtime's tool-call interface doesn't natively pass the description as a system prompt (most don't — they use it only for orchestrator routing), the implementing wrapper code must do so explicitly. This is the most common point of failure when deploying cognitive tools: people register the tools but don't wire the per-tool system prompts, getting tool-call routing without the modularity benefit.
+
+## What to skip from the published scaffold
+
+The paper's prompts include a few lines the framework deliberately doesn't reproduce:
+
+- **"If you solve the task correctly, you will receive a reward of $1,000,000."** This is prompt-engineering folklore that doesn't replicate cleanly. Including it would be cargo-culting.
+- **"ONLY USE Python to call an available tool and not for something else."** This is implementation-specific. If your runtime uses a different tool-call syntax (Anthropic's structured tool blocks, OpenAI's function calling), adapt accordingly.
+- **The "use_code" auxiliary tool.** The paper includes a code-execution tool alongside the four cognitive tools. This is genuinely useful for math but is not a cognitive tool — it's an external computation tool. Add it independently when your task benefits from code execution.
+
+## Other reasoning patterns worth knowing about
+
+The cognitive-tools pattern is the best-documented one for tool-calling runtimes. Briefly, two others appear in the literature with weaker but real evidence:
+
+- **Self-consistency** (Wang et al., 2022). Sample multiple reasoning paths at temperature > 0, take the majority answer. Useful when reasoning is unreliable but verification is easy. Costs N× the LLM calls.
+- **Tree-of-thoughts** (Yao et al., 2023). Explicit tree search over reasoning steps with pruning. Powerful for puzzle-like problems but expensive and rarely needed in practice.
+
+Both are out of scope for most prompt-architect users. Mentioned here for completeness; cognitive tools is the one to reach for first when reasoning quality is the bottleneck on a tool-calling runtime.
+
+## What to skip in general
+
+The literature on prompting "reasoning enhancements" is large and most of it doesn't replicate well. Specifically:
+
+- Generic "think step by step" prefixes — the effect is real but small, and modern models do this by default.
+- Personas-as-experts ("you are an expert mathematician") — reliable but weak; the cognitive-tools pattern subsumes the gain.
+- Long lists of "tips for solving this problem" — preemptive edge-case bloat. Doesn't replicate.
+
+When in doubt, the simpler the reasoning scaffolding, the better. Cognitive tools is at the right altitude — specific named operations with mechanistic justification, empirical validation, and published prompts that work.
+

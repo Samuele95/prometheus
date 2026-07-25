@@ -1,0 +1,26 @@
+cff-version: 1.2.0
+title: "Prometheus: a meta-prompting framework for agentic systems"
+message: "If you use this framework in your research, please cite it."
+type: software
+authors:
+  - name: "Samuele Stronati"
+repository-code: "https://github.com/Samuele95/prometheus"
+url: "https://samuele95.github.io/prometheus/code-forge.html"
+abstract: >-
+  Prometheus is a build-time meta-prompting framework that designs, audits, and
+  refactors prompts for tool-calling LLM agents. It treats a prompt as an
+  operator acting on a model's distribution over interpretations rather than a
+  key that retrieves a stored answer, and covers seven structural prompt shapes
+  across three modes: from-scratch design, refactor, and MAPE-K lifecycle
+  management of a deployed agent. Every deliverable ships with a verifier
+  specification across static, single-run, and cross-run layers.
+keywords:
+  - prompt engineering
+  - meta-prompting
+  - large language models
+  - agentic systems
+  - LLM-as-judge
+  - context engineering
+license: MIT
+version: "2.0.0"
+date-released: "2026-07-25"

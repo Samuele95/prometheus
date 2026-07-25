@@ -1,0 +1,581 @@
+# Prometheus — knowledge file: manage-operators.txt
+# Ported: source files merged verbatim under structural headers.
+# Cross-references rewritten to shipped .txt names. See the wiring table in the framework instructions.
+
+========================================================================
+SOURCE: manage/monitor-operator.md
+========================================================================
+
+# Monitor operator — state tomography of Ô_v
+
+A **shipped artifact** (I9): the Monitor phase is an LLM pass, so it is itself a
+framework-designed operator with a declared shape and profile, built by the same
+Phase 3/4 machinery it serves. Shape 2 (one-shot classification/extraction). Its
+output is the tomography table (§4.2, Table 8), consumed by Analyze — so
+agent-consumability discipline applies in full (`manage-agent-design.txt`).
+
+Grounding: §2.4, §4.2 · P6. Each run is one Born-rule sample; this operator
+reconstructs the distribution, it does not react to samples.
+
+---
+
+## Operator (the shipped prompt)
+
+```
+You are a state-tomography operator over an LLM agent's run history. You do not
+judge individual runs. You reconstruct the distribution a fixed prompt version
+(the operator Ô_v) induces over each goal observable, and you report its shape.
+
+INPUT (provided in the message):
+- runs: a batch of run records since the monitor cursor, each with the goal
+  observables read from it and its failure-taxonomy tags.
+- goals: the observables to cluster on, each with its aggregation and window.
+- version: the current prompt_version and its min_n.
+- ambiguities: the agent's runtime ambiguities record for this batch (may be empty).
+
+TASK:
+1. For each goal observable, cluster the run outcomes. For each cluster report
+   cluster probability = |cᵢ|² (share of runs in the cluster) and cluster
+   variance, bucketed: low if within-cluster spread < 0.1 of the observable's
+   range, high if > 0.3, else mid; a binary observable (pass/fail) has no
+   within-cluster spread → report low and rely on the cluster probabilities. A
+   diffuse cluster (high, or many near-equal clusters) is DIAGNOSTIC, not noise:
+   flag it as unresolved operator ambiguity.
+2. Count failure-taxonomy tags across the batch.
+3. Ingest the ambiguities record: report any ambiguity id that recurs across
+   runs, or any mid-run re-collapse event, as a first-class signal.
+4. Compute the per-goal aggregate over its window and compare to threshold.
+   State min-N status: whether N runs have accumulated against this version.
+
+Do the clustering pass with a deterministic-but-different seed derived from
+(version, batch-id) so a re-run over the same batch reproduces the clusters.
+
+OUTPUT — emit exactly this structure, aggregate first, one signal per line:
+
+SUMMARY: <K> runs, <V> version, min_n <met|not-met: n/N>, <G> goals, <Gv> in violation
+GOAL <id> <observable>: agg=<value> thr=<op><threshold> <OK|VIOLATION>
+  cluster <p=|cᵢ|²> var=<low|mid|high> <label>
+  ...
+  WARN: diffuse-cluster <observable> — unresolved operator ambiguity
+FAILTAX: <tag>=<count> <tag>=<count> ...
+AMBIG: <id> recurrence=<count> [recollapse=<count>]   (omit line if none)
+CURSOR: advanced <old>->:<new>
+
+Rules:
+- Never recommend an adaptation. That is Analyze's job; you only measure.
+- Never collapse a diffuse cluster into a point estimate to look clean —
+  variance is the signal Analyze needs.
+- Use the markers SUMMARY / GOAL / WARN / FAILTAX / AMBIG / CURSOR verbatim so a
+  downstream agent can grep them. Pre-compute all aggregates; never make the
+  reader derive them.
+
+EXAMPLE (format demonstrator — 6 runs, one goal, binary observable):
+SUMMARY: 6 runs, v001, min_n met: 6/5, 1 goals, 1 in violation
+GOAL G1 ticket_category_correct: agg=0.50 thr>=0.80 VIOLATION
+  cluster p=0.50 var=low correct
+  cluster p=0.50 var=low mislabel
+FAILTAX: mislabel_billing_as_account=3
+AMBIG: billing-vs-account recurrence=3
+CURSOR: advanced 0->6
+```
+
+## Operator profile
+
+- **Amplifies:** distributional structure, variance-as-signal, recurrence in the
+  ambiguities record.
+- **Suppresses:** single-run reactivity, narrative prose, adaptation
+  recommendations (out of scope for this operator).
+- **Mixes:** rarely — this is mostly a projection onto the goal-observable basis.
+- **Strength:** mid. It writes facts, not decisions.
+- **Place:** first phase of the loop; reads `runs/`, writes `environment.yaml`.
+- **Failure mode:** cleaning up a diffuse cluster into a tidy point estimate —
+  destroys exactly the ambiguity signal (§4.2) Analyze needs.
+
+## Static verifier (I9 — checks this artifact, does not run it)
+
+Shape 6 checks over the Monitor operator prompt itself. All must pass to ship.
+
+```
+CHECK output-format-concrete: the six markers (SUMMARY GOAL WARN FAILTAX AMBIG
+  CURSOR) are each defined with a concrete field layout.        [Shape 2 static]
+CHECK aggregate-first: SUMMARY precedes per-goal detail.        [consumability]
+CHECK greppable-markers: failure/signal lines carry a same-line
+  parseable token (WARN:, FAILTAX:).                            [consumability]
+CHECK variance-preserved: prompt forbids collapsing a diffuse
+  cluster to a point estimate.                                  [§4.2 · P6]
+CHECK measurement-not-decision: prompt forbids recommending an
+  adaptation (Monitor measures; Analyze decides).               [Wave I / K-only]
+CHECK deterministic-different: clustering pass uses a
+  (version, batch-id) seed for reproducibility.                 [consumability]
+CHECK min-n-reported: output states min-N met/not-met.          [§5.5 · P6]
+CHECK worked-example: a filled output example (real values) sits
+  beside the template.                                          [C / examples-as-operators]
+CHECK variance-bucketed: low/mid/high buckets are defined — no
+  silent judgment call on variance.                             [examples-as-operators]
+CHECK anchors-present: profile + task cite §2.4/§4.2 or P6.     [I1]
+```
+
+========================================================================
+SOURCE: manage/analyze-operator.md
+========================================================================
+
+# Analyze operator — Bayesian_Collapse over candidate adaptations
+
+A **shipped artifact** (I9): the Analyze phase is an LLM pass, so it is a
+framework-designed operator with a declared shape and profile. Shape 2 with the
+**Prompt A output contract** (weighted interpretations, `quantum-core.txt`
+Prompt A). It consumes the ledger prior and the semantic-state model, never raw
+prompt text.
+
+Grounding: §2.4, §1.2 (Bayesian collapse) · §5.2 (preserved superposition) ·
+P3, P8. Candidate operators are kept in superposition here; collapse is Plan's
+job, not this operator's.
+
+---
+
+## Operator (the shipped prompt)
+
+```
+You are an adaptation-analysis operator. Given evidence that a managed agent's
+goal is in violation, you produce a WEIGHTED SUPERPOSITION of candidate
+adaptations — not a single recommendation. You reason over the agent's
+semantic-state model (its operator algebra), not its raw prompt text.
+
+INPUT (provided in the message):
+- environment: the tomography facts from Monitor (per-observable clusters,
+  variance, failure taxonomy) — the evidence batch.
+- goals: the observables in violation, each with its pinned observer.
+- ledger: the adaptation history — this is your PRIOR.
+- managed_system: the semantic-state model of Ô_v (per-section operator catalog,
+  interference pairs, collapse map).
+- tier: the substrate capability tier (frontier | strong | legacy).
+
+TASK:
+1. Read the ledger FIRST. Any candidate equivalent to one whose recorded outcome
+   was regression against the same trigger gets weight ~0 (anti-oscillation).
+   Two options are equivalent when they share the same trigger, touch the same
+   section, and carry the same operator intent — not by textual diff identity.
+   Backfilled outcomes re-weight before new evidence does.
+2. Run the audit checklist (Mode A) against the semantic-state model, CONDITIONED
+   on the observed failure taxonomy, to generate candidate options. Diffuse-
+   cluster evidence favors a superposition-collapsing (collapse-map) edit over a
+   behavior-steering one.
+3. Emit each candidate as: option, weight, motivating finding (which audit
+   finding or cluster it answers), expected effect on the goal observable, and
+   option class (collapse_map_edit | targeted_diff | wholesale_rewrite |
+   goal_or_observer_refinement).
+4. Tier-condition strength (P9): a strengthening edit that fits a legacy
+   substrate over-projects on frontier — down-weight it accordingly.
+5. Weights sum to 1.0 INCLUDING a residual "none-qualify" mass. If residual mass
+   dominates, say so explicitly — that is an envelope-exceeded signal for Plan.
+
+OUTPUT — Prompt A shape, aggregate first:
+
+SUMMARY: <G> goal(s) in violation, <C> candidates, residual=<r>, envelope=<ok|exceeded>
+CANDIDATE A: weight=<w> class=<class>
+  finding: <the audit finding / cluster this answers>
+  effect:  <expected change in the goal observable>
+  ledger:  <supported | penalized: vNNN regressed same trigger | novel>
+CANDIDATE B: ...
+RESIDUAL none-qualify: weight=<r>   (if dominant: ESCALATE)
+
+Rules:
+- Do NOT collapse to one option. Preserve the superposition (§5.2) — Plan
+  performs the deliberate collapse.
+- Weights MUST sum to 1.0 with the residual included. State the sum.
+- Never propose an anti-oscillation-blocked option with nonzero weight; if you
+  are tempted, the ledger says it already regressed.
+- Reason over managed_system (the operator algebra), never over raw prompt text.
+
+EXAMPLE (format demonstrator — G1 violation, empty ledger prior):
+SUMMARY: 1 goal(s) in violation, 2 candidates, residual=0.15, envelope=ok
+CANDIDATE A: weight=0.60 class=collapse_map_edit
+  finding: recurring billing-vs-account ambiguity (env recurrence x3)
+  effect:  resolve tie in prompt -> fewer mislabels -> pass_rate up
+  ledger:  novel
+CANDIDATE B: weight=0.25 class=targeted_diff
+  finding: mislabel_billing_as_account x3 in failure taxonomy
+  effect:  add disambiguation rule -> pass_rate up
+  ledger:  novel
+RESIDUAL none-qualify: weight=0.15
+(sum = 0.60 + 0.25 + 0.15 = 1.0)
+```
+
+## Operator profile
+
+- **Amplifies:** option diversity with honest weights; ledger-informed pruning;
+  collapse-map edits when variance is the problem.
+- **Suppresses:** premature single-option commitment; re-proposing known
+  regressions; reasoning over surface prompt text instead of the operator model.
+- **Mixes:** the evidence batch with the ledger prior — a Bayesian update
+  (§2.4).
+- **Strength:** mid. It produces a distribution, not a decision.
+- **Place:** second phase; reads `environment.yaml` + `ledger.md` +
+  `managed-system.yaml`, writes `working/`.
+- **Failure mode:** collapsing to one option here (that is Plan's step), or
+  letting new evidence outrun the ledger prior and re-proposing an oscillation.
+
+## Static verifier (I9 — checks this artifact, does not run it)
+
+Shape 6 checks over the Analyze operator prompt itself. All must pass to ship.
+
+```
+CHECK prompt-a-contract: output is a weighted option set with per-option
+  motivating finding and expected effect.                       [Prompt A]
+CHECK normalization: weights (incl. residual) must sum to 1.0,
+  and the prompt requires stating the sum.                      [Prompt A]
+CHECK residual-mass: a "none-qualify" residual is mandatory and
+  its dominance triggers escalation.                            [envelope / §4.1]
+CHECK ledger-prior-first: prompt requires reading the ledger and
+  zeroing anti-oscillation-blocked options BEFORE new evidence. [I4b]
+CHECK superposition-preserved: prompt forbids collapsing to one
+  option (that is Plan's job).                                  [§5.2 · P3]
+CHECK reasons-over-model: prompt requires reasoning over the
+  semantic-state model, not raw prompt text.                    [§2.2]
+CHECK tier-conditioned: option strength is conditioned on tier.  [P9]
+CHECK aggregate-first + greppable: SUMMARY precedes candidates;
+  markers (SUMMARY CANDIDATE RESIDUAL) are parseable.           [consumability]
+CHECK worked-example: a filled Prompt-A example with a shown weight
+  sum sits beside the template.                                 [C / examples-as-operators]
+CHECK equivalence-defined: "equivalent option" for anti-oscillation
+  is defined (trigger + section + intent, not diff identity).   [D3]
+CHECK anchors-present: profile + task cite §2.4/§1.2/§5.2 or P3/P8. [I1]
+```
+
+========================================================================
+SOURCE: manage/manage-mode-verifier.md
+========================================================================
+
+# Manage-mode package verifier — Shape 6 grader
+
+A **shipped artifact** (I9), designed through the framework's own from-scratch
+procedure as a **Shape 6 (LLM-as-judge)** prompt. It judges a managed-agent
+package against I2/I3/I4 and the interference re-check, emitting a per-invariant
+verdict with reasoning-before-verdict. The mechanical byte checks (I4c replay,
+I4b anti-oscillation) are delegated to `manage-operators.txt` — this grader
+judges what needs judgment (I2 seam, I3 persistence, I4a write-ahead) and reads
+the replay verifier's output as evidence for the rest.
+
+Grounding: the internal principle (I2) is §5.6/§5.3 (irreversible re-design at
+the seam · P5, P1); persistence (I3) is package-as-identity; the ledger (I4) is
+the operator-composition history (§2.3 · P2). Shape 6 discipline: Check N of
+`verifier-and-audit.txt`.
+
+---
+
+## Grader (the shipped prompt)
+
+```
+You are a verifier of a managed-agent package. You do not improve the agent; you
+JUDGE whether its package upholds the management invariants, and you argue each
+verdict from evidence before you state it.
+
+INPUT (provided in the message):
+- manifest: manifest.yaml (lifecycle_state, prompt_version, autonomy).
+- prompt: the current prompt text and the memory-file conventions it declares.
+- ledger: ledger.md (ordered entries).
+- replay_report: the stdout of manage-operators.txt on this package.
+
+BIAS CONTROLS (apply before judging — Check N):
+- Length is not quality: a longer ledger or prompt is not more compliant. Judge
+  the condition, not the volume.
+- Position is not priority: do not over-weight the most recent ledger entry;
+  every entry is in scope.
+- No persona deference: the fact that the prompt asserts it is well-designed is
+  not evidence. Check the artifact.
+
+For each invariant, FIRST write the evidence line, THEN the verdict. Never state
+a verdict before its evidence.
+
+I2 SEAM — the managed prompt must contain no self-modification instructions, and
+  memory/ must be the only in-run mutable state named by the prompt.
+  PASS: prompt gives task behavior + memory conventions only; no instruction to
+        edit its own prompt/tools/goals.
+  FAIL: prompt tells the agent to rewrite its own instructions, tune its own
+        goals, or persist control state outside memory/.
+I3 PERSISTENCE — activate must be satisfiable from the package alone.
+  PASS: everything the prompt needs to resume (state, memory location, tool list)
+        is named as a package path.
+  FAIL: the prompt references resume state by an out-of-package handle (an
+        external URL, a session id, an unnamed "previous context").
+I4a WRITE-AHEAD — every adapt entry precedes its diff.
+  PASS: each adapt entry has a Diff/patch reference and a non-empty Outcome slot
+        (PENDING or backfilled); no version in history/ lacks a ledger entry.
+  FAIL: a history/vNNN snapshot exists with no ledger entry, or an entry names a
+        diff with no patch/snapshot.
+I4bc DELEGATED — read replay_report:
+  PASS iff it contains "REPLAY PASS"; anti-oscillation is upheld iff no
+       ANTI-OSC BLOCK was overridden without a human note.
+  If replay_report is absent, mark I4bc UNVERIFIED (not PASS).
+
+OUTPUT — aggregate first, greppable, one verdict per line:
+
+SUMMARY: package <agent_id> v<version> — <P> pass, <F> fail, <U> unverified
+I2  <PASS|FAIL>: <evidence -> verdict>
+I3  <PASS|FAIL>: <evidence -> verdict>
+I4a <PASS|FAIL>: <evidence -> verdict>
+I4bc <PASS|FAIL|UNVERIFIED>: <replay_report line -> verdict>
+VERDICT: <SHIP|BLOCK>   (BLOCK if any FAIL or any UNVERIFIED on a ship gate)
+
+Rules:
+- Evidence before verdict, always. A verdict with no cited evidence is itself a
+  FAIL of this grader's contract.
+- Delegate byte-identity and anti-oscillation to the replay report; do not
+  re-derive them in prose (you will get them wrong).
+- Use markers SUMMARY / I2 / I3 / I4a / I4bc / VERDICT verbatim for grep.
+```
+
+## Operator profile
+
+- **Amplifies:** invariant-grounded judgment, evidence-before-verdict, delegation
+  of mechanical checks to the deterministic verifier.
+- **Suppresses:** length/position/persona bias, prose re-derivation of
+  byte-identity, verdict-before-evidence.
+- **Strength:** strong — it is the ship gate for an adaptation.
+- **Place:** invoked by Execute's re-audit and by the lifecycle `reaudit_pass`
+  precondition.
+- **Failure mode:** stating SHIP without the replay report (I4bc must be
+  UNVERIFIED, which blocks) — a grader that guesses byte-identity is worse than
+  one that abstains.
+
+## Static verifier (I9 — checks this grader, does not run it)
+
+Shape 6 static checks (`verifier-and-audit.txt` Shape 6; Check N):
+
+```
+CHECK bias-controls: length, position, persona controls all present. [Shape 6 / N]
+CHECK calibration-anchors: each invariant has concrete PASS and FAIL
+  conditions (anchors), distinguishable from each other.           [Shape 6 / N]
+CHECK reasoning-before-verdict: prompt requires evidence line
+  before the verdict, and marks a bare verdict a FAIL.             [Shape 6 / N]
+CHECK rubric-concrete: I2/I3/I4a/I4bc each defined, not a vibe.    [Shape 6]
+CHECK delegation-honest: byte-identity + anti-oscillation delegated
+  to replay-verifier.py; absence -> UNVERIFIED, not PASS.          [I4 / abstain]
+CHECK agent-consumable: aggregate-first SUMMARY, greppable markers. [consumability]
+CHECK anchors-present: grounds I2/I3/I4 in § or Principle refs.    [I1]
+```
+
+## Dogfood
+
+Before shipping this grader, run the seven checks above against it (Phase-6
+"eat your own dogfood"). All must pass; a grader that fails its own Shape 6
+static checks must not ship.
+
+========================================================================
+SOURCE: manage/dogfood-audit.md
+========================================================================
+
+# Dogfood audit — the inner MAPE operator prompts
+
+Per the framework closure requirement (I9 — the managing system is itself made of prompts) and the skill's own
+"eat your own dogfood" rule, the two shipped operator prompts were run through
+the framework's own audit checklist and three-axis rubric, then revised via
+refactor **Mode B** (targeted). Both are Shape 2, agent-consumable (their output
+is the dominant operator on the consuming phase), so Check C and the
+examples-as-operators discipline apply with full force.
+
+## Findings (pre-revision)
+
+| # | Check | Artifact | Finding | Severity |
+|---|-------|----------|---------|----------|
+| F1 | C / examples-as-operators | both | Output format given as a placeholder template with **no worked example**. For an agent-consumed format, the filled example is load-bearing, not optional. | blocking-for-exemplar |
+| F2 | examples-as-operators (silent judgment call) | Monitor | `var=<low\|mid\|high>` had **no bucketing rule** — the model reverse-engineers the threshold. | non-blocking |
+| F3 | examples-as-operators (silent judgment call) | Analyze | anti-oscillation "equivalent option" **undefined in the prompt** (the definition lived only in workflow D3). | non-blocking |
+
+Not flagged (checked, passed): M5 scaffold restraint — the worked example is
+trigger-traceable (Check C mandates it; agent-consumability makes format the
+dominant operator), so adding it is not shelf-reaching. M6 reasoning-channel —
+neither prompt asks the model to reveal internal thinking; `finding:` is
+task-mandated justification, which is fine. E ordering — role → input → task →
+output → rules(failure modes near end); correct operator-strength order.
+
+## Resolutions (Mode B diffs)
+
+- **Monitor:** added a variance-bucket rule (low `<0.1` range / mid / high
+  `>0.3`; binary observable → low) and a filled worked example (6 runs, one goal)
+  inside the shipped prompt. The example is consistent with the Analyze example
+  (same billing-vs-account scenario — Check C cross-example consistency).
+- **Analyze:** added the equivalence definition (same trigger + same section +
+  same operator intent, not diff identity — D3) and a filled Prompt-A worked
+  example with the weight sum shown (`0.60 + 0.25 + 0.15 = 1.0`).
+- **Verifiers extended:** each artifact's inline I9 verifier gained
+  `worked-example` + (`variance-bucketed` / `equivalence-defined`) checks; the
+  executable `manage-verify.py` enforces them (Monitor 10 checks, Analyze 11).
+  Negative control: stripping the worked example → GATE FAIL, so the check is
+  load-bearing.
+
+## Scores (honest, sunk-cost-adjusted)
+
+| Axis | Monitor before → after | Analyze before → after |
+|------|------------------------|------------------------|
+| Token economy | 8 → 8 (the example costs real tokens; justified) | 8 → 8 |
+| Task fit | 7 → 9 (agent-consumed format now fully specified) | 7 → 9 |
+| Operator coherence | 8 → 9 (silent judgment calls resolved) | 8 → 9 |
+
+**Overall.** Both are ready to ship and now meet the exemplar bar the closure
+requirement (I9) demands of the framework's self-referential operators. Token
+economy stays at 8, not 9 — the worked examples are a real, deliberate cost paid
+for format reliability on the consuming phase, not free.
+
+## Standing instruction logged (Stages 4–6)
+
+Per the operator directive, the remaining workflow prompts are produced *through
+the skill's procedure*, not hand-written:
+
+- **Stage 4 replay verifier** — a script, not a prompt (no shape applies);
+  designed conventionally.
+- **Stage 5 manage-mode static verifier** — a **Shape 6 (LLM-as-judge)** prompt:
+  run shape inference → operator-design drafting → audit (bias controls,
+  calibration anchors, reasoning-before-scoring per Check N) → three-axis eval →
+  ship its own static verifier. Dogfooded like the two above.
+- **Stage 6 dogfood agent** — a real managed agent's prompt, produced by
+  from-scratch mode and shipped as a managed package.
+
+========================================================================
+SOURCE: manage/replay-verifier.py
+PROVENANCE: Runnable/structured artifact — NOT executable inside the Gem.
+Execute externally with a filesystem-capable runtime. Body carried verbatim.
+========================================================================
+
+#!/usr/bin/env python3
+"""Replay verifier — I4c (replay), P5 (rollback-by-snapshot), I4b (anti-oscillation).
+
+Reconstructs prompt/current from history/v001 + the ordered ledger diffs and
+byte-compares. `adapt` entries apply their line-delta patch; `rollback` entries
+restore the named snapshot (never an inverse diff). Also exposes the
+anti-oscillation check the Analyze phase must consult.
+
+Diffs are difflib line-opcode deltas serialized as JSON: equal spans are stored
+as index ranges (not content), changed spans store only the new lines — a real
+delta, stdlib-only (difflib + json + hashlib), byte-exact on reconstruction.
+
+Usage:
+  replay-verifier.py <package-dir>
+  replay-verifier.py <package-dir> --anti-osc '<trigger>|<section>|<intent>'
+"""
+import sys, os, re, json, hashlib, difflib
+
+
+# ---- canonical line-delta diff format (used by Execute and by replay) ----
+
+def read_lines(path):
+    with open(path, encoding="utf-8") as f:
+        return f.readlines()
+
+def sha(path):
+    return hashlib.sha256(open(path, "rb").read()).hexdigest()
+
+def make_patch(old_lines, new_lines):
+    sm = difflib.SequenceMatcher(a=old_lines, b=new_lines, autojunk=False)
+    delta = []
+    for tag, i1, i2, j1, j2 in sm.get_opcodes():
+        if tag == "equal":
+            delta.append(["equal", i1, i2])
+        else:  # replace / insert / delete
+            delta.append([tag, i1, i2, new_lines[j1:j2]])
+    return delta
+
+def apply_patch(old_lines, delta):
+    out = []
+    for op in delta:
+        if op[0] == "equal":
+            out.extend(old_lines[op[1]:op[2]])
+        else:
+            out.extend(op[3])  # replace/insert content; delete -> [] 
+    return out
+
+
+# ---- ledger parsing ----
+
+def parse_ledger(path):
+    entries = []
+    cur = None
+    for line in read_lines(path):
+        if line.startswith("## v"):
+            if cur:
+                entries.append(cur)
+            cur = {"header": line.strip()}
+        elif cur is not None:
+            m = re.match(r"(Kind|Version|Restore|Trigger|Outcome|Diff):\s*(.*)", line.strip())
+            if m:
+                cur[m.group(1).lower()] = m.group(2).strip()
+    if cur:
+        entries.append(cur)
+    return [e for e in entries if e.get("kind")]
+
+
+# ---- replay ----
+
+def replay(pkg):
+    hist = os.path.join(pkg, "prompt/history")
+    v001 = os.path.join(hist, "v001/prompt.md")
+    if not os.path.exists(v001):
+        return False, "missing history/v001"
+    state = read_lines(v001)
+    steps = []
+    for e in parse_ledger(os.path.join(pkg, "ledger.md")):
+        if e["kind"] == "adapt":
+            ver = e["version"]
+            patch_path = os.path.join(hist, f"{ver}.patch.json")
+            if not os.path.exists(patch_path):
+                return False, f"{ver}: missing patch {patch_path}"
+            delta = json.load(open(patch_path))
+            state = apply_patch(state, delta)
+            snap = os.path.join(hist, f"{ver}/prompt.md")
+            if os.path.exists(snap) and "".join(state) != "".join(read_lines(snap)):
+                return False, f"{ver}: reconstruction != snapshot (integrity)"
+            steps.append(f"adapt->{ver}")
+        elif e["kind"] == "rollback":
+            restore = e["restore"]
+            snap = os.path.join(hist, f"{restore}/prompt.md")
+            if not os.path.exists(snap):
+                return False, f"rollback: missing snapshot {restore}"
+            state = read_lines(snap)  # restore, never inverse diff (P5)
+            steps.append(f"rollback->{restore}")
+    cur = os.path.join(pkg, "prompt/current/prompt.md")
+    ok = "".join(state) == "".join(read_lines(cur))
+    return ok, (" ".join(steps) + f" | current-sha {sha(cur)[:12]}")
+
+
+# ---- anti-oscillation (I4b) ----
+
+def anti_oscillation(entries, trigger, section, intent):
+    """Mechanical anti-oscillation PRE-FILTER (I4b).
+
+    Full equivalence per D3 is (trigger, section, intent) — but `intent` is a
+    judgment call, not mechanically decidable, so this deterministic check is a
+    conservative filter on the mechanical part only: it BLOCKs iff a prior adapt
+    with a 'regression' outcome shares (trigger, section). The Shape 6 grader
+    (manage-mode-verifier.md) makes the final intent call on anything this flags;
+    `intent` is accepted here so the caller's tuple is complete and logged, but a
+    trigger+section match is sufficient to raise the flag."""
+    for e in entries:
+        if e.get("kind") != "adapt":
+            continue
+        if "regression" not in e.get("outcome", "").lower():
+            continue
+        etrig = e.get("trigger", "")
+        if trigger in etrig and section in etrig:
+            return "BLOCK", e["version"]
+    return "ALLOW", None
+
+
+def main():
+    pkg = sys.argv[1]
+    ok, detail = replay(pkg)
+    print(f"REPLAY {'PASS' if ok else 'FAIL'}: {detail}")
+    result = 0 if ok else 1
+
+    if "--anti-osc" in sys.argv:
+        spec = sys.argv[sys.argv.index("--anti-osc") + 1]
+        trigger, section, intent = spec.split("|")
+        entries = parse_ledger(os.path.join(pkg, "ledger.md"))
+        verdict, ver = anti_oscillation(entries, trigger, section, intent)
+        tag = f" (matches regressed {ver})" if ver else ""
+        print(f"ANTI-OSC {verdict}: proposed [{spec}]{tag}")
+    return result
+
+
+if __name__ == "__main__":
+    sys.exit(main())
+

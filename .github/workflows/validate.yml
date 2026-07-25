@@ -1,0 +1,104 @@
+name: Validate corpus
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Compile the only script
+        run: python3 -m py_compile manage/replay-verifier.py
+
+      - name: SKILL.md frontmatter is present and well formed
+        run: |
+          python3 - <<'PY'
+          import sys, pathlib
+          text = pathlib.Path("SKILL.md").read_text(encoding="utf-8")
+          if not text.startswith("---"):
+              sys.exit("SKILL.md: missing YAML frontmatter")
+          end = text.find("\n---", 3)
+          if end == -1:
+              sys.exit("SKILL.md: frontmatter is not terminated")
+          fm = text[3:end]
+          for key in ("name:", "description:"):
+              if key not in fm:
+                  sys.exit(f"SKILL.md: frontmatter missing {key}")
+          desc = fm.split("description:", 1)[1].split("\n")[0].strip()
+          if len(desc) < 80:
+              sys.exit("SKILL.md: description too short to route on")
+          print("frontmatter ok, description", len(desc), "chars")
+          PY
+
+      - name: Corpus inventory is complete
+        run: |
+          python3 - <<'PY'
+          import sys, pathlib
+          required = [
+              "SKILL.md", "LICENSE", "README.md", "CHANGELOG.md", "CITATIONS.md",
+              "operators/section-operators.md",
+              "templates/shape-catalog.md",
+              "templates/interview-branches.md",
+              "templates/minimum-viable-prompt.yaml",
+              "references/quantum-principles.md",
+              "references/audit-checklist.md",
+              "references/evaluation-rubric.md",
+              "references/verifier-specification.md",
+              "references/refactor-mode.md",
+              "references/manage-mode.md",
+              "manage/replay-verifier.py",
+              "gem/en/gem-instructions.md",
+              "assets/social-preview.png",
+              "docs/og-image.png",
+              "docs/index.html",
+          ]
+          missing = [p for p in required if not pathlib.Path(p).exists()]
+          if missing:
+              sys.exit("missing required files:\n  " + "\n  ".join(missing))
+          print(f"all {len(required)} required paths present")
+          PY
+
+      - name: Gem knowledge filenames match the wiring table
+        run: |
+          python3 - <<'PY'
+          import sys, pathlib
+          inst = pathlib.Path("gem/en/gem-instructions.md").read_text(encoding="utf-8")
+          files = sorted(p.name for p in pathlib.Path("gem/knowledge").glob("*.txt"))
+          if len(files) != 8:
+              sys.exit(f"expected 8 knowledge files, found {len(files)}: {files}")
+          unwired = [f for f in files if f not in inst]
+          if unwired:
+              sys.exit("knowledge files never named in the wiring table "
+                       "(unreachable under selective retrieval):\n  " + "\n  ".join(unwired))
+          print("all 8 knowledge files are named in the wiring table")
+          PY
+
+      - name: No placeholders left behind
+        run: |
+          # The three meta-files below document the placeholder convention,
+          # so they legitimately contain the token and are excluded.
+          if grep -RIn "REPLACE-ME" \
+               --include="*.md" --include="*.html" --include="*.cff" --include="*.yml" \
+               --exclude="validate.yml" \
+               --exclude="CONTRIBUTING.md" \
+               --exclude="PULL_REQUEST_TEMPLATE.md" \
+               --exclude-dir=".git" . ; then
+            echo "::error::unresolved REPLACE-ME placeholder(s) above"
+            exit 1
+          fi
+          if grep -RIn --fixed-strings "[Your Name]" \
+               --include="*" --exclude="validate.yml" --exclude-dir=".git" --exclude-dir="assets" . ; then
+            echo "::error::LICENSE copyright holder was never filled in"
+            exit 1
+          fi
+          echo "no placeholders"

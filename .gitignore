@@ -1,0 +1,21 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Run artifacts produced by manage mode (agent-owned data plane)
+run-evidence/*.local.json
+*.ledger.local
+
+# Never commit real agent memory or credentials
+**/memory/
+.env
+.env.*

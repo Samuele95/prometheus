@@ -1,0 +1,48 @@
+name: Corpus addition
+description: Propose a new shape, operator, audit check, or runtime port.
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Every addition costs attention budget on every run. The framework's own
+        audit check M5 applies here: an addition ships only if it is traceable
+        to a failure it prevents.
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Kind of addition
+      options:
+        - New structural shape
+        - New section operator
+        - New audit check
+        - New runtime port
+        - Interview branch / question bank
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: failure
+    attributes:
+      label: Failure mode this prevents
+      description: Required. Describe a concrete case where the framework gets it wrong today.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What you propose
+    validations:
+      required: true
+  - type: input
+    id: placement
+    attributes:
+      label: Where it belongs
+      description: Which file? Adding to always-loaded SKILL.md needs a strong reason.
+    validations:
+      required: true
+  - type: textarea
+    id: cost
+    attributes:
+      label: What it costs
+      description: Rough token cost, and what you would cut to pay for it.

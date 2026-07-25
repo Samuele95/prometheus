@@ -1,0 +1,1754 @@
+{
+ "census": {
+  "files": 24,
+  "bytes": 316137,
+  "manifest": {
+   "SKILL.md": {
+    "bytes": 22091,
+    "lines": 170,
+    "sha256": "b3891b299adadd11933e9056714e76ae40fe5606047ef16017e03e41dc88a897"
+   },
+   "LICENSE": {
+    "bytes": 1068,
+    "lines": 21,
+    "sha256": "72a6ee38f0be9315c9c17e2aeb013e65e67ac1783018868dfc7432fcd3b6f927"
+   },
+   "CHANGELOG.md": {
+    "bytes": 13544,
+    "lines": 252,
+    "sha256": "23037c015224bf686fed07f3a2f19ff15cd53682080491083b5f6c4b4b95e497"
+   },
+   "CITATIONS.md": {
+    "bytes": 17378,
+    "lines": 294,
+    "sha256": "aa96473dd240b10f896deaf95fd8c43a5ed270394c9fd03a5106d6061056e120"
+   },
+   "references/agent-consumability.md": {
+    "bytes": 5826,
+    "lines": 108,
+    "sha256": "9bb967d6e3f01fa36449c7a44fe09cace8f293219fb22f9be1d065a7bd6e14b2"
+   },
+   "references/reasoning-patterns.md": {
+    "bytes": 31772,
+    "lines": 491,
+    "sha256": "c081975dcd17a34525e42286bf87103d25058eb33dff555ee8600044c1f07424"
+   },
+   "references/agent-state.md": {
+    "bytes": 23307,
+    "lines": 427,
+    "sha256": "2dbeefdc19645d641e073670f67a272860568d1c8716078b43ce218e6c82e968"
+   },
+   "references/evaluation-rubric.md": {
+    "bytes": 6907,
+    "lines": 151,
+    "sha256": "89bf2ef2b704a2b37361aa46154ea1b8e63d5c360893a7d31a80e9779b48b23d"
+   },
+   "references/agent-team-topologies.md": {
+    "bytes": 14987,
+    "lines": 182,
+    "sha256": "e18f6e381462d2def7753a62499a933566eff7c8e04f4682b6f220770089cc26"
+   },
+   "references/audit-checklist.md": {
+    "bytes": 25964,
+    "lines": 301,
+    "sha256": "809165a6143aee3081abe10ff41e839373be70023bcd0b1e095ed04c29a5a24b"
+   },
+   "references/verifier-specification.md": {
+    "bytes": 11757,
+    "lines": 110,
+    "sha256": "1c78dbd0b0bb31cab8c30cd143c8d282748de85f8a03f98c7759271d378364f3"
+   },
+   "references/verifier-agent-patterns.md": {
+    "bytes": 13016,
+    "lines": 232,
+    "sha256": "b0dca891f155dba2be9ad375ac4a2fe3f7487da873111d8ed1099943c5cdadd5"
+   },
+   "references/quantum-principles.md": {
+    "bytes": 10084,
+    "lines": 127,
+    "sha256": "0498c801fcee7c7267d7d7af180c9eb77b7aa6dedb20b004952473216b9081b3"
+   },
+   "references/refactor-mode.md": {
+    "bytes": 15447,
+    "lines": 165,
+    "sha256": "ffaddda718f10898308d61639be2920575fdd3bcbf548ea0fd036fd83e471719"
+   },
+   "references/manage-mode.md": {
+    "bytes": 11395,
+    "lines": 195,
+    "sha256": "8b04ae25b849e38f738f4fd9101407cfeb220c8c1b08409b0e49d44a41c86b7d"
+   },
+   "operators/section-operators.md": {
+    "bytes": 18884,
+    "lines": 252,
+    "sha256": "14f67cc00710a5901e56b2d1869ec2eb28a14bff68c91648be4cb6be2471538e"
+   },
+   "templates/interview-branches.md": {
+    "bytes": 20945,
+    "lines": 234,
+    "sha256": "1106d2fd887e077fa841287a6b538d42e7119304d562c61597e9480b6ea62470"
+   },
+   "templates/minimum-viable-prompt.yaml": {
+    "bytes": 2163,
+    "lines": 51,
+    "sha256": "18b7005fb980077afb0dfd995bd3e0e3f52b9dfc49fdd8788e70a5d2a371393c"
+   },
+   "templates/shape-catalog.md": {
+    "bytes": 22708,
+    "lines": 220,
+    "sha256": "1a559008a06dd6845abe23668f339620826f0c01f6d5febc65c251ed93f33eb5"
+   },
+   "manage/monitor-operator.md": {
+    "bytes": 5567,
+    "lines": 108,
+    "sha256": "8dcdcc51af969f3bb590cccb37eae84e2cafb5c2844b0b7299c6a86437d0b71b"
+   },
+   "manage/dogfood-audit.md": {
+    "bytes": 4009,
+    "lines": 65,
+    "sha256": "6a306a6aef2d7302916c007b3d7a21d00c96a2683db176b4efdd649ba282c945"
+   },
+   "manage/replay-verifier.py": {
+    "bytes": 5304,
+    "lines": 141,
+    "sha256": "c0bb53d223794095cf9eb7c3688112bcb7aa4d6284626a3a95df5c8c6ca81b8c"
+   },
+   "manage/manage-mode-verifier.md": {
+    "bytes": 5649,
+    "lines": 114,
+    "sha256": "d0cf99c057e45235fe53b0e2a759a41df5c79fcfb7ac57810b08a7851eefe0f4"
+   },
+   "manage/analyze-operator.md": {
+    "bytes": 6365,
+    "lines": 122,
+    "sha256": "9b4c3cc5affdcc4cab0262f7c36d6e50188bc0bdc0d507e3581dff241ce4c108"
+   }
+  }
+ },
+ "runtime_allowlist": {
+  "rule": {
+   "k_store_files": [
+    "environment.yaml",
+    "goals.yaml",
+    "ledger.md",
+    "managed-system.yaml",
+    "manifest.yaml"
+   ],
+   "workspace_dir_roots": [
+    "history",
+    "knowledge",
+    "memory",
+    "prompt",
+    "runs",
+    "tools",
+    "working"
+   ],
+   "declaration_anchor": "references/agent-state.md:22-38 (Package layout)",
+   "patch_anchor": "references/manage-mode.md:143-144 (persist diff)"
+  },
+  "observed_targets": {
+   "environment.yaml": "references/agent-state.md:22-38 (Package layout)",
+   "goals.yaml": "references/agent-state.md:22-38 (Package layout)",
+   "history/": "references/agent-state.md:22-38 (Package layout)",
+   "history/v001/": "references/agent-state.md:22-38 (Package layout)",
+   "history/vNNN.patch.json": "references/manage-mode.md:143-144 (persist diff)",
+   "history/vNNN/": "references/agent-state.md:22-38 (Package layout)",
+   "knowledge/": "references/agent-state.md:22-38 (Package layout)",
+   "ledger.md": "references/agent-state.md:22-38 (Package layout)",
+   "managed-system.yaml": "references/agent-state.md:22-38 (Package layout)",
+   "manifest.yaml": "references/agent-state.md:22-38 (Package layout)",
+   "memory/": "references/agent-state.md:22-38 (Package layout)",
+   "prompt/": "references/agent-state.md:22-38 (Package layout)",
+   "prompt/current/": "references/agent-state.md:22-38 (Package layout)",
+   "runs/": "references/agent-state.md:22-38 (Package layout)",
+   "tools/": "references/agent-state.md:22-38 (Package layout)",
+   "working/": "references/agent-state.md:22-38 (Package layout)"
+  }
+ },
+ "grammar_conventions": {
+  "F": 59,
+  "P": 74,
+  "D": 26,
+  "PD": 8
+ },
+ "edges": [
+  {
+   "src": "CHANGELOG.md",
+   "line": 10,
+   "raw": "CITATIONS.md",
+   "conv": "F"
+  },
+  {
+   "src": "CHANGELOG.md",
+   "line": 28,
+   "raw": "SKILL.md",
+   "conv": "F"
+  },
+  {
+   "src": "CHANGELOG.md",
+   "line": 33,
+   "raw": "references/agent-state.md",
+   "conv": "P"
+  },
+  {
+   "src": "CHANGELOG.md",
+   "line": 38,
+   "raw": "references/manage-mode.md",
+   "conv": "P"
+  },
+  {
+   "src": "CHANGELOG.md",
+   "line": 43,
+   "raw": "manage/monitor-operator.md",
+   "conv": "P"
+  },
+  {
+   "src": "CHANGELOG.md",
+   "line": 44,
+   "raw": "manage/analyze-operator.md",
+   "conv": "P"
+  },
+  {
+   "src": "CHANGELOG.md",
+   "line": 48,
+   "raw": "manage/manage-mode-verifier.md",
+   "conv": "P"
+  },
+  {
+   "src": "CHANGELOG.md",
+   "line": 52,
+   "raw": "manage/replay-verifier.py",
+   "conv": "P"
+  },
+  {
+   "src": "CHANGELOG.md",
+   "line": 56,
+   "raw": "references/verifier-specification.md",
+   "conv": "P"
+  },
+  {
+   "src": "CHANGELOG.md",
+   "line": 58,
+   "raw": "CITATIONS.md",
+   "conv": "F"
+  },
+  {
+   "src": "CHANGELOG.md",
+   "line": 62,
+   "raw": "SKILL.md",
+   "conv": "F"
+  },
+  {
+   "src": "CHANGELOG.md",
+   "line": 62,
+   "raw": "CHANGELOG.md",
+   "conv": "F"
+  },
+  {
+   "src": "CHANGELOG.md",
+   "line": 63,
+   "raw": "CITATIONS.md",
+   "conv": "F"
+  },
+  {
+   "src": "CHANGELOG.md",
+   "line": 63,
+   "raw": "references/verifier-specification.md",
+   "conv": "P"
+  },
+  {
+   "src": "CHANGELOG.md",
+   "line": 64,
+   "raw": "operators/section-operators.md",
+   "conv": "P"
+  },
+  {
+   "src": "CHANGELOG.md",
+   "line": 66,
+   "raw": "agent-state.md",
+   "conv": "F"
+  },
+  {
+   "src": "CHANGELOG.md",
+   "line": 74,
+   "raw": "CITATIONS.md",
+   "conv": "F"
+  },
+  {
+   "src": "CHANGELOG.md",
+   "line": 82,
+   "raw": "quantum-principles.md",
+   "conv": "F"
+  },
+  {
+   "src": "CHANGELOG.md",
+   "line": 142,
+   "raw": "DEPLOY.md",
+   "conv": "F"
+  },
+  {
+   "src": "CHANGELOG.md",
+   "line": 142,
+   "raw": "docs/",
+   "conv": "D"
+  },
+  {
+   "src": "CHANGELOG.md",
+   "line": 143,
+   "raw": "SKILL.md",
+   "conv": "F"
+  },
+  {
+   "src": "CHANGELOG.md",
+   "line": 145,
+   "raw": "INSTALL-DESKTOP.md",
+   "conv": "F"
+  },
+  {
+   "src": "CITATIONS.md",
+   "line": 52,
+   "raw": "SKILL.md",
+   "conv": "F"
+  },
+  {
+   "src": "CITATIONS.md",
+   "line": 57,
+   "raw": "references/agent-team-topologies.md",
+   "conv": "P"
+  },
+  {
+   "src": "CITATIONS.md",
+   "line": 72,
+   "raw": "references/agent-consumability.md",
+   "conv": "P"
+  },
+  {
+   "src": "CITATIONS.md",
+   "line": 100,
+   "raw": "operators/section-operators.md",
+   "conv": "P"
+  },
+  {
+   "src": "CITATIONS.md",
+   "line": 148,
+   "raw": "references/reasoning-patterns.md",
+   "conv": "P"
+  },
+  {
+   "src": "CITATIONS.md",
+   "line": 163,
+   "raw": "references/quantum-principles.md",
+   "conv": "P"
+  },
+  {
+   "src": "CITATIONS.md",
+   "line": 164,
+   "raw": "operators/section-operators.md",
+   "conv": "P"
+  },
+  {
+   "src": "CITATIONS.md",
+   "line": 186,
+   "raw": "references/reasoning-patterns.md",
+   "conv": "P"
+  },
+  {
+   "src": "CITATIONS.md",
+   "line": 202,
+   "raw": "references/reasoning-patterns.md",
+   "conv": "P"
+  },
+  {
+   "src": "SKILL.md",
+   "line": 38,
+   "raw": "references/quantum-principles.md",
+   "conv": "P"
+  },
+  {
+   "src": "SKILL.md",
+   "line": 38,
+   "raw": "operators/",
+   "conv": "D"
+  },
+  {
+   "src": "SKILL.md",
+   "line": 46,
+   "raw": "references/refactor-mode.md",
+   "conv": "P"
+  },
+  {
+   "src": "SKILL.md",
+   "line": 48,
+   "raw": "references/manage-mode.md",
+   "conv": "P"
+  },
+  {
+   "src": "SKILL.md",
+   "line": 48,
+   "raw": "references/agent-state.md",
+   "conv": "P"
+  },
+  {
+   "src": "SKILL.md",
+   "line": 52,
+   "raw": "references/refactor-mode.md",
+   "conv": "P"
+  },
+  {
+   "src": "SKILL.md",
+   "line": 52,
+   "raw": "references/manage-mode.md",
+   "conv": "P"
+  },
+  {
+   "src": "SKILL.md",
+   "line": 62,
+   "raw": "templates/shape-catalog.md",
+   "conv": "P"
+  },
+  {
+   "src": "SKILL.md",
+   "line": 68,
+   "raw": "references/reasoning-patterns.md",
+   "conv": "P"
+  },
+  {
+   "src": "SKILL.md",
+   "line": 68,
+   "raw": "references/reasoning-patterns.md",
+   "conv": "P"
+  },
+  {
+   "src": "SKILL.md",
+   "line": 70,
+   "raw": "references/quantum-principles.md",
+   "conv": "P"
+  },
+  {
+   "src": "SKILL.md",
+   "line": 78,
+   "raw": "templates/interview-branches.md",
+   "conv": "P"
+  },
+  {
+   "src": "SKILL.md",
+   "line": 84,
+   "raw": "templates/interview-branches.md",
+   "conv": "P"
+  },
+  {
+   "src": "SKILL.md",
+   "line": 100,
+   "raw": "templates/shape-catalog.md",
+   "conv": "P"
+  },
+  {
+   "src": "SKILL.md",
+   "line": 100,
+   "raw": "operators/",
+   "conv": "D"
+  },
+  {
+   "src": "SKILL.md",
+   "line": 100,
+   "raw": "templates/minimum-viable-prompt.yaml",
+   "conv": "P"
+  },
+  {
+   "src": "SKILL.md",
+   "line": 102,
+   "raw": "references/reasoning-patterns.md",
+   "conv": "P"
+  },
+  {
+   "src": "SKILL.md",
+   "line": 104,
+   "raw": "references/agent-consumability.md",
+   "conv": "P"
+  },
+  {
+   "src": "SKILL.md",
+   "line": 106,
+   "raw": "references/agent-team-topologies.md",
+   "conv": "P"
+  },
+  {
+   "src": "SKILL.md",
+   "line": 118,
+   "raw": "references/audit-checklist.md",
+   "conv": "P"
+  },
+  {
+   "src": "SKILL.md",
+   "line": 130,
+   "raw": "references/evaluation-rubric.md",
+   "conv": "P"
+  },
+  {
+   "src": "SKILL.md",
+   "line": 147,
+   "raw": "references/verifier-specification.md",
+   "conv": "P"
+  },
+  {
+   "src": "SKILL.md",
+   "line": 153,
+   "raw": "references/reasoning-patterns.md",
+   "conv": "P"
+  },
+  {
+   "src": "SKILL.md",
+   "line": 157,
+   "raw": "references/verifier-agent-patterns.md",
+   "conv": "P"
+  },
+  {
+   "src": "SKILL.md",
+   "line": 161,
+   "raw": "references/quantum-principles.md",
+   "conv": "P"
+  },
+  {
+   "src": "manage/analyze-operator.md",
+   "line": 5,
+   "raw": "references/quantum-principles.md",
+   "conv": "P"
+  },
+  {
+   "src": "manage/analyze-operator.md",
+   "line": 92,
+   "raw": "environment.yaml",
+   "conv": "F"
+  },
+  {
+   "src": "manage/analyze-operator.md",
+   "line": 92,
+   "raw": "ledger.md",
+   "conv": "F"
+  },
+  {
+   "src": "manage/analyze-operator.md",
+   "line": 93,
+   "raw": "managed-system.yaml",
+   "conv": "F"
+  },
+  {
+   "src": "manage/analyze-operator.md",
+   "line": 93,
+   "raw": "working/",
+   "conv": "D"
+  },
+  {
+   "src": "manage/dogfood-audit.md",
+   "line": 36,
+   "raw": "manage-verify.py",
+   "conv": "F"
+  },
+  {
+   "src": "manage/manage-mode-verifier.md",
+   "line": 7,
+   "raw": "manage/replay-verifier.py",
+   "conv": "P"
+  },
+  {
+   "src": "manage/manage-mode-verifier.md",
+   "line": 14,
+   "raw": "references/audit-checklist.md",
+   "conv": "P"
+  },
+  {
+   "src": "manage/manage-mode-verifier.md",
+   "line": 95,
+   "raw": "references/verifier-specification.md",
+   "conv": "P"
+  },
+  {
+   "src": "manage/monitor-operator.md",
+   "line": 7,
+   "raw": "references/agent-consumability.md",
+   "conv": "P"
+  },
+  {
+   "src": "manage/monitor-operator.md",
+   "line": 82,
+   "raw": "runs/",
+   "conv": "D"
+  },
+  {
+   "src": "manage/monitor-operator.md",
+   "line": 82,
+   "raw": "environment.yaml",
+   "conv": "F"
+  },
+  {
+   "src": "operators/section-operators.md",
+   "line": 200,
+   "raw": "agent-consumability.md",
+   "conv": "F"
+  },
+  {
+   "src": "references/agent-state.md",
+   "line": 17,
+   "raw": "references/quantum-principles.md",
+   "conv": "P"
+  },
+  {
+   "src": "references/agent-state.md",
+   "line": 49,
+   "raw": "managed-system.yaml",
+   "conv": "F"
+  },
+  {
+   "src": "references/agent-state.md",
+   "line": 67,
+   "raw": "environment.yaml",
+   "conv": "F"
+  },
+  {
+   "src": "references/agent-state.md",
+   "line": 75,
+   "raw": "goals.yaml",
+   "conv": "F"
+  },
+  {
+   "src": "references/agent-state.md",
+   "line": 92,
+   "raw": "working/",
+   "conv": "D"
+  },
+  {
+   "src": "references/agent-state.md",
+   "line": 100,
+   "raw": "prompt/",
+   "conv": "D"
+  },
+  {
+   "src": "references/agent-state.md",
+   "line": 100,
+   "raw": "tools/",
+   "conv": "D"
+  },
+  {
+   "src": "references/agent-state.md",
+   "line": 100,
+   "raw": "knowledge/",
+   "conv": "D"
+  },
+  {
+   "src": "references/agent-state.md",
+   "line": 101,
+   "raw": "memory/",
+   "conv": "D"
+  },
+  {
+   "src": "references/agent-state.md",
+   "line": 106,
+   "raw": "memory/",
+   "conv": "D"
+  },
+  {
+   "src": "references/agent-state.md",
+   "line": 138,
+   "raw": "operators/section-operators.md",
+   "conv": "P"
+  },
+  {
+   "src": "references/agent-state.md",
+   "line": 188,
+   "raw": "managed-system.yaml",
+   "conv": "F"
+  },
+  {
+   "src": "references/agent-state.md",
+   "line": 222,
+   "raw": "goals.yaml",
+   "conv": "F"
+  },
+  {
+   "src": "references/agent-state.md",
+   "line": 223,
+   "raw": "prompt/current/",
+   "conv": "PD"
+  },
+  {
+   "src": "references/agent-state.md",
+   "line": 224,
+   "raw": "history/v001/",
+   "conv": "PD"
+  },
+  {
+   "src": "references/agent-state.md",
+   "line": 228,
+   "raw": "manifest.yaml",
+   "conv": "F"
+  },
+  {
+   "src": "references/agent-state.md",
+   "line": 228,
+   "raw": "prompt/current/",
+   "conv": "PD"
+  },
+  {
+   "src": "references/agent-state.md",
+   "line": 229,
+   "raw": "memory/",
+   "conv": "D"
+  },
+  {
+   "src": "references/agent-state.md",
+   "line": 233,
+   "raw": "runs/",
+   "conv": "D"
+  },
+  {
+   "src": "references/agent-state.md",
+   "line": 234,
+   "raw": "environment.yaml",
+   "conv": "F"
+  },
+  {
+   "src": "references/agent-state.md",
+   "line": 244,
+   "raw": "managed-system.yaml",
+   "conv": "F"
+  },
+  {
+   "src": "references/agent-state.md",
+   "line": 251,
+   "raw": "manifest.yaml",
+   "conv": "F"
+  },
+  {
+   "src": "references/agent-state.md",
+   "line": 262,
+   "raw": "manifest.yaml",
+   "conv": "F"
+  },
+  {
+   "src": "references/agent-state.md",
+   "line": 262,
+   "raw": "prompt/current/",
+   "conv": "PD"
+  },
+  {
+   "src": "references/agent-state.md",
+   "line": 262,
+   "raw": "memory/",
+   "conv": "D"
+  },
+  {
+   "src": "references/agent-state.md",
+   "line": 265,
+   "raw": "memory/",
+   "conv": "D"
+  },
+  {
+   "src": "references/agent-state.md",
+   "line": 292,
+   "raw": "ledger.md",
+   "conv": "F"
+  },
+  {
+   "src": "references/agent-state.md",
+   "line": 341,
+   "raw": "prompt/current/",
+   "conv": "PD"
+  },
+  {
+   "src": "references/agent-state.md",
+   "line": 343,
+   "raw": "manage/replay-verifier.py",
+   "conv": "P"
+  },
+  {
+   "src": "references/agent-state.md",
+   "line": 353,
+   "raw": "manifest.yaml",
+   "conv": "F"
+  },
+  {
+   "src": "references/agent-state.md",
+   "line": 373,
+   "raw": "goals.yaml",
+   "conv": "F"
+  },
+  {
+   "src": "references/agent-state.md",
+   "line": 392,
+   "raw": "memory/",
+   "conv": "D"
+  },
+  {
+   "src": "references/agent-team-topologies.md",
+   "line": 171,
+   "raw": "templates/shape-catalog.md",
+   "conv": "P"
+  },
+  {
+   "src": "references/audit-checklist.md",
+   "line": 7,
+   "raw": "references/refactor-mode.md",
+   "conv": "P"
+  },
+  {
+   "src": "references/audit-checklist.md",
+   "line": 89,
+   "raw": "operators/section-operators.md",
+   "conv": "P"
+  },
+  {
+   "src": "references/audit-checklist.md",
+   "line": 166,
+   "raw": "agent-consumability.md",
+   "conv": "F"
+  },
+  {
+   "src": "references/audit-checklist.md",
+   "line": 215,
+   "raw": "references/reasoning-patterns.md",
+   "conv": "P"
+  },
+  {
+   "src": "references/audit-checklist.md",
+   "line": 220,
+   "raw": "shape-catalog.md",
+   "conv": "F"
+  },
+  {
+   "src": "references/audit-checklist.md",
+   "line": 220,
+   "raw": "reasoning-patterns.md",
+   "conv": "F"
+  },
+  {
+   "src": "references/audit-checklist.md",
+   "line": 280,
+   "raw": "references/agent-consumability.md",
+   "conv": "P"
+  },
+  {
+   "src": "references/manage-mode.md",
+   "line": 13,
+   "raw": "references/agent-state.md",
+   "conv": "P"
+  },
+  {
+   "src": "references/manage-mode.md",
+   "line": 21,
+   "raw": "references/quantum-principles.md",
+   "conv": "P"
+  },
+  {
+   "src": "references/manage-mode.md",
+   "line": 53,
+   "raw": "runs/",
+   "conv": "D"
+  },
+  {
+   "src": "references/manage-mode.md",
+   "line": 53,
+   "raw": "working/",
+   "conv": "D"
+  },
+  {
+   "src": "references/manage-mode.md",
+   "line": 53,
+   "raw": "goals.yaml",
+   "conv": "F"
+  },
+  {
+   "src": "references/manage-mode.md",
+   "line": 54,
+   "raw": "manifest.yaml",
+   "conv": "F"
+  },
+  {
+   "src": "references/manage-mode.md",
+   "line": 55,
+   "raw": "environment.yaml",
+   "conv": "F"
+  },
+  {
+   "src": "references/manage-mode.md",
+   "line": 59,
+   "raw": "working/",
+   "conv": "D"
+  },
+  {
+   "src": "references/manage-mode.md",
+   "line": 59,
+   "raw": "ledger.md",
+   "conv": "F"
+  },
+  {
+   "src": "references/manage-mode.md",
+   "line": 61,
+   "raw": "references/verifier-specification.md",
+   "conv": "P"
+  },
+  {
+   "src": "references/manage-mode.md",
+   "line": 63,
+   "raw": "manage/monitor-operator.md",
+   "conv": "P"
+  },
+  {
+   "src": "references/manage-mode.md",
+   "line": 64,
+   "raw": "memory/",
+   "conv": "D"
+  },
+  {
+   "src": "references/manage-mode.md",
+   "line": 66,
+   "raw": "manifest.yaml",
+   "conv": "F"
+  },
+  {
+   "src": "references/manage-mode.md",
+   "line": 82,
+   "raw": "environment.yaml",
+   "conv": "F"
+  },
+  {
+   "src": "references/manage-mode.md",
+   "line": 82,
+   "raw": "goals.yaml",
+   "conv": "F"
+  },
+  {
+   "src": "references/manage-mode.md",
+   "line": 83,
+   "raw": "ledger.md",
+   "conv": "F"
+  },
+  {
+   "src": "references/manage-mode.md",
+   "line": 84,
+   "raw": "managed-system.yaml",
+   "conv": "F"
+  },
+  {
+   "src": "references/manage-mode.md",
+   "line": 86,
+   "raw": "working/",
+   "conv": "D"
+  },
+  {
+   "src": "references/manage-mode.md",
+   "line": 90,
+   "raw": "references/audit-checklist.md",
+   "conv": "P"
+  },
+  {
+   "src": "references/manage-mode.md",
+   "line": 93,
+   "raw": "manage/analyze-operator.md",
+   "conv": "P"
+  },
+  {
+   "src": "references/manage-mode.md",
+   "line": 115,
+   "raw": "working/",
+   "conv": "D"
+  },
+  {
+   "src": "references/manage-mode.md",
+   "line": 115,
+   "raw": "managed-system.yaml",
+   "conv": "F"
+  },
+  {
+   "src": "references/manage-mode.md",
+   "line": 116,
+   "raw": "manifest.yaml",
+   "conv": "F"
+  },
+  {
+   "src": "references/manage-mode.md",
+   "line": 118,
+   "raw": "working/",
+   "conv": "D"
+  },
+  {
+   "src": "references/manage-mode.md",
+   "line": 124,
+   "raw": "references/refactor-mode.md",
+   "conv": "P"
+  },
+  {
+   "src": "references/manage-mode.md",
+   "line": 139,
+   "raw": "working/",
+   "conv": "D"
+  },
+  {
+   "src": "references/manage-mode.md",
+   "line": 139,
+   "raw": "manifest.yaml",
+   "conv": "F"
+  },
+  {
+   "src": "references/manage-mode.md",
+   "line": 141,
+   "raw": "ledger.md",
+   "conv": "F"
+  },
+  {
+   "src": "references/manage-mode.md",
+   "line": 143,
+   "raw": "prompt/current/",
+   "conv": "PD"
+  },
+  {
+   "src": "references/manage-mode.md",
+   "line": 143,
+   "raw": "history/vNNN/",
+   "conv": "PD"
+  },
+  {
+   "src": "references/manage-mode.md",
+   "line": 144,
+   "raw": "history/vNNN.patch.json",
+   "conv": "P"
+  },
+  {
+   "src": "references/manage-mode.md",
+   "line": 146,
+   "raw": "manifest.yaml",
+   "conv": "F"
+  },
+  {
+   "src": "references/manage-mode.md",
+   "line": 147,
+   "raw": "managed-system.yaml",
+   "conv": "F"
+  },
+  {
+   "src": "references/manage-mode.md",
+   "line": 152,
+   "raw": "references/verifier-specification.md",
+   "conv": "P"
+  },
+  {
+   "src": "references/manage-mode.md",
+   "line": 153,
+   "raw": "agent-state.md",
+   "conv": "F"
+  },
+  {
+   "src": "references/manage-mode.md",
+   "line": 172,
+   "raw": "environment.yaml",
+   "conv": "F"
+  },
+  {
+   "src": "references/manage-mode.md",
+   "line": 181,
+   "raw": "manifest.yaml",
+   "conv": "F"
+  },
+  {
+   "src": "references/quantum-principles.md",
+   "line": 12,
+   "raw": "section-operators.md",
+   "conv": "F"
+  },
+  {
+   "src": "references/quantum-principles.md",
+   "line": 45,
+   "raw": "section-operators.md",
+   "conv": "F"
+  },
+  {
+   "src": "references/refactor-mode.md",
+   "line": 35,
+   "raw": "operators/section-operators.md",
+   "conv": "P"
+  },
+  {
+   "src": "references/refactor-mode.md",
+   "line": 79,
+   "raw": "audit-checklist.md",
+   "conv": "F"
+  },
+  {
+   "src": "references/verifier-agent-patterns.md",
+   "line": 3,
+   "raw": "verifier-specification.md",
+   "conv": "F"
+  },
+  {
+   "src": "references/verifier-agent-patterns.md",
+   "line": 79,
+   "raw": "verifier-specification.md",
+   "conv": "F"
+  },
+  {
+   "src": "references/verifier-specification.md",
+   "line": 8,
+   "raw": "references/verifier-agent-patterns.md",
+   "conv": "P"
+  },
+  {
+   "src": "references/verifier-specification.md",
+   "line": 52,
+   "raw": "agent-consumability.md",
+   "conv": "F"
+  },
+  {
+   "src": "references/verifier-specification.md",
+   "line": 90,
+   "raw": "references/manage-mode.md",
+   "conv": "P"
+  },
+  {
+   "src": "references/verifier-specification.md",
+   "line": 92,
+   "raw": "manage/replay-verifier.py",
+   "conv": "P"
+  },
+  {
+   "src": "references/verifier-specification.md",
+   "line": 92,
+   "raw": "prompt/current/",
+   "conv": "PD"
+  },
+  {
+   "src": "references/verifier-specification.md",
+   "line": 94,
+   "raw": "manage/manage-mode-verifier.md",
+   "conv": "P"
+  },
+  {
+   "src": "references/verifier-specification.md",
+   "line": 94,
+   "raw": "memory/",
+   "conv": "D"
+  },
+  {
+   "src": "references/verifier-specification.md",
+   "line": 94,
+   "raw": "history/",
+   "conv": "D"
+  },
+  {
+   "src": "templates/interview-branches.md",
+   "line": 27,
+   "raw": "operators/section-operators.md",
+   "conv": "P"
+  },
+  {
+   "src": "templates/shape-catalog.md",
+   "line": 32,
+   "raw": "operators/section-operators.md",
+   "conv": "P"
+  },
+  {
+   "src": "templates/shape-catalog.md",
+   "line": 57,
+   "raw": "references/reasoning-patterns.md",
+   "conv": "P"
+  },
+  {
+   "src": "templates/shape-catalog.md",
+   "line": 66,
+   "raw": "references/reasoning-patterns.md",
+   "conv": "P"
+  },
+  {
+   "src": "templates/shape-catalog.md",
+   "line": 68,
+   "raw": "references/reasoning-patterns.md",
+   "conv": "P"
+  },
+  {
+   "src": "templates/shape-catalog.md",
+   "line": 178,
+   "raw": "references/agent-team-topologies.md",
+   "conv": "P"
+  },
+  {
+   "src": "templates/shape-catalog.md",
+   "line": 180,
+   "raw": "references/agent-consumability.md",
+   "conv": "P"
+  }
+ ],
+ "targets": {
+  "CHANGELOG.md": {
+   "class": "IN-CORPUS",
+   "why": "bare->CHANGELOG.md",
+   "conv": "F",
+   "n_refs": 1,
+   "refs": [
+    "CHANGELOG.md:62"
+   ]
+  },
+  "CITATIONS.md": {
+   "class": "IN-CORPUS",
+   "why": "bare->CITATIONS.md",
+   "conv": "F",
+   "n_refs": 4,
+   "refs": [
+    "CHANGELOG.md:10",
+    "CHANGELOG.md:58",
+    "CHANGELOG.md:63",
+    "CHANGELOG.md:74"
+   ]
+  },
+  "DEPLOY.md": {
+   "class": "OUT-OF-CORPUS",
+   "why": "referenced only from repo-metadata",
+   "conv": "F",
+   "n_refs": 1,
+   "refs": [
+    "CHANGELOG.md:142"
+   ]
+  },
+  "INSTALL-DESKTOP.md": {
+   "class": "OUT-OF-CORPUS",
+   "why": "referenced only from repo-metadata",
+   "conv": "F",
+   "n_refs": 1,
+   "refs": [
+    "CHANGELOG.md:145"
+   ]
+  },
+  "SKILL.md": {
+   "class": "IN-CORPUS",
+   "why": "bare->SKILL.md",
+   "conv": "F",
+   "n_refs": 4,
+   "refs": [
+    "CHANGELOG.md:143",
+    "CHANGELOG.md:28",
+    "CHANGELOG.md:62",
+    "CITATIONS.md:52"
+   ]
+  },
+  "agent-consumability.md": {
+   "class": "IN-CORPUS",
+   "why": "bare->references/agent-consumability.md",
+   "conv": "F",
+   "n_refs": 3,
+   "refs": [
+    "operators/section-operators.md:200",
+    "references/audit-checklist.md:166",
+    "references/verifier-specification.md:52"
+   ]
+  },
+  "agent-state.md": {
+   "class": "IN-CORPUS",
+   "why": "bare->references/agent-state.md",
+   "conv": "F",
+   "n_refs": 2,
+   "refs": [
+    "CHANGELOG.md:66",
+    "references/manage-mode.md:153"
+   ]
+  },
+  "audit-checklist.md": {
+   "class": "IN-CORPUS",
+   "why": "bare->references/audit-checklist.md",
+   "conv": "F",
+   "n_refs": 1,
+   "refs": [
+    "references/refactor-mode.md:79"
+   ]
+  },
+  "docs/": {
+   "class": "OUT-OF-CORPUS",
+   "why": "referenced only from repo-metadata",
+   "conv": "D",
+   "n_refs": 1,
+   "refs": [
+    "CHANGELOG.md:142"
+   ]
+  },
+  "environment.yaml": {
+   "class": "RUNTIME-GENERATED",
+   "why": "references/agent-state.md:22-38 (Package layout)",
+   "conv": "F",
+   "n_refs": 7,
+   "refs": [
+    "manage/analyze-operator.md:92",
+    "manage/monitor-operator.md:82",
+    "references/agent-state.md:234",
+    "references/agent-state.md:67",
+    "references/manage-mode.md:172",
+    "references/manage-mode.md:55",
+    "references/manage-mode.md:82"
+   ]
+  },
+  "goals.yaml": {
+   "class": "RUNTIME-GENERATED",
+   "why": "references/agent-state.md:22-38 (Package layout)",
+   "conv": "F",
+   "n_refs": 5,
+   "refs": [
+    "references/agent-state.md:222",
+    "references/agent-state.md:373",
+    "references/agent-state.md:75",
+    "references/manage-mode.md:53",
+    "references/manage-mode.md:82"
+   ]
+  },
+  "history/": {
+   "class": "RUNTIME-GENERATED",
+   "why": "references/agent-state.md:22-38 (Package layout)",
+   "conv": "D",
+   "n_refs": 1,
+   "refs": [
+    "references/verifier-specification.md:94"
+   ]
+  },
+  "history/v001/": {
+   "class": "RUNTIME-GENERATED",
+   "why": "references/agent-state.md:22-38 (Package layout)",
+   "conv": "PD",
+   "n_refs": 1,
+   "refs": [
+    "references/agent-state.md:224"
+   ]
+  },
+  "history/vNNN.patch.json": {
+   "class": "RUNTIME-GENERATED",
+   "why": "references/manage-mode.md:143-144 (persist diff)",
+   "conv": "P",
+   "n_refs": 1,
+   "refs": [
+    "references/manage-mode.md:144"
+   ]
+  },
+  "history/vNNN/": {
+   "class": "RUNTIME-GENERATED",
+   "why": "references/agent-state.md:22-38 (Package layout)",
+   "conv": "PD",
+   "n_refs": 1,
+   "refs": [
+    "references/manage-mode.md:143"
+   ]
+  },
+  "knowledge/": {
+   "class": "RUNTIME-GENERATED",
+   "why": "references/agent-state.md:22-38 (Package layout)",
+   "conv": "D",
+   "n_refs": 1,
+   "refs": [
+    "references/agent-state.md:100"
+   ]
+  },
+  "ledger.md": {
+   "class": "RUNTIME-GENERATED",
+   "why": "references/agent-state.md:22-38 (Package layout)",
+   "conv": "F",
+   "n_refs": 5,
+   "refs": [
+    "manage/analyze-operator.md:92",
+    "references/agent-state.md:292",
+    "references/manage-mode.md:141",
+    "references/manage-mode.md:59",
+    "references/manage-mode.md:83"
+   ]
+  },
+  "manage-verify.py": {
+   "class": "DANGLING",
+   "why": "workflow-asserted; 0 on disk",
+   "conv": "F",
+   "n_refs": 1,
+   "refs": [
+    "manage/dogfood-audit.md:36"
+   ]
+  },
+  "manage/analyze-operator.md": {
+   "class": "IN-CORPUS",
+   "why": "path",
+   "conv": "P",
+   "n_refs": 2,
+   "refs": [
+    "CHANGELOG.md:44",
+    "references/manage-mode.md:93"
+   ]
+  },
+  "manage/manage-mode-verifier.md": {
+   "class": "IN-CORPUS",
+   "why": "path",
+   "conv": "P",
+   "n_refs": 2,
+   "refs": [
+    "CHANGELOG.md:48",
+    "references/verifier-specification.md:94"
+   ]
+  },
+  "manage/monitor-operator.md": {
+   "class": "IN-CORPUS",
+   "why": "path",
+   "conv": "P",
+   "n_refs": 2,
+   "refs": [
+    "CHANGELOG.md:43",
+    "references/manage-mode.md:63"
+   ]
+  },
+  "manage/replay-verifier.py": {
+   "class": "IN-CORPUS",
+   "why": "path",
+   "conv": "P",
+   "n_refs": 4,
+   "refs": [
+    "CHANGELOG.md:52",
+    "manage/manage-mode-verifier.md:7",
+    "references/agent-state.md:343",
+    "references/verifier-specification.md:92"
+   ]
+  },
+  "managed-system.yaml": {
+   "class": "RUNTIME-GENERATED",
+   "why": "references/agent-state.md:22-38 (Package layout)",
+   "conv": "F",
+   "n_refs": 7,
+   "refs": [
+    "manage/analyze-operator.md:93",
+    "references/agent-state.md:188",
+    "references/agent-state.md:244",
+    "references/agent-state.md:49",
+    "references/manage-mode.md:115",
+    "references/manage-mode.md:147",
+    "references/manage-mode.md:84"
+   ]
+  },
+  "manifest.yaml": {
+   "class": "RUNTIME-GENERATED",
+   "why": "references/agent-state.md:22-38 (Package layout)",
+   "conv": "F",
+   "n_refs": 10,
+   "refs": [
+    "references/agent-state.md:228",
+    "references/agent-state.md:251",
+    "references/agent-state.md:262",
+    "references/agent-state.md:353",
+    "references/manage-mode.md:116",
+    "references/manage-mode.md:139",
+    "references/manage-mode.md:146",
+    "references/manage-mode.md:181",
+    "references/manage-mode.md:54",
+    "references/manage-mode.md:66"
+   ]
+  },
+  "memory/": {
+   "class": "RUNTIME-GENERATED",
+   "why": "references/agent-state.md:22-38 (Package layout)",
+   "conv": "D",
+   "n_refs": 8,
+   "refs": [
+    "references/agent-state.md:101",
+    "references/agent-state.md:106",
+    "references/agent-state.md:229",
+    "references/agent-state.md:262",
+    "references/agent-state.md:265",
+    "references/agent-state.md:392",
+    "references/manage-mode.md:64",
+    "references/verifier-specification.md:94"
+   ]
+  },
+  "operators/": {
+   "class": "IN-CORPUS",
+   "why": "dir",
+   "conv": "D",
+   "n_refs": 2,
+   "refs": [
+    "SKILL.md:100",
+    "SKILL.md:38"
+   ]
+  },
+  "operators/section-operators.md": {
+   "class": "IN-CORPUS",
+   "why": "path",
+   "conv": "P",
+   "n_refs": 8,
+   "refs": [
+    "CHANGELOG.md:64",
+    "CITATIONS.md:100",
+    "CITATIONS.md:164",
+    "references/agent-state.md:138",
+    "references/audit-checklist.md:89",
+    "references/refactor-mode.md:35",
+    "templates/interview-branches.md:27",
+    "templates/shape-catalog.md:32"
+   ]
+  },
+  "prompt/": {
+   "class": "RUNTIME-GENERATED",
+   "why": "references/agent-state.md:22-38 (Package layout)",
+   "conv": "D",
+   "n_refs": 1,
+   "refs": [
+    "references/agent-state.md:100"
+   ]
+  },
+  "prompt/current/": {
+   "class": "RUNTIME-GENERATED",
+   "why": "references/agent-state.md:22-38 (Package layout)",
+   "conv": "PD",
+   "n_refs": 6,
+   "refs": [
+    "references/agent-state.md:223",
+    "references/agent-state.md:228",
+    "references/agent-state.md:262",
+    "references/agent-state.md:341",
+    "references/manage-mode.md:143",
+    "references/verifier-specification.md:92"
+   ]
+  },
+  "quantum-principles.md": {
+   "class": "IN-CORPUS",
+   "why": "bare->references/quantum-principles.md",
+   "conv": "F",
+   "n_refs": 1,
+   "refs": [
+    "CHANGELOG.md:82"
+   ]
+  },
+  "reasoning-patterns.md": {
+   "class": "IN-CORPUS",
+   "why": "bare->references/reasoning-patterns.md",
+   "conv": "F",
+   "n_refs": 1,
+   "refs": [
+    "references/audit-checklist.md:220"
+   ]
+  },
+  "references/agent-consumability.md": {
+   "class": "IN-CORPUS",
+   "why": "path",
+   "conv": "P",
+   "n_refs": 5,
+   "refs": [
+    "CITATIONS.md:72",
+    "SKILL.md:104",
+    "manage/monitor-operator.md:7",
+    "references/audit-checklist.md:280",
+    "templates/shape-catalog.md:180"
+   ]
+  },
+  "references/agent-state.md": {
+   "class": "IN-CORPUS",
+   "why": "path",
+   "conv": "P",
+   "n_refs": 3,
+   "refs": [
+    "CHANGELOG.md:33",
+    "SKILL.md:48",
+    "references/manage-mode.md:13"
+   ]
+  },
+  "references/agent-team-topologies.md": {
+   "class": "IN-CORPUS",
+   "why": "path",
+   "conv": "P",
+   "n_refs": 3,
+   "refs": [
+    "CITATIONS.md:57",
+    "SKILL.md:106",
+    "templates/shape-catalog.md:178"
+   ]
+  },
+  "references/audit-checklist.md": {
+   "class": "IN-CORPUS",
+   "why": "path",
+   "conv": "P",
+   "n_refs": 3,
+   "refs": [
+    "SKILL.md:118",
+    "manage/manage-mode-verifier.md:14",
+    "references/manage-mode.md:90"
+   ]
+  },
+  "references/evaluation-rubric.md": {
+   "class": "IN-CORPUS",
+   "why": "path",
+   "conv": "P",
+   "n_refs": 1,
+   "refs": [
+    "SKILL.md:130"
+   ]
+  },
+  "references/manage-mode.md": {
+   "class": "IN-CORPUS",
+   "why": "path",
+   "conv": "P",
+   "n_refs": 4,
+   "refs": [
+    "CHANGELOG.md:38",
+    "SKILL.md:48",
+    "SKILL.md:52",
+    "references/verifier-specification.md:90"
+   ]
+  },
+  "references/quantum-principles.md": {
+   "class": "IN-CORPUS",
+   "why": "path",
+   "conv": "P",
+   "n_refs": 7,
+   "refs": [
+    "CITATIONS.md:163",
+    "SKILL.md:161",
+    "SKILL.md:38",
+    "SKILL.md:70",
+    "manage/analyze-operator.md:5",
+    "references/agent-state.md:17",
+    "references/manage-mode.md:21"
+   ]
+  },
+  "references/reasoning-patterns.md": {
+   "class": "IN-CORPUS",
+   "why": "path",
+   "conv": "P",
+   "n_refs": 11,
+   "refs": [
+    "CITATIONS.md:148",
+    "CITATIONS.md:186",
+    "CITATIONS.md:202",
+    "SKILL.md:102",
+    "SKILL.md:153",
+    "SKILL.md:68",
+    "references/audit-checklist.md:215",
+    "templates/shape-catalog.md:57",
+    "templates/shape-catalog.md:66",
+    "templates/shape-catalog.md:68"
+   ]
+  },
+  "references/refactor-mode.md": {
+   "class": "IN-CORPUS",
+   "why": "path",
+   "conv": "P",
+   "n_refs": 4,
+   "refs": [
+    "SKILL.md:46",
+    "SKILL.md:52",
+    "references/audit-checklist.md:7",
+    "references/manage-mode.md:124"
+   ]
+  },
+  "references/verifier-agent-patterns.md": {
+   "class": "IN-CORPUS",
+   "why": "path",
+   "conv": "P",
+   "n_refs": 2,
+   "refs": [
+    "SKILL.md:157",
+    "references/verifier-specification.md:8"
+   ]
+  },
+  "references/verifier-specification.md": {
+   "class": "IN-CORPUS",
+   "why": "path",
+   "conv": "P",
+   "n_refs": 6,
+   "refs": [
+    "CHANGELOG.md:56",
+    "CHANGELOG.md:63",
+    "SKILL.md:147",
+    "manage/manage-mode-verifier.md:95",
+    "references/manage-mode.md:152",
+    "references/manage-mode.md:61"
+   ]
+  },
+  "runs/": {
+   "class": "RUNTIME-GENERATED",
+   "why": "references/agent-state.md:22-38 (Package layout)",
+   "conv": "D",
+   "n_refs": 3,
+   "refs": [
+    "manage/monitor-operator.md:82",
+    "references/agent-state.md:233",
+    "references/manage-mode.md:53"
+   ]
+  },
+  "section-operators.md": {
+   "class": "IN-CORPUS",
+   "why": "bare->operators/section-operators.md",
+   "conv": "F",
+   "n_refs": 2,
+   "refs": [
+    "references/quantum-principles.md:12",
+    "references/quantum-principles.md:45"
+   ]
+  },
+  "shape-catalog.md": {
+   "class": "IN-CORPUS",
+   "why": "bare->templates/shape-catalog.md",
+   "conv": "F",
+   "n_refs": 1,
+   "refs": [
+    "references/audit-checklist.md:220"
+   ]
+  },
+  "templates/interview-branches.md": {
+   "class": "IN-CORPUS",
+   "why": "path",
+   "conv": "P",
+   "n_refs": 2,
+   "refs": [
+    "SKILL.md:78",
+    "SKILL.md:84"
+   ]
+  },
+  "templates/minimum-viable-prompt.yaml": {
+   "class": "IN-CORPUS",
+   "why": "path",
+   "conv": "P",
+   "n_refs": 1,
+   "refs": [
+    "SKILL.md:100"
+   ]
+  },
+  "templates/shape-catalog.md": {
+   "class": "IN-CORPUS",
+   "why": "path",
+   "conv": "P",
+   "n_refs": 3,
+   "refs": [
+    "SKILL.md:100",
+    "SKILL.md:62",
+    "references/agent-team-topologies.md:171"
+   ]
+  },
+  "tools/": {
+   "class": "RUNTIME-GENERATED",
+   "why": "references/agent-state.md:22-38 (Package layout)",
+   "conv": "D",
+   "n_refs": 1,
+   "refs": [
+    "references/agent-state.md:100"
+   ]
+  },
+  "verifier-specification.md": {
+   "class": "IN-CORPUS",
+   "why": "bare->references/verifier-specification.md",
+   "conv": "F",
+   "n_refs": 2,
+   "refs": [
+    "references/verifier-agent-patterns.md:3",
+    "references/verifier-agent-patterns.md:79"
+   ]
+  },
+  "working/": {
+   "class": "RUNTIME-GENERATED",
+   "why": "references/agent-state.md:22-38 (Package layout)",
+   "conv": "D",
+   "n_refs": 8,
+   "refs": [
+    "manage/analyze-operator.md:93",
+    "references/agent-state.md:92",
+    "references/manage-mode.md:115",
+    "references/manage-mode.md:118",
+    "references/manage-mode.md:139",
+    "references/manage-mode.md:53",
+    "references/manage-mode.md:59",
+    "references/manage-mode.md:86"
+   ]
+  }
+ }
+}

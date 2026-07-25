@@ -1,0 +1,182 @@
+# Agent-team topologies
+
+When a task is decomposed across multiple coordinated agents, the choice of *topology* — how the agents are arranged and how work flows between them — is the most consequential design decision. Wrong topology produces brittle systems regardless of how well individual prompts are written. This file documents four canonical topologies, when each applies, and the operator profile of each role within them.
+
+These topologies are the structural primitives. Real systems often combine them (an orchestrator-workers system whose individual workers use parallelization-voting internally, etc.). The framework's audit phase checks that the chosen topology actually fits the task before committing to per-role drafting.
+
+## Topology 1: Orchestrator-workers
+
+A central LLM (orchestrator) dynamically decomposes a task into subtasks, delegates each to a worker LLM, and synthesizes the results. The key property: **subtasks aren't pre-defined**. The orchestrator decides what they are based on the specific input.
+
+```
+                ┌──> Worker A ──┐
+Input ──> Orchestrator ──> Worker B ──> Synthesizer ──> Output
+                └──> Worker C ──┘
+```
+
+**Source:** Anthropic, "Building Effective AI Agents."
+
+**When to use.** Task complexity is high and the right decomposition depends on the input itself. Coding tasks where the number of files affected can't be predicted upfront. Research tasks where the right sub-questions emerge from initial exploration. Anywhere the user wouldn't be able to write a static workflow because they don't know in advance what the steps are.
+
+**When not to use.** When the decomposition is known and stable — that's parallelization-sectioning. When you don't actually need a synthesizer — that's parallelization-voting. When one of the agents needs to critique another's output rather than work on a partition — that's evaluator-optimizer.
+
+### Role operator profiles
+
+**Orchestrator.**
+- Shape: system persona with strong delegation patterns.
+- Amplifies: task decomposition, worker assignment, result synthesis. Output is structured: a list of subtasks with clear scope, then a final synthesized answer.
+- Suppresses: doing the work itself. The orchestrator's job is to delegate, not execute. Anti-pattern: orchestrator that writes code instead of dispatching coding workers.
+- Strength: very high — sets the entire team's behavior.
+- Critical sub-pattern: **never delegate understanding.** When the orchestrator dispatches a worker, the prompt must include specific context (file paths, line numbers, the exact change to make) — not vague handoffs like "based on your findings, fix this." The model in the worker role can't synthesize from nothing; the orchestrator has to do that synthesis itself before delegating. (Source: handbook §AgentTool.)
+
+**Worker (sub-agent).**
+- Shape: sub-agent / tool prompt (Shape 4).
+- Amplifies: focused execution within a narrow scope. Returns structured output the orchestrator can parse.
+- Suppresses: scope expansion, talking back to the orchestrator's plan, working on tasks not assigned.
+- Strength: mid to strong — defined entirely by its scope and capability lockdown.
+- Critical sub-pattern: **capability lockdown** if the worker has any destructive capability. Read-only workers should have explicit "you cannot write files, even via shell redirection" prose, not just structural restrictions. (Source: Claude Code Explore agent.)
+
+**Synthesizer (optional, often the orchestrator itself).**
+- Shape: one-shot complex task (Shape 2) when separate, or part of orchestrator's persona when fused.
+- Amplifies: integration of worker results into a coherent final output.
+- Suppresses: re-doing work the workers already did.
+- When to separate: when the synthesis is itself complex enough to deserve its own focused attention. Default: fuse into orchestrator.
+
+### Common failure modes
+
+- **Synthesis collapse.** Workers return rich output; orchestrator reduces to a generic summary. Fix: orchestrator's prompt must specify what synthesis means (combine, prioritize, contradict-resolve), not just "summarize."
+- **Scope leakage.** Workers expand beyond their assigned scope, producing output that overlaps or contradicts other workers. Fix: per-worker prompts include explicit scope-lockdown language.
+- **Stale delegation.** Orchestrator delegates without enough context, expecting workers to figure out what the parent already knew. Workers produce shallow output. Fix: never delegate understanding.
+
+## Topology 2: Parallelization — sectioning
+
+Multiple workers run in parallel on **pre-defined**, independent aspects of a task. Each worker focuses on one specific aspect; results are aggregated.
+
+```
+        ┌──> Worker A (aspect 1) ──┐
+Input ──┼──> Worker B (aspect 2) ──┼──> Aggregator ──> Output
+        └──> Worker C (aspect 3) ──┘
+```
+
+**Source:** Anthropic, "Building Effective AI Agents."
+
+**When to use.** The task naturally decomposes into independent aspects that don't depend on each other's outputs. Common in evaluation pipelines (one worker scores empathy, another scores accuracy, another scores concision). Common in guardrails (one worker handles the user query, another screens it for inappropriate content in parallel).
+
+**When not to use.** When subtasks aren't known in advance — that's orchestrator-workers. When workers should converge on one answer rather than handle different aspects — that's voting.
+
+### Role operator profiles
+
+**Worker (one per aspect).**
+- Shape: usually one-shot complex task (Shape 2) or LLM-as-judge (Shape 6) for evaluation aspects.
+- Amplifies: deep focus on one specific aspect. The whole reason for parallelization-sectioning is that **focused attention beats divided attention** — separating considerations into separate calls produces better per-aspect output than a single call covering all aspects.
+- Suppresses: cross-aspect concerns. The empathy worker doesn't think about accuracy.
+- Strength: high within its aspect, none outside.
+- Critical: each worker's prompt should be designed without awareness of the other workers. They are independent operators.
+
+**Aggregator.**
+- Shape: one-shot complex task with a structured output schema.
+- Amplifies: combination of independent results into a coherent multi-faceted output. Often just structural assembly (concatenating per-aspect scores into a JSON object), not interpretation.
+- Suppresses: re-evaluating worker outputs. The aggregator trusts the workers; if it doesn't, the design is wrong.
+- Strength: low to mid — usually mechanical.
+- Often replaceable by code rather than an LLM call. If the aggregation is structural (assembling fields), use code. Use an LLM only when the aggregation requires interpretation.
+
+### Common failure modes
+
+- **Hidden dependency.** Two "independent" aspects turn out to share information (the empathy worker's reasoning would benefit from knowing the accuracy score). Fix: re-examine the topology — this might actually be a workflow chain or orchestrator-workers, not parallelization.
+- **Aggregator overreach.** The aggregator starts re-judging worker outputs instead of combining them. Fix: replace with code if the aggregation is mechanical, or clearly delimit the aggregator's role.
+
+## Topology 3: Parallelization — voting
+
+Multiple workers run the **same task** in parallel; their outputs are aggregated by voting, averaging, or consensus rules.
+
+```
+        ┌──> Worker (instance 1) ──┐
+Input ──┼──> Worker (instance 2) ──┼──> Voter/Aggregator ──> Output
+        └──> Worker (instance 3) ──┘
+```
+
+**Source:** Anthropic, "Building Effective AI Agents."
+
+**When to use.** When higher confidence is required than a single LLM call provides. Code review for vulnerabilities (multiple reviewers, flag if any finds a problem). Content moderation (multiple judges, escalate if any flags). Hard reasoning tasks where temperature > 0 sampling produces variance worth aggregating. The cost is N× the LLM calls; the benefit is reduced false negatives or false positives depending on the voting rule.
+
+**When not to use.** Voting is wasteful for tasks where one well-prompted worker suffices. Test: if you're 95%+ confident in the single-worker version, voting adds cost without value.
+
+### Role operator profiles
+
+**Worker (N instances of the same prompt).**
+- Shape: usually one-shot complex task (Shape 2) or LLM-as-judge (Shape 6).
+- Critical: workers should run with diversification — different temperatures, different model versions, or genuinely different prompts (multi-perspective voting). Identical workers at temperature 0 produce identical outputs and the aggregation is pointless.
+- Amplifies: the consistent signal across workers.
+- Suppresses: idiosyncratic outputs from any single worker.
+
+**Voter/Aggregator.**
+- Shape: usually code (majority vote, threshold, average) rather than an LLM call. LLM only when the voting is qualitative ("are these three reviews consistent in their concerns?").
+- Voting rule design is load-bearing: thresholds (flag if 1-of-N flags vs 2-of-N), tie-breaking, abstention handling. Decide explicitly per use case.
+
+### Common failure modes
+
+- **Identical workers.** All N workers return the same answer because they're the same prompt at temperature 0. Vote is meaningless. Fix: diversify (temperature, prompt variants, models) or drop the topology.
+- **Wrong voting rule.** "1-of-N flags" produces high false positives in moderation; "majority flags" produces high false negatives. The rule must match the cost asymmetry of the task.
+
+## Topology 4: Evaluator-optimizer
+
+One LLM generates a candidate output; another LLM evaluates and returns feedback; the generator iterates. Loop continues until the evaluator approves or a max-iterations cap is hit.
+
+```
+                  ┌──── feedback ────┐
+                  ↓                  │
+Input ──> Generator ──> Output ──> Evaluator ──> Final
+                                     │
+                                     └──> approved
+```
+
+**Source:** Anthropic, "Building Effective AI Agents."
+
+**When to use.** When the task has clear quality criteria the evaluator can apply but the generator can't reliably hit on the first try. Writing tasks where revision genuinely improves output. Code that needs to compile and pass tests (the test suite is the evaluator, the generator is the coder). Structured output where validation can fail and trigger regeneration.
+
+**When not to use.** When the evaluator's criteria are fuzzy enough that it can't reliably approve good output — the loop runs forever. When generation is cheap enough that you should just run N parallel attempts and take the best (that's voting).
+
+### Role operator profiles
+
+**Generator.**
+- Shape: usually one-shot complex task (Shape 2). Receives the original input plus, on iterations after the first, the evaluator's previous feedback.
+- Amplifies: the failure modes the evaluator named in feedback. The generator should explicitly address each piece of feedback.
+- Suppresses: regression — fixing what the evaluator flagged shouldn't break what was already good. This is hard and is a common failure mode; the generator's prompt should explicitly preserve previously-approved aspects.
+- Strength: mid — depends heavily on feedback quality.
+
+**Evaluator.**
+- Shape: LLM-as-judge (Shape 6) — but with a critical extension: the evaluator must produce **actionable feedback**, not just scores. The generator can't act on "score: 6/10"; it can act on "the second paragraph contradicts the third — pick one stance."
+- Amplifies: the gap between current output and acceptable output.
+- Suppresses: scope expansion (don't critique aspects that were never in scope).
+- Strength: very high — the evaluator's feedback quality directly determines convergence.
+
+### Common failure modes
+
+- **Goodhart on the evaluator.** Generator learns to game the evaluator's specific phrasing rather than improving genuine quality. Mitigated by: rotating evaluator prompts, holding out a separate validator the generator never sees, or comparing against a known-good reference.
+- **Convergence failure.** Loop never terminates; evaluator keeps finding things to critique. Fix: max-iterations cap, plus an evaluator instruction to approve once output meets the bar (perfectionism is a failure mode).
+- **Regression.** Iteration N fixes what iteration N-1 was flagged for, but breaks something iteration N-1 had right. Fix: evaluator tracks what was good across iterations; generator's prompt explicitly preserves approved aspects.
+
+## Hybrid topologies
+
+Real systems often combine these. A few common combinations:
+
+- **Orchestrator-workers + voting at worker level.** The orchestrator dispatches subtasks; each subtask is solved by N parallel workers voting. Use when individual subtasks are high-stakes (security review of each file).
+- **Evaluator-optimizer + parallelization-sectioning at evaluator.** Multiple evaluator workers each scoring a different aspect, generator iterates against the union. Use when "good output" has multiple independent dimensions.
+- **Orchestrator-workers with the orchestrator as evaluator.** Orchestrator dispatches, receives results, and optionally re-dispatches if results don't meet the bar. The orchestrator becomes the evaluator in a degenerate case.
+
+When designing a hybrid, draft each topology layer separately first, then audit the cross-layer interfaces (does the inner topology's output match what the outer expects?).
+
+## Capability lockdown for roles
+
+Any role in an agent team with destructive capability (write access, shell access, financial actions, anything irreversible) needs the layered lockdown pattern. Capability lockdown is a persona-level concern, not specific to multi-agent systems — see Shape 5 (system persona) in `templates/shape-catalog.md` for the full pattern (structural + prose layering, forceful negative phrasing, repetition, explanation). When designing an agent team, apply that pattern per-role for any role with destructive capability.
+
+## Summary table
+
+| Topology | Subtasks | Convergence | Best for |
+|---|---|---|---|
+| Orchestrator-workers | Dynamic | Single pass | Tasks where decomposition depends on input |
+| Parallelization-sectioning | Pre-defined, independent | Single pass | Multi-aspect tasks with focused-attention benefit |
+| Parallelization-voting | Identical workers | Aggregation rule | High-stakes single-task confidence |
+| Evaluator-optimizer | One task, iterated | Loop until acceptance | Tasks where revision improves output |
+
+When in doubt, start with orchestrator-workers if subtasks are dynamic, parallelization-sectioning if they're static. Voting and evaluator-optimizer are specialized variants worth reaching for only when their specific properties match the task.

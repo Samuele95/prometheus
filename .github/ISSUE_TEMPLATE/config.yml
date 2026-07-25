@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Question or discussion
+    url: https://github.com/Samuele95/prometheus/discussions
+    about: Ask how to use the framework, or propose an idea before building it.
+  - name: Documentation
+    url: https://samuele95.github.io/prometheus/documentation-forge.html
+    about: Read the full documentation, including install for each runtime.
