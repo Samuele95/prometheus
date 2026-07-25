@@ -66,9 +66,9 @@ Three pillars, each with its own section below — click a card to jump.
 
 - [⚡ Quick start](#-quick-start)
 - [What it is](#what-it-is)
+- [Core idea: prompts as operators](#core-idea-prompts-as-operators)
 - [What it builds](#what-it-builds)
 - [Three modes](#three-modes) · [Manage mode (MAPE-K)](#manage-mode--a-mape-k-loop-over-a-live-agent)
-- [Core idea: prompts as operators](#core-idea-prompts-as-operators)
 - [The Fabrication Cycle](#the-fabrication-cycle)
 - [Verification](#verification)
 - [Install](#install)
@@ -118,6 +118,20 @@ produces; a self-adaptive agent kept healthy across its lifetime is the largest.
 always-loaded `SKILL.md` router (~22&nbsp;KB) plus a companion corpus pulled into
 context only at the step that needs it. No build step, no dependencies, MIT.
 
+## Core idea: prompts as operators
+
+Every section of a prompt is an **operator** acting on the task — it amplifies some
+readings of the intent, suppresses others, and mixes the rest. Order is load-bearing:
+a later operator's meaning depends on the reading an earlier one already selected. One
+operator is set apart — **Collapse**, the measurement act, where the prompt commits to
+a single interpretation. Agents and workflows are assembled from the same operators,
+which is why the discipline scales from a one-line instruction to a lifecycle-managed
+system.
+
+<div align="center">
+  <img src="assets/readme-operators.svg" width="82%" alt="A prompt drawn as a stack of operators acting on the raw task: Role & framing (amplify), Context operators (mix), Constraints (suppress), Reasoning scaffold (amplify), and Collapse (measure and commit to one reading). Order is load-bearing.">
+</div>
+
 ## What it builds
 
 The same operator model compiles into whatever the task needs. The six outputs stack
@@ -152,20 +166,6 @@ Analyze → Plan → Execute** loop over it, always *between* runs, never drivin
 > are manager-owned (the control plane it rewrites); the agent's own `memory/` is
 > agent-owned (the data plane) and is read as a probe, **never** hand-edited. It reads
 > run evidence and rewrites the agent — it never sits in the request path.
-
-## Core idea: prompts as operators
-
-Every section of a prompt is an **operator** acting on the task — it amplifies some
-readings of the intent, suppresses others, and mixes the rest. Order is load-bearing:
-a later operator's meaning depends on the reading an earlier one already selected. One
-operator is set apart — **Collapse**, the measurement act, where the prompt commits to
-a single interpretation. Agents and workflows are assembled from the same operators,
-which is why the discipline scales from a one-line instruction to a lifecycle-managed
-system.
-
-<div align="center">
-  <img src="assets/readme-operators.svg" width="82%" alt="A prompt drawn as a stack of operators acting on the raw task: Role & framing (amplify), Context operators (mix), Constraints (suppress), Reasoning scaffold (amplify), and Collapse (measure and commit to one reading). Order is load-bearing.">
-</div>
 
 ## The Fabrication Cycle
 
