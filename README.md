@@ -1,56 +1,72 @@
-<p align="center">
-  <img src="assets/banner.png" alt="Prometheus — prompts as operators" width="100%">
+<div align="center">
+
+<img src="assets/banner.png" alt="Prometheus — prompts as operators" width="100%">
+
+<h1>Prometheus</h1>
+
+**A meta-prompting framework for agentic systems.**
+It designs, audits, and *maintains* prompts, agents, and agentic workflows —
+each shipped with a verifier that proves it works.
+
+<p>
+  <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-ff7a2f?style=flat-square"></a>
+  <a href="https://github.com/Samuele95/prometheus/releases/latest"><img alt="Latest release" src="https://img.shields.io/github/v/release/Samuele95/prometheus?style=flat-square&color=ff7a2f&label=release"></a>
+  <a href="https://github.com/Samuele95/prometheus/stargazers"><img alt="Stars" src="https://img.shields.io/github/stars/Samuele95/prometheus?style=flat-square&color=4a4550"></a>
+  <img alt="Dependencies: none" src="https://img.shields.io/badge/dependencies-none-4a4550?style=flat-square">
+  <img alt="Runs at build time" src="https://img.shields.io/badge/runs-build--time-4a4550?style=flat-square">
 </p>
 
-<h1 align="center">Prometheus</h1>
-
-<p align="center">
-  <a href="LICENSE"><img alt="Licence: MIT" src="https://img.shields.io/badge/licence-MIT-ff7a2f?style=flat-square"></a>
-  <img alt="No dependencies" src="https://img.shields.io/badge/dependencies-none-ff7a2f?style=flat-square">
-  <img alt="Runs at build time" src="https://img.shields.io/badge/runs-at%20build%20time-4a4550?style=flat-square">
-  <img alt="Builds: prompts · agents · workflows" src="https://img.shields.io/badge/builds-prompts%20·%20agents%20·%20workflows-4a4550?style=flat-square">
-  <img alt="Modes: 3" src="https://img.shields.io/badge/modes-3-4a4550?style=flat-square">
-</p>
-
-<p align="center">
-  <b>A meta-prompting framework for agentic systems.</b><br>
-  It designs, audits, and <i>maintains</i> prompts, agents, and agentic workflows —
-  each shipped with a verifier that proves it works.
-</p>
-
-<p align="center">
-  <a href="#-quick-start">Quick start</a> &nbsp;·&nbsp;
+<p>
+  <a href="#-quick-start"><b>Quick start</b></a> &nbsp;·&nbsp;
   <a href="https://samuele95.github.io/prometheus/">Website</a> &nbsp;·&nbsp;
   <a href="https://samuele95.github.io/prometheus/documentation-forge.html">Documentation</a> &nbsp;·&nbsp;
   <a href="https://github.com/Samuele95/prometheus/releases/latest/download/prometheus-skill.zip">Download the skill</a>
 </p>
 
-> **A prompt is an operator, not a key.** You don't *retrieve* the right answer by
-> finding magic words — you *construct* it, section by justified section, the way
-> you build a circuit. Agents and workflows are just the largest things you build
-> that way.
+</div>
 
-<p align="center">
+> [!NOTE]
+> **A prompt is an operator, not a key.** You don't *retrieve* the right answer by
+> finding magic words — you *construct* it, section by justified section, the way you
+> build a circuit. Agents and workflows are just the largest things you build that way.
+
+<div align="center">
   <img src="assets/card-01.png" width="32%" alt="Three modes: from-scratch, refactor, manage">
   <img src="assets/card-02.png" width="32%" alt="Six phases: shape, interview, draft, audit, score, deliver">
   <img src="assets/card-03.png" width="32%" alt="Always verified: static, single-run, cross-run">
-</p>
+</div>
 
 ---
 
 ## Contents
 
-- [Quick start](#-quick-start)
+<table>
+<tr>
+<td valign="top">
+
+- [⚡ Quick start](#-quick-start)
 - [What it is](#what-it-is)
 - [What it builds](#what-it-builds)
 - [Three modes](#three-modes)
+
+</td>
+<td valign="top">
+
 - [Core idea: prompts as operators](#core-idea-prompts-as-operators)
 - [The Fabrication Cycle](#the-fabrication-cycle)
 - [Verification](#verification)
+
+</td>
+<td valign="top">
+
 - [Install](#install)
 - [Repository layout](#repository-layout)
 - [Documentation](#documentation)
 - [License](#license)
+
+</td>
+</tr>
+</table>
 
 ---
 
@@ -76,37 +92,35 @@ no dependencies. The host auto-routes to Prometheus the moment it sees the inten
 build an agent that triages support tickets and files them with our tools
 ```
 
-> Using Gemini instead? Prometheus ships a filesystem-free **Gem port** — see
+> [!TIP]
+> Using Gemini instead? Prometheus ships a filesystem-free **Gem port** — jump to
 > [Install → Gemini Gem](#gemini-gem).
-
----
 
 ## What it is
 
 Prometheus is a portable **agent skill** and a build-time engine for **agentic
-systems**. Give it an intent and it engineers the artifact end to end — a prompt,
-a **full agent**, or a **multi-step workflow** — audits it, scores it, and ships it
-with a verifier. It runs entirely at **build time**: it designs, audits, refactors,
-and *maintains* the things your agents are made of. It does not sit in your request
-path at runtime.
+systems**. Give it an intent and it engineers the artifact end to end — a prompt, a
+**full agent**, or a **multi-step workflow** — audits it, scores it, and ships it with
+a verifier. It runs entirely at **build time**: it designs, audits, refactors, and
+*maintains* the things your agents are made of. It does not sit in your request path
+at runtime.
 
 It is deliberately **not prompt-only**. A system prompt is the smallest thing it
 produces; a self-adaptive agent kept healthy across its lifetime is the largest.
 
 It's one always-loaded `SKILL.md` router (~22&nbsp;KB) plus a corpus of companion
 knowledge files pulled into context only at the step that needs them. No build step,
-no dependencies, MIT — and there's a **Gemini Gem** port for a filesystem-free
-runtime.
+no dependencies, MIT — and there's a **Gemini Gem** port for a filesystem-free runtime.
 
 ## What it builds
 
-The same operator model compiles into whatever the task needs. The six outputs
-stack into three layers, the way a network stacks: raw instructions in, **agents in
-the middle**, judgement on the way out.
+The same operator model compiles into whatever the task needs. The six outputs stack
+into three layers, the way a network stacks: raw instructions in, **agents in the
+middle**, judgement on the way out.
 
-<p align="center">
+<div align="center">
   <img src="assets/readme-layers.svg" alt="What Prometheus produces, as three stacked layers: prompts, generic agents, evaluators" width="100%">
-</p>
+</div>
 
 <table>
 <tr><th align="left">Layer</th><th align="left">Output</th><th align="left">What it is</th></tr>
@@ -120,9 +134,9 @@ the middle**, judgement on the way out.
 
 ## Three modes
 
-<p align="center">
+<div align="center">
   <img src="assets/readme-modes.svg" alt="Three modes: from-scratch, refactor, manage" width="100%">
-</p>
+</div>
 
 | Mode | Use it to |
 |---|---|
@@ -132,51 +146,49 @@ the middle**, judgement on the way out.
 
 ### Manage mode — a MAPE-K loop over a live agent
 
-The mode that makes Prometheus more than a prompt tool. Point it at a
-managed-agent package — a directory that *is* the agent's identity — and it runs a
-**Monitor → Analyze → Plan → Execute** loop over it, always *between* runs, never
-driving it live:
+The mode that makes Prometheus more than a prompt tool. Point it at a managed-agent
+package — a directory that *is* the agent's identity — and it runs a **Monitor →
+Analyze → Plan → Execute** loop over it, always *between* runs, never driving it live:
 
-- **Monitor** reconstructs the behaviour the current prompt actually induces, from
-  recent run evidence.
-- **Analyze** keeps candidate adaptations in weighted superposition and prunes the
-  ones a ledger says already regressed.
-- **Plan** collapses to a single edit.
-- **Execute** applies it at a controlled lifecycle seam — write-ahead-logged and
-  reversible by snapshot.
+| Step | What it does |
+|---|---|
+| **Monitor** | Reconstructs the behaviour the current prompt actually induces, from recent run evidence. |
+| **Analyze** | Keeps candidate adaptations in weighted superposition and prunes the ones a ledger says already regressed. |
+| **Plan** | Collapses to a single edit. |
+| **Execute** | Applies it at a controlled lifecycle seam — write-ahead-logged and reversible by snapshot. |
 
-It enforces a strict **control-plane / data-plane split**: the prompt, tools, and
-knowledge files are manager-owned (the control plane it rewrites); the agent's own
-`memory/` is agent-owned (the data plane) and is read as a probe, never
-hand-edited. It is a build-time manager that reads run evidence and rewrites the
-agent — it never sits in the request path.
+> [!IMPORTANT]
+> Strict **control-plane / data-plane split**: the prompt, tools, and knowledge files
+> are manager-owned (the control plane it rewrites); the agent's own `memory/` is
+> agent-owned (the data plane) and is read as a probe, **never** hand-edited. It reads
+> run evidence and rewrites the agent — it never sits in the request path.
 
 ## Core idea: prompts as operators
 
 Every section of a prompt is an **operator** acting on the task — it amplifies some
-readings of the intent, suppresses others, and mixes the rest. Order is
-load-bearing: a later operator's meaning depends on the reading an earlier one
-already selected. One operator is set apart — **Collapse**, the measurement act,
-where the prompt commits to a single interpretation. Agents and workflows are
-assembled from the same operators, which is why the same discipline scales from a
-one-line instruction to a lifecycle-managed system.
+readings of the intent, suppresses others, and mixes the rest. Order is load-bearing:
+a later operator's meaning depends on the reading an earlier one already selected. One
+operator is set apart — **Collapse**, the measurement act, where the prompt commits to
+a single interpretation. Agents and workflows are assembled from the same operators,
+which is why the same discipline scales from a one-line instruction to a
+lifecycle-managed system.
 
-<p align="center">
+<div align="center">
   <img src="assets/readme-operators.svg" alt="A prompt as a stack of operators" width="82%">
-</p>
+</div>
 
 ## The Fabrication Cycle
 
-From-scratch design compiles a raw task into a delivered artifact across six
-ordered phases. Data flows forward; a single feedback edge returns a failing audit
-from Phase&nbsp;4 to Phase&nbsp;3 for revision — the only loop in the pipeline.
+From-scratch design compiles a raw task into a delivered artifact across six ordered
+phases. Data flows forward; a single feedback edge returns a failing audit from
+Phase&nbsp;4 to Phase&nbsp;3 for revision — the only loop in the pipeline.
 
-<p align="center">
+<div align="center">
   <img src="assets/readme-pipeline.svg" alt="The Fabrication Cycle: six phases with one audit-to-draft feedback edge" width="100%">
-</p>
+</div>
 
 | # | Phase | What it does |
-|---|-----------|-------------------------------------------------|
+|:-:|-----------|-------------------------------------------------|
 | 1 | Shape     | Infer the structural shape and strength tier |
 | 2 | Interview | Recover the runtime and the definition of done |
 | 3 | Draft     | Lay out the artifact as ordered operators |
@@ -187,21 +199,24 @@ from Phase&nbsp;4 to Phase&nbsp;3 for revision — the only loop in the pipeline
 ## Verification
 
 Every artifact — prompt, agent, or workflow — ships with a verifier defined across
-three layers: **static** properties of the artifact, **single-run** properties of
-one output or trajectory, and **cross-run** properties visible only across many.
-Cross-run is where agent regressions hide. A scaffold-to-trigger list records which
-capability is actually tested versus merely source-backed.
+three layers: **static** properties of the artifact, **single-run** properties of one
+output or trajectory, and **cross-run** properties visible only across many. Cross-run
+is where agent regressions hide. A scaffold-to-trigger list records which capability is
+actually tested versus merely source-backed.
 
 For hard multi-step reasoning on a tool-calling runtime, Prometheus can emit a
-cognitive-tools scaffold: a system prompt plus four tool definitions you register
-in your own runtime.
+cognitive-tools scaffold: a system prompt plus four tool definitions you register in
+your own runtime.
 
 ## Install
 
-Prometheus is one folder containing a `SKILL.md` with valid frontmatter. How you
-make it discoverable depends on your runtime.
+Prometheus is one folder containing a `SKILL.md` with valid frontmatter. How you make
+it discoverable depends on your runtime.
 
-### Agentic runtimes (Claude Code, OpenAI Codex, opencode, Cursor, …)
+<details open>
+<summary><b>Agentic runtimes</b> — Claude Code, OpenAI Codex, opencode, Cursor, …</summary>
+
+<br>
 
 Clone the repository and copy it onto your host's skill search path, keeping
 `references/`, `operators/`, `templates/`, and `manage/` intact:
@@ -211,37 +226,44 @@ git clone https://github.com/Samuele95/prometheus.git
 cp -a prometheus ~/.claude/skills/prometheus
 ```
 
-`gem/`, `docs/`, and `.github/` are packaging, not corpus — the skill works with
-or without them. There is no build step and no dependencies. The host reads the
-frontmatter `description` and routes to the skill whenever it sees the intent —
-"write a prompt for X", "build an agent", "design an agentic workflow", "grade
-these outputs", "fix my prompt", or "manage this agent".
+`gem/`, `docs/`, and `.github/` are packaging, not corpus — the skill works with or
+without them. There is no build step and no dependencies. The host reads the frontmatter
+`description` and routes to the skill whenever it sees the intent — "write a prompt for
+X", "build an agent", "design an agentic workflow", "grade these outputs", "fix my
+prompt", or "manage this agent".
 
-### Gemini Gem
+</details>
 
-Gemini has no filesystem and caps a Gem's knowledge base at ten files, so the
-framework is **ported**, not copied: the twenty-four source files are consolidated
-into one standing instruction plus eight knowledge files. See
-[`gem/GEM-DESCRIPTION.md`](gem/GEM-DESCRIPTION.md) for the port details, features,
-and limitations, and [`gem/en/setup-guide.md`](gem/en/setup-guide.md) to install.
+<details>
+<summary><b>Gemini Gem</b> — filesystem-free port</summary>
 
-In short: create a Gem named **Prometheus**, paste `gem/en/gem-instructions.md`
-into its instruction field, upload the eight `gem/knowledge/*.txt` files **without
-renaming them** (retrieval is selective, so the wiring table's filenames are
-load-bearing), and start describing your task.
+<br>
+
+Gemini has no filesystem and caps a Gem's knowledge base at ten files, so the framework
+is **ported**, not copied: the twenty-four source files are consolidated into one
+standing instruction plus eight knowledge files. See
+[`gem/GEM-DESCRIPTION.md`](gem/GEM-DESCRIPTION.md) for the port details, features, and
+limitations, and [`gem/en/setup-guide.md`](gem/en/setup-guide.md) to install.
+
+In short: create a Gem named **Prometheus**, paste `gem/en/gem-instructions.md` into its
+instruction field, upload the eight `gem/knowledge/*.txt` files **without renaming them**
+(retrieval is selective, so the wiring table's filenames are load-bearing), and start
+describing your task.
+
+</details>
 
 ## Repository layout
 
-```
-SKILL.md            # always-loaded router: mode detection + from-scratch procedure
-references/         # shared knowledge (quantum principles, shapes, reasoning, …)
-operators/          # the operator catalog
-templates/          # interview branches, output templates
-manage/             # manage-mode MAPE-K loop, operators, and replay-verifier.py
-gem/                # the Gemini Gem port (+ GEM-DESCRIPTION.md)
-docs/               # the documentation site (GitHub Pages)
-assets/            # figures, banner, social preview
-CITATIONS.md        # every technique traced to a primary source
+```text
+SKILL.md         # always-loaded router: mode detection + from-scratch procedure
+references/      # shared knowledge (quantum principles, shapes, reasoning, …)
+operators/       # the operator catalog
+templates/       # interview branches, output templates
+manage/          # manage-mode MAPE-K loop, operators, and replay-verifier.py
+gem/             # the Gemini Gem port (+ GEM-DESCRIPTION.md)
+docs/            # the documentation site (GitHub Pages)
+assets/          # figures, banner, social preview
+CITATIONS.md     # every technique traced to a primary source
 ```
 
 The only script, `manage/replay-verifier.py`, imports nothing outside the Python
@@ -249,16 +271,22 @@ standard library. There is no build step and nothing to install.
 
 ## Documentation
 
-The full documentation — the operator model, the seven shapes, the three modes,
-the manage-mode loop, the audit checklist, and per-runtime install guides — is
-published from `docs/`:
+The full documentation — the operator model, the seven shapes, the three modes, the
+manage-mode loop, the audit checklist, and per-runtime install guides — is published
+from `docs/`:
 
-**→ [Read the documentation](https://samuele95.github.io/prometheus/documentation-forge.html)**
+<div align="center">
 
-It includes an interactive source browser that shows the exact corpus for the
-runtime you pick, so you can read what the model will read before installing.
+**→ [Read the documentation](https://samuele95.github.io/prometheus/documentation-forge.html) ←**
+
+</div>
+
+It includes an interactive source browser that shows the exact corpus for the runtime
+you pick, so you can read what the model will read before installing.
 
 ## License
 
 [MIT](LICENSE). Every technique is traced to a primary source in
 [CITATIONS.md](CITATIONS.md).
+
+<div align="center"><sub>Built by Samuele Stronati · <a href="https://samuele95.github.io/prometheus/">samuele95.github.io/prometheus</a></sub></div>
