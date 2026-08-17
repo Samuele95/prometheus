@@ -60,6 +60,8 @@ This document distills the quantum semantic framework into the operational princ
 
 **Implication:** Each prompt section, each interview question, each agent action is a measurement. Information lost early can't be recovered later.
 
+**Mechanistic support (interpretability, one vendor's frontier models):** the model's multi-step reasoning routes through a limited-capacity global-workspace — a few dozen concepts at a time, written once and read by many downstream consumers, while most processing bypasses it entirely. Compact, early-loaded critical context maximizes the chance it occupies that workspace when needed; bloat competes for a genuinely scarce broadcast resource. This is the mechanism behind both this principle and the smallest-viable-token-set rule, in the same way the symbolic-mechanisms result grounds the structure checks.
+
 **Operational actions:**
 - Load critical context as early as possible — it survives more projections.
 - Don't ask interview questions whose answers are already in the user's request — that's an information-destroying repetition.
@@ -108,6 +110,27 @@ Operationally: calibrate default operator strength *down* as substrate capabilit
 
 The framework infers a **substrate capability tier** (frontier / strong / legacy; unknown → assume strong) from the runtime answer in Phase 1, and conditions default operator strength, scaffold-triggering thresholds, and delivery guidance on it.
 
+## Principle 10: Rationale extends the operator's reach
+
+A constraint shipped with its reason projects beyond its enumerated cases. The bare rule collapses only the states it names; the rationale is itself part of the operator, and it keeps projecting on inputs the rule's author never anticipated — the model applies the *principle* where the enumeration runs out.
+
+(Primary evidence: alignment-training research at one vendor found that training on *explanations of values* generalized far out-of-distribution where demonstrations of correct behavior did not — 28× data efficiency in the cited experiments — and that teaching the principles underlying desired behavior outperformed demonstrations alone. Scope: measured at training time; adopted here as a prompt-design principle because the same asymmetry — reasons generalize, enumerations don't — follows directly from Principle 1, and because the framework already practices it locally in Shape 5's capability lockdown, point 4: "Explanation, not just rule." This principle generalizes that point to every load-bearing constraint.)
+
+**Operational actions:**
+- Attach a one-line *because* to every load-bearing constraint. "Do not modify files — another agent owns writes, and concurrent modification corrupts the work" outlives "Do not modify files."
+- Prefer principle-plus-rationale over exhaustive enumeration (consistent with Principle 9: on capable substrates the enumeration over-projects *and* under-generalizes).
+- When examples must carry a rule, vary their surface context. Diverse contexts generalize; near-identical repetitions teach the surface, not the rule.
+
+## Principle 11: Suppression names — and naming partially amplifies
+
+Interpretability work on a frontier model's global workspace found that instructing the model *not* to think about a concept still activates that concept's internal representation — less than direct discussion, but far more than never mentioning it. In operator terms: a suppress-operator that names its target is also a weak amplifier of that target. Prohibition is never a clean projection to zero.
+
+**Operational actions:**
+- Prefer positive framing for behavior-shaping: "write in plain declarative sentences" over "don't be flowery." The positive form amplifies the desired basis state without priming the undesired one.
+- Reserve named prohibitions for lockdown and known sharp edges, where the priming cost is deliberate and compensated — by repetition, structural restriction, and rationale (Principle 10). This is why the layered lockdown pattern works despite being built from negations.
+- Audit every DO-NOT list against this principle: each named prohibition both warns and primes. A specific sharp-edge prohibition is net-positive; a generic prohibition list is net-negative twice over — it wastes tokens (audit §B) *and* primes the behaviors it lists.
+- This is the mechanism behind the existing "use anti-examples sparingly — priming effects" guidance in the operator catalog.
+
 ## Selected library prompts (for reference)
 
 These prompts from the source library are directly useful when designing or auditing meta-prompts:
@@ -133,6 +156,9 @@ Full text of these prompts is in the source paper's Appendix B.1. The framework'
 | Temperature is measurement | Recommend per use case; sample for exploration |
 | Empirical, not metaphysical | Optional permutation tests for high stakes |
 | Observer-dependent | Account for tool/runtime as part of operator design |
+| Strength is substrate-relative | Calibrate operator strength down as capability rises |
+| Rationale extends reach | Load-bearing constraints carry their *because* |
+| Naming partially amplifies | Positive framing by default; prohibitions only for sharp edges |
 
 ========================================================================
 SOURCE: operators/section-operators.md
@@ -195,6 +221,7 @@ These are projections within the subspace set by the strong operators.
 - **Strength:** mid. Each constraint is its own operator; total strength scales with count.
 - **Place after task definition.** Order constraints by importance (more important first).
 - **Commutation:** constraints often commute with each other when independent; cross-cutting constraints (e.g., "be concise" vs "show your reasoning") don't.
+- **Rationale-bearing constraints (Principle 10).** A load-bearing constraint should carry its one-line *because*. The rationale is part of the operator: the bare rule projects only on the cases it names, while the reason keeps projecting on inputs the author never anticipated. Prefer principle-plus-rationale over exhaustive enumeration — the enumeration both over-projects on capable substrates (Principle 9) and under-generalizes off-distribution.
 
 ### Initial contracts (engineering) / outline (writing) / methodology (research)
 
@@ -264,6 +291,7 @@ These are projections within the subspace set by the strong operators.
 - **Strength:** mid.
 - **Place near end** of prompt — high-attention position.
 - **Failure mode:** generic warnings ("don't make mistakes") waste tokens. Each DO NOT must address a specific known sharp edge.
+- **Priming cost (Principle 11):** every named prohibition partially amplifies the concept it names — interpretability work shows "don't think about X" still activates X internally. A specific sharp-edge DO NOT is net-positive (the warning outweighs the prime); a generic prohibition list is net-negative twice over. Where behavior-shaping is the goal, prefer the positive-framed equivalent; keep negation for lockdown and real sharp edges, compensated by repetition and rationale.
 
 ### Permission to abstain
 
@@ -302,7 +330,7 @@ The self-check is `examine_answer` applied to the conversation rather than to a 
 
 ### Long-horizon operators (Shape 1; some apply to Shape 4 workers on long tasks)
 
-Six compact operators for long-autonomy prompts, adapted from vendor guidance on long-run agent behavior. Each earns its place only when the run is genuinely long (M5 applies); a two-checkpoint task needs none of them.
+Compact operators for long-autonomy prompts, adapted from vendor guidance on long-run agent behavior. Each earns its place only when the run is genuinely long (M5 applies); a two-checkpoint task needs none of them.
 
 **Progress-claim grounding.**
 - **Amplifies:** evidence-backed status reporting — every progress claim auditable against a tool result from the session; unverified work reported as unverified; failures reported with output.
@@ -333,6 +361,14 @@ Six compact operators for long-autonomy prompts, adapted from vendor guidance on
 - **Amplifies:** mid-run delivery of content the user must see exactly as written (a partial deliverable, a direct answer to a mid-loop question, a progress update with specific numbers) via a dedicated tool whose input renders verbatim — tool inputs are never summarized.
 - **Suppresses:** burying verbatim-critical content inside summarizable narration.
 - **Strength:** weak-to-mid; only meaningful when the harness defines the tool. **Two-part operator:** the tool definition alone under-fires — pair it with elicitation language in the prompt ("when you have content the user must read verbatim, call send_to_user with it; not for narration or reasoning"). Flag as harness-dependent in delivery; omit entirely when the runtime has no such tool.
+
+**Persistence / capability-prior correction (open-ended discovery runs only).**
+- **Amplifies:** continuing past initial failure on genuinely hard, verifiable problems — treating early dead ends as exploration data rather than evidence of impossibility, and re-examining its own negative self-assessment before abandoning a line.
+- **Suppresses:** premature abandonment driven by the substrate's trained prior that famous hard problems are beyond it. Frontier-research experience reports this prior, not capability, was the binding constraint: the primary human intervention on a successful open-problem run was variants of "keep going," and hundreds of candidate ideas were discarded before the productive one.
+- **Strength:** mid; rises with problem difficulty.
+- **Gated on verification strength.** Only include when the run has strong verification (validator agents, tests, formal checks, numerical cross-checks) — persistence without verification amplifies confident wrong output instead of discovery. The operator licenses more *attempts*, never lower *evidence standards*.
+- **Place with the checkpoint / anti-early-stopping contract** — it is the discovery-run sibling of anti-early-stopping: that one stops the agent quitting a turn early; this one stops it quitting the problem early.
+- **M5:** requires an open-ended-discovery trigger (research loop, open problem, search over a large idea space with a strong verifier). A routine engineering loop gets none of it.
 
 **Lead-with-outcome (final summaries to humans).**
 - **Amplifies:** re-grounding the reader — the first sentence answers "what happened / what did you find"; supporting detail after; selectivity over compression (drop details that don't change what the reader does next, rather than compressing everything into fragments); session-local shorthand, arrow chains, and made-up labels dropped or re-introduced in plain language.

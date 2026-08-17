@@ -10,7 +10,7 @@ refactor / manage) to a Gemini Gem. Everything needed to assemble the Gem is in
 
 ```
 en/
-  gem-instructions.md   paste into the Gem instructions field (19,249 chars)
+  gem-instructions.md   paste into the Gem instructions field (19,825 chars)
   setup-guide.md        assembly steps + the naming note — read first
   smoke-tests.md        5 tests covering the 5 silent-failure surfaces
   dogfood-audit.md      the framework's own audit checklist, run on itself

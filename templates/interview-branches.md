@@ -40,6 +40,7 @@ Ask 2–3 of these, broadest first:
 3. **Heterogeneity / pre-decided architecture.** "Are there architectural decisions already made you want to lock in, or is the agent free to propose?"
 4. **Audience for the output.** "Who else reads this work — graders, teammates, reviewers, only you? Affects what gets logged inline."
 5. **Time budget / hard deadline.** "Hard deadline or open-ended? If hard, when?"
+6. **Trigger and stop.** "What starts an iteration and what ends the loop — your messages turn by turn, a goal condition (if so, what's the checkable condition and the attempt cap?), a schedule (if so, how often does the watched input actually change?), or an external event?" Ask when the request signals goal-seeking, scheduling, or unattended recurrence; the answer selects the row in Shape 1's trigger/stop taxonomy (`templates/shape-catalog.md`).
 
 ## Shape 2: One-shot complex task questions
 
@@ -137,13 +138,14 @@ This converts a yes/no question ("do you have examples?") into a structured surf
 
 For agent teams, two decisions dominate everything else: topology choice and role roster. Both benefit from co-authoring rather than flat questioning.
 
-**Step 1 — Topology selection (flat).** This stays as a single question because the four canonical topologies are a discrete choice:
+**Step 1 — Topology selection (flat).** This stays as a single question because the five canonical topologies are a discrete choice:
 
 > How do the agents coordinate? Pick one or describe a hybrid:
 > (a) Orchestrator dispatches dynamic subtasks to workers, synthesizes results — useful when you can't predict the subtasks in advance.
 > (b) Multiple workers in parallel, each handling a different *aspect* of the input — useful when the task has independent sub-considerations.
 > (c) Multiple workers in parallel doing the *same* task, results aggregated by voting/consensus — useful for high-stakes confidence.
 > (d) Generator produces output, evaluator critiques it, generator revises — useful when revision genuinely improves output.
+> (e) Many peer agents on the same open-ended objective, coordinating through a shared forum, with arbiter/validator agents verifying findings — useful for verifiable discovery at scale (audits, vulnerability sweeps, idea-space exploration); poor for building one coherent artifact.
 
 If the user is unsure, propose the most likely fit based on their task description and explain why.
 
@@ -214,7 +216,7 @@ Two conditions on the triage:
 - **It requires knowing the user's starting point.** When familiarity is unstated and the task is non-trivial, fold a starting-point elicitation into an existing interview question rather than adding one — e.g., extend the done-definition question with "…and what's your experience with this domain / codebase, so I know which assumptions to spell out?"
 - **Escalation rule.** If the user cannot evaluate the variants a cheap-measurement pass produces, the ambiguity was in the *measurement basis*, not the state — they don't yet know what dimension "good" varies along. Escalate from the unknown-knowns pattern to the blind-spot/teaching pattern before producing more variants.
 
-**The reference operator.** When the user cannot verbalize a requirement, a reference artifact is the densest available operator — it transfers basis states prose cannot. Source code is the strongest reference of all, even in another language ("this library implements the exact behavior I want — match its semantics"); designs, documents, and examples of prior output also work. When the can't-verbalize signal appears, the interview should ask for a reference before asking the user to try harder with words.
+**The reference operator.** When the user cannot verbalize a requirement, a reference artifact is the densest available operator — it transfers basis states prose cannot. Source code is the strongest reference of all, even in another language ("this library implements the exact behavior I want — match its semantics"); designs, documents, and examples of prior output also work. When the can't-verbalize signal appears, the interview should ask for a reference before asking the user to try harder with words. References beat prose as *verification* material too: a test suite, a runnable mockup, or a rubric for a verifier-agent specifies "done" at higher fidelity than a plan document — when the user has one, wire it into the done definition rather than paraphrasing it.
 
 ## Conduct rules
 

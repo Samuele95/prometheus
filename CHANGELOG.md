@@ -14,6 +14,114 @@ Status legend: **validated** = stress-tested or exercised on a real task;
 
 ---
 
+## [Unreleased] — MASS findings (August 2026)
+
+Single-source pass over Zhou et al., "Multi-Agent Design: Optimizing Agents with
+Better Prompts and Topologies" (arXiv:2502.02533, ICLR 2026). Findings adopted
+as Shape 7 design rules; the automated search machinery evaluated and not ported
+(build-time framework, no eval-set access). All items **source-backed, untested
+in this framework**.
+
+### Added
+- **Topology optimization ordering** section in `agent-team-topologies.md`:
+  single-agent baseline rule (prompt optimization beats agent scaling on token
+  effectiveness), topology-blocks-earn-their-place rule (beneficial topologies
+  are a small fraction of the design space), compose-then-retune rule (Stage 3
+  ≙ re-tuning under Principle 4 interference). — *mass*
+- **Compose-then-retune pass** as Shape 7 spine step 8. — *mass*
+- **Voting + debate rounds** hybrid with commitment-before-exchange sequencing,
+  reconciling debate with the independence-isolation failure-mode rule; round
+  cap required. — *mass; multiagent*
+- **"Topology earns its place"** check appended to audit §N. — *mass*
+- `CITATIONS.md` entry (partial disposition, machinery-not-ported stated). — *mass*
+
+---
+
+## [Unreleased] — frontier-source pass II (August 2026)
+
+Source-driven incremental pass over eight newly supplied Anthropic primaries
+(four claude.com/blog posts, four anthropic.com/research publications). Gap
+analysis first: material already absorbed in the earlier frontier pass
+(substrate tiers, Principle 9, long-horizon operators, unknowns triage,
+subtractive refactor, reasoning-control guidance) was verified present and left
+untouched. All new items **source-backed, untested in this framework**.
+Model-agnostic invariant held: vendor/model names only in `CITATIONS.md` and
+existing per-runtime footnotes. Training-time and interpretability findings are
+adapted with the boundary stated (new `CITATIONS.md` §A2), per the Yang-et-al.
+precedent for mechanistic support.
+
+### Added
+- **Principle 10 (rationale extends the operator's reach)** in
+  `quantum-principles.md` + rationale-bearing-constraints notes in the
+  constraints operator and `SKILL.md` drafting rules: load-bearing constraints
+  carry their *because*; principle-plus-rationale generalizes where enumeration
+  runs out; generalizes Shape 5's "explanation, not just rule." — *teaching-why*
+- **Principle 11 (suppression names — naming partially amplifies)** +
+  priming-cost notes on the DO-NOT and anti-example operators: positive framing
+  by default, named prohibitions only for lockdown and real sharp edges. —
+  *global-workspace*
+- **Workspace-capacity mechanistic note** under Principle 5 and audit §B
+  (limited-capacity write-once/read-many workspace grounds early-loading and
+  smallest-viable-token-set). — *global-workspace*
+- **Cross-layer redundancy + progressive disclosure** waste classes in audit §B
+  and a drafting rule in `SKILL.md` (say it once in the owning layer;
+  selectively loaded detail over monolith). — *new-rules*
+- **Delegation ladder** note in audit §A (delegate approach / procedure /
+  timing; one rung higher on frontier tiers; context over constraints). —
+  *cowork; new-rules*
+- **Interface-design-as-operator** paragraph in Shape 4 (expressive parameters
+  and enums over usage examples on frontier tiers). — *new-rules*
+- **Trigger/stop taxonomy** for Shape 1 (turn-based / goal-based / scheduled /
+  proactive), deterministic stop conditions + iteration caps, interval matching,
+  quantitative self-verification, scripts-for-deterministic-work; audit §I
+  deterministic-stop confirmation; optional Shape 1 interview question 6. —
+  *loops*
+- **Plan-ordering-by-decision-volatility** note in Shape 1 spine item 7. —
+  *field guide*
+- **Persistence / capability-prior correction** long-horizon operator, gated on
+  open-ended-discovery trigger + strong verification (M5). — *riemann-zeta*
+- **Topology 5 (swarm / shared-forum collective)** in
+  `agent-team-topologies.md`: peer/forum/arbiter operator profiles,
+  validator-heavy roster guidance, discovery-vs-production applicability rule,
+  three swarm-specific failure modes. — *multiagent; riemann-zeta*
+- **Empirical failure-modes catalog (cross-topology)**: conformity collapse,
+  hidden-profile information loss, missing epistemic vigilance,
+  convergence-driven collusion, turf wars — each with a prompt-level cure; five
+  matching agent-team checks appended to audit §N; Shape 7 failure-mode pointer;
+  swarm option (e) in the Shape 7 topology question. — *multiagent*
+- **Rich-references extension** to the reference operator (test suites, mockups,
+  rubrics as verification material wired into the done definition). — *new-rules*
+- **`CITATIONS.md` §A2** (research adapted across the training/inference
+  boundary) + seven new source entries; field-guide entry updated. — *all*
+
+### Changed
+- Topology counts updated four → five (`SKILL.md`, shape catalog, audit §N,
+  topology file intro/summary); long-horizon operator count de-hardcoded
+  ("Six" → "Compact"). No existing normative rule was removed or weakened.
+
+### Per-task source map
+
+| # | Change | Source claim |
+|---|---|---|
+| 1 | Principle 10 + constraint notes | teaching-why: explanations generalize OOD (28×); principles beat demonstrations |
+| 2 | Principle 11 + DO-NOT/anti-example priming notes | global-workspace: suppressed concepts still activate |
+| 3 | Workspace-capacity note (P5, audit §B) | global-workspace: few-dozen-concept broadcast hub; reasoning drops to near zero without it |
+| 4 | Progressive disclosure + cross-layer redundancy | new-rules: progressive disclosure; eliminate redundant instructions; 80% system-prompt removal |
+| 5 | Delegation ladder (audit §A) | cowork: delegate approach/procedure/timing; context over constraints |
+| 6 | Interface-design-as-operator (Shape 4) | new-rules: expressive parameters/enums over examples |
+| 7 | Trigger/stop taxonomy + audit §I | loops: four loop types; deterministic stop criteria; interval matching; verification skills |
+| 8 | Persistence operator | riemann-zeta: "keep going" as primary intervention; skepticism prior |
+| 9 | Topology 5 + failure-modes catalog + audit §N checks | multiagent: forum swarm 266-vs-21; conformity; hidden profile; vigilance; collusion; turf wars |
+| 10 | Rich-references extension | new-rules: rich references over simple specs |
+| 11 | Plan-ordering note | field guide: implementation plans |
+
+### Verification
+Cross-references resolve (new sections referenced by path exist); topology
+count consistent across all five citing files; model-name grep clean in
+normative text; existing text untouched except the enumerated count updates.
+
+---
+
 ## [Unreleased] — renamed to Prometheus
 
 ### Changed
