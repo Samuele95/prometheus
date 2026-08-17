@@ -103,15 +103,16 @@ For reasoning-heavy tasks where structured decomposition outperforms monolithic 
 
 When the prompt's output will be consumed by another LLM agent rather than displayed to a human (most common in Shape 4 sub-agent / tool prompts and Shape 6 LLM-as-judge), consult `references/agent-consumability.md`. Output design changes when the consumer is an agent: greppable failure markers, aggregate-first structure, compact stdout with verbose logs, deterministic-but-different sampling, and visible state transitions.
 
-For Shape 7 (agent team), the topology choice is foundational and must precede per-role drafting. Consult `references/agent-team-topologies.md` for the four canonical topologies (orchestrator-workers, parallelization-sectioning, parallelization-voting, evaluator-optimizer) with their operator profiles, role definitions, and common failure modes. Pick the topology first, then draft each role's prompt using its individual shape's spine, then audit cross-role coherence.
+For Shape 7 (agent team), the topology choice is foundational and must precede per-role drafting. Consult `references/agent-team-topologies.md` for the five canonical topologies (orchestrator-workers, parallelization-sectioning, parallelization-voting, evaluator-optimizer, swarm/shared-forum) with their operator profiles, role definitions, and common failure modes — including the empirically documented multi-agent failure modes (conformity collapse, hidden-profile information loss, missing epistemic vigilance, collusion, turf wars). Pick the topology first, then draft each role's prompt using its individual shape's spine, then audit cross-role coherence.
 
 Universal drafting rules apply to all shapes:
 
 - **Right altitude.** Specific enough to act on, flexible enough for the model to adapt. Brittle hardcoding and vague hand-waving are dual failure modes.
 - **Smallest viable token set.** Strike anything not addressing a specific failure mode or enabling a concrete behavior. Each token costs attention.
+- **Progressive disclosure over monolith.** When the runtime supports selectively loaded context (skills, referenced files, deferred tool definitions), detail that is only sometimes needed lives in a separately loaded artifact the model pulls on demand; the always-loaded core stays lightweight and names where the detail lives. Say each thing once, in the context layer that owns it — never duplicated across system prompt, tool descriptions, and memory files. (See audit §B.)
 - **Examples over rules.** When a rule is load-bearing, write a worked example. Examples are load-bearing operators that anchor abstract instructions. **But examples have their own ambiguity surface** — any silent judgment call inside an example becomes a rule the model reverse-engineers. Before shipping any example, ask: what does this example silently teach beyond what I intended? If unsure, replace it with a cleaner case.
 - **Section ordering by operator strength.** Strongest operators first.
-- **Failure modes as DO NOTs.** Each addresses a specific known sharp edge with concrete consequence. Generic warnings waste tokens.
+- **Failure modes as DO NOTs.** Each addresses a specific known sharp edge with concrete consequence. Generic warnings waste tokens — and every named prohibition partially primes the behavior it names (Principle 11), so prefer positive framing for mere behavior-shaping and reserve DO NOTs for real sharp edges. Load-bearing constraints carry their one-line *because* (Principle 10) — the rationale generalizes where the enumeration runs out.
 
 ### Phase 4 — Audit (structural and quantum)
 

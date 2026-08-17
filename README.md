@@ -115,7 +115,7 @@ runtime.
 
 It is deliberately **not prompt-only**: a system prompt is the smallest thing it
 produces; a self-adaptive agent kept healthy across its lifetime is the largest. One
-always-loaded `SKILL.md` router (~22&nbsp;KB) plus a companion corpus pulled into
+always-loaded `SKILL.md` router (~23&nbsp;KB) plus a companion corpus pulled into
 context only at the step that needs it. No build step, no dependencies, MIT.
 
 ## Core idea: prompts as operators
@@ -197,6 +197,12 @@ actually tested versus merely source-backed.
 For hard multi-step reasoning on a tool-calling runtime, Prometheus can also emit a
 cognitive-tools scaffold: a system prompt plus four tool definitions you register in
 your own runtime.
+
+Multi-agent teams are first-class: five canonical topologies (orchestrator-workers,
+sectioning, voting, evaluator-optimizer, swarm/shared-forum), each audited against an
+empirically grounded failure-mode catalog — conformity collapse, hidden-profile
+information loss, missing epistemic vigilance, collusion, turf wars — drawn from
+published swarm experiments and traced in [CITATIONS.md](CITATIONS.md).
 
 ## Install
 

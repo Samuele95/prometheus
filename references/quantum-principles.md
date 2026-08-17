@@ -52,6 +52,8 @@ This document distills the quantum semantic framework into the operational princ
 
 **Implication:** Each prompt section, each interview question, each agent action is a measurement. Information lost early can't be recovered later.
 
+**Mechanistic support (interpretability, one vendor's frontier models):** the model's multi-step reasoning routes through a limited-capacity global-workspace — a few dozen concepts at a time, written once and read by many downstream consumers, while most processing bypasses it entirely. Compact, early-loaded critical context maximizes the chance it occupies that workspace when needed; bloat competes for a genuinely scarce broadcast resource. This is the mechanism behind both this principle and the smallest-viable-token-set rule, in the same way the symbolic-mechanisms result grounds the structure checks.
+
 **Operational actions:**
 - Load critical context as early as possible — it survives more projections.
 - Don't ask interview questions whose answers are already in the user's request — that's an information-destroying repetition.
@@ -100,6 +102,27 @@ Operationally: calibrate default operator strength *down* as substrate capabilit
 
 The framework infers a **substrate capability tier** (frontier / strong / legacy; unknown → assume strong) from the runtime answer in Phase 1, and conditions default operator strength, scaffold-triggering thresholds, and delivery guidance on it.
 
+## Principle 10: Rationale extends the operator's reach
+
+A constraint shipped with its reason projects beyond its enumerated cases. The bare rule collapses only the states it names; the rationale is itself part of the operator, and it keeps projecting on inputs the rule's author never anticipated — the model applies the *principle* where the enumeration runs out.
+
+(Primary evidence: alignment-training research at one vendor found that training on *explanations of values* generalized far out-of-distribution where demonstrations of correct behavior did not — 28× data efficiency in the cited experiments — and that teaching the principles underlying desired behavior outperformed demonstrations alone. Scope: measured at training time; adopted here as a prompt-design principle because the same asymmetry — reasons generalize, enumerations don't — follows directly from Principle 1, and because the framework already practices it locally in Shape 5's capability lockdown, point 4: "Explanation, not just rule." This principle generalizes that point to every load-bearing constraint.)
+
+**Operational actions:**
+- Attach a one-line *because* to every load-bearing constraint. "Do not modify files — another agent owns writes, and concurrent modification corrupts the work" outlives "Do not modify files."
+- Prefer principle-plus-rationale over exhaustive enumeration (consistent with Principle 9: on capable substrates the enumeration over-projects *and* under-generalizes).
+- When examples must carry a rule, vary their surface context. Diverse contexts generalize; near-identical repetitions teach the surface, not the rule.
+
+## Principle 11: Suppression names — and naming partially amplifies
+
+Interpretability work on a frontier model's global workspace found that instructing the model *not* to think about a concept still activates that concept's internal representation — less than direct discussion, but far more than never mentioning it. In operator terms: a suppress-operator that names its target is also a weak amplifier of that target. Prohibition is never a clean projection to zero.
+
+**Operational actions:**
+- Prefer positive framing for behavior-shaping: "write in plain declarative sentences" over "don't be flowery." The positive form amplifies the desired basis state without priming the undesired one.
+- Reserve named prohibitions for lockdown and known sharp edges, where the priming cost is deliberate and compensated — by repetition, structural restriction, and rationale (Principle 10). This is why the layered lockdown pattern works despite being built from negations.
+- Audit every DO-NOT list against this principle: each named prohibition both warns and primes. A specific sharp-edge prohibition is net-positive; a generic prohibition list is net-negative twice over — it wastes tokens (audit §B) *and* primes the behaviors it lists.
+- This is the mechanism behind the existing "use anti-examples sparingly — priming effects" guidance in the operator catalog.
+
 ## Selected library prompts (for reference)
 
 These prompts from the source library are directly useful when designing or auditing meta-prompts:
@@ -125,3 +148,6 @@ Full text of these prompts is in the source paper's Appendix B.1. The framework'
 | Temperature is measurement | Recommend per use case; sample for exploration |
 | Empirical, not metaphysical | Optional permutation tests for high stakes |
 | Observer-dependent | Account for tool/runtime as part of operator design |
+| Strength is substrate-relative | Calibrate operator strength down as capability rises |
+| Rationale extends reach | Load-bearing constraints carry their *because* |
+| Naming partially amplifies | Positive framing by default; prohibitions only for sharp edges |

@@ -28,12 +28,20 @@ considered, not ported; **rejected** = examined and declined.
 | Claude prompting best practices | Anthropic docs | platform.claude.com/docs | partial |
 | Prompting Claude Fable 5 | Anthropic docs | platform.claude.com/docs | partial |
 | A field guide to Claude Fable 5: Finding your unknowns | Anthropic (Shihipar) | claude.com/blog | partial |
+| The new rules of context engineering for Claude 5-generation models | Anthropic | claude.com/blog | partial |
+| Getting started with loops | Anthropic | claude.com/blog | partial |
+| Working with Claude Fable 5 in Claude Cowork | Anthropic | claude.com/blog | partial |
+| Teaching Claude why | Anthropic research | anthropic.com/research | adapted |
+| A global workspace in language models | Anthropic research | anthropic.com/research | adapted |
+| Claude and the Riemann hypothesis (zeta research) | Anthropic research | anthropic.com/research | partial |
+| Multiagent systems research | Anthropic research | anthropic.com/research | absorbed |
 | Claude Code internal architecture | source analysis | handbook | absorbed |
 | Eliciting Reasoning with Cognitive Tools | paper (IBM Zurich) | arXiv:2506.12115 | absorbed · central |
 | A quantum semantic framework for NLP | paper (Agostino et al.) | arXiv:2506.10077 | absorbed · metaphor |
 | Emergent Symbolic Mechanisms… | paper (Yang et al., ICML'25) | arXiv:2502.20332 | absorbed |
 | Unlocking Structured Thinking w/ Cognitive Prompting | paper (Kramer, Baumann) | arXiv:2410.02953 | partial |
 | A Survey of Context Engineering for LLMs | paper (Mei et al.) | arXiv:2507.13334 | evaluated |
+| Multi-Agent Design: Optimizing Agents with Better Prompts and Topologies | paper (Zhou et al., ICLR'26) | arXiv:2502.02533 | partial |
 | Self-Consistency… | paper (Wang et al.) | arXiv:2203.11171 | mentioned |
 | Tree of Thoughts | paper (Yao et al.) | arXiv:2305.10601 | mentioned |
 | Chain-of-Thought Prompting… | paper (Wei et al.) | arXiv:2201.11903 | background |
@@ -122,7 +130,124 @@ escalate to the teaching/blind-spot pattern, per the guide's color-grading
 account); the **reference operator** ("the absolute best reference is source
 code," even in another language — the densest operator when the user cannot
 verbalize a requirement); and the **deviations-log operator** jointly with the
-model guide above (conservative option, log under "Deviations," continue).
+model guide above (conservative option, log under "Deviations," continue); and,
+from the August 2026 pass, the **plan-ordering-by-decision-volatility** note in
+Shape 1's spine ("highlight decisions I'm most likely to tweak… bury mechanical
+refactoring" — volatile decisions lead, where review is cheap).
+
+**"The new rules of context engineering for Claude 5-generation models"** —
+Anthropic (claude.com/blog; retrieved August 2026).
+Absorbed in part. Much of it was already in the framework via the earlier
+best-practices pass (reduce overconstraining, rules→judgment, subtractive
+refactoring — Principle 9 and the subtractive-refactor row). Newly licenses: the
+**cross-layer redundancy** and **progressive-disclosure** items in audit §B and
+the drafting rules (say each thing once in the layer that owns it; selectively
+loaded detail over monolith — empirical anchor: the vendor removed the large
+majority of a production agent's system prompt on its newest models with no
+measured regression); the **interface-design-as-operator** paragraph in Shape 4
+(expressive parameters and enums teach tool usage more cheaply and less
+ambiguously than examples on frontier tiers); and the strengthened
+**rich-references** note (test suites, mockups, rubrics as higher-fidelity
+specifications than prose plans) folded into the reference operator. The
+auto-memory and /doctor product features were noted but not ported — they are
+runtime capabilities, not prompt design.
+
+**"Getting started with loops"** — Anthropic (claude.com/blog; retrieved
+August 2026).
+Absorbed in part. Licenses the **trigger/stop taxonomy** in Shape 1 (turn-based /
+goal-based / scheduled / proactive-event rows, each with design consequences),
+the **deterministic stop-condition + iteration-cap** rule (checkable, quantitative
+goals; "stop after N attempts"), the **interval-matching** rule for scheduled
+loops (don't poll faster than the input changes), the **quantitative
+self-verification** rule ("never report changes complete based on edit success
+alone" — verify end-to-end with checks the agent executes), and the
+**scripts-for-deterministic-work** rule. The audit's loop-completeness check (§I)
+gained the deterministic-stop confirmation. Product-specific mechanics (/goal,
+/loop, /schedule, /usage) were not ported; their design content was.
+
+**"Working with Claude Fable 5 in Claude Cowork"** — Anthropic (claude.com/blog;
+retrieved August 2026).
+Absorbed in part, expressed model-agnostically. Much was already present
+(interview-before-executing, checkable done definitions, effort-based
+reasoning-control guidance, the stale-corrections/subtractive-refactor row).
+Newly licenses: the **delegation ladder** in audit §A (delegate the approach /
+the procedure / the timing; pick the rung per directive, default one rung higher
+on frontier tiers) and the **context-over-constraints** phrasing folded into the
+same note (who the work is for, when it's needed, what it accomplishes — context
+enables decisions in unanticipated situations; constraints only forbid).
+Graduated delegation (start with quickly-verifiable work, escalate as results
+prove reliable) was evaluated and left as user workflow rather than prompt
+content. The classifier-fallback and sidebar-visibility material is product
+behavior; not ported.
+
+## A2. Anthropic research (adapted across the training/inference boundary)
+
+These are training-time or interpretability results, not prompting guides. The
+framework adapts them the way it already adapts the symbolic-mechanisms paper:
+as *mechanistic support* and *design principles licensed by analogy*, with the
+boundary-crossing stated rather than hidden.
+
+**"Teaching Claude why"** — Anthropic research (anthropic.com/research; retrieved
+August 2026).
+Adapted. Training on *explanations of values* generalized far out-of-distribution
+where demonstrations did not (28× data efficiency in the cited experiments), and
+teaching underlying principles beat demonstrations alone; diverse training
+contexts improved generalization even when the diversity was functionally inert.
+Licenses **Principle 10 (rationale extends the operator's reach)** — load-bearing
+constraints carry their one-line *because*; principle-plus-rationale over
+enumeration; vary example surface contexts. Scope caveat carried into the
+principle text: evidence is training-time; adopted as a prompt-design principle
+because the asymmetry follows from Principle 1 and generalizes the framework's
+existing Shape 5 "explanation, not just rule" practice.
+
+**"A global workspace in language models"** — Anthropic research
+(anthropic.com/research; retrieved August 2026).
+Adapted as mechanistic support, in the same role as Yang et al. Licenses:
+the **workspace-capacity note** under Principle 5 and audit §B (multi-step
+reasoning routes through a limited-capacity, write-once/read-many workspace —
+why compact early-loaded context and progressive disclosure work), and
+**Principle 11 (suppression names — and naming partially amplifies)** — the
+finding that "don't think about X" still activates X's internal representation,
+grounding the positive-framing default, the sharp-edges-only rule for DO-NOT
+lists, and the existing anti-example priming caution. The J-lens monitoring and
+intervention techniques are interpretability infrastructure, not promptable;
+not ported.
+
+**Riemann zeta research run** — Anthropic research (anthropic.com/research;
+retrieved August 2026).
+Partial. An account of a frontier-discovery run, mined for orchestration
+patterns rather than mathematics. Licenses: the **persistence /
+capability-prior correction** long-horizon operator (the primary human
+intervention was variants of "keep going"; initial self-skepticism from trained
+priors about famous open problems, not capability, was the binding constraint;
+hundreds of discarded ideas preceded the result) — gated on strong verification
+and an open-ended-discovery trigger; and the **validator-heavy roster** guidance
+in the swarm topology (the run's roster weighted validators heavily: independent
+re-derivation, cross-refereeing, formal/numerical checks, originality sweeps,
+external review). The encouragement anecdote is adopted as an operator with an
+explicit gate, not as general advice — persistence without verification
+amplifies confident wrong output.
+
+**Multiagent systems research** — Anthropic research (anthropic.com/research;
+retrieved August 2026).
+Absorbed. The largest single source of this pass. Licenses: **Topology 5
+(swarm / shared-forum collective)** — forum-coordinated swarm vs. isolated
+parallel agents (an order of magnitude more verified findings on comparable
+token budget, minimal overlap between methods), emergent specialization, forum
+as designed artifact ("use something like a central forum in which agents can
+agree on best practices and protocols"), arbiter/validator roles, and the
+poor-taste / declining-merge-rate counter-indication for convergent production
+work; and the **empirical failure-modes catalog** with its five audit checks —
+conformity collapse (identical contexts → duplicate branches, titles, projects;
+polling floods), hidden-profile information loss (unshared decisive facts never
+volunteered once consensus forms), missing epistemic vigilance (accuracy
+collapses as unreliable reports rise; no reputation to lose; supply courts /
+peer review / verification norms by design), convergence-driven collusion
+(price-matching through public signals alone → isolate independent judges until
+commitment), and turf wars between mutually unaware co-tenants (sabotage
+assumptions, lockouts, kill loops → mutual awareness, resource ownership,
+negotiated resolution protocols). Model-comparison results were not ported
+(model-agnostic invariant); the design lessons were.
 
 ---
 
@@ -185,6 +310,28 @@ abstraction heads → symbolic induction heads → retrieval heads — is *why*
 structured prompts (named sections, schemas, consistent ordering) outperform
 unstructured ones. Cited in `references/reasoning-patterns.md` and underpins the
 structure-related audit checks.
+
+**"Multi-Agent Design: Optimizing Agents with Better Prompts and Topologies"** —
+Han Zhou, Xingchen Wan, Ruoxi Sun, Hamid Palangi, Shariq Iqbal, Ivan Vulić,
+Anna Korhonen, Sercan Ö. Arık. arXiv:2502.02533 (2025; v2 2026), ICLR 2026.
+Evaluated and partially used — findings absorbed as design rules, machinery not
+ported. The MASS framework searches prompts and topologies jointly in three
+stages (block-level prompt optimization → influence-pruned topology search →
+workflow-level joint prompt re-tune). Licenses the **topology optimization
+ordering** section in `references/agent-team-topologies.md` and its three rules:
+the *single-agent baseline* (prompt-optimizing one agent is more token-effective
+than scaling agent count with default prompts; weakly-prompted scaling saturates
+early), *topology blocks must earn their place* (beneficial topologies are "a
+small fraction of the full design space"; some blocks actively degrade), and the
+*compose-then-retune pass* now closing Shape 7's spine (their Stage 3 — prompts
+tuned in isolation need re-tuning under composition interference, consistent
+with Principle 4). Also licenses the **voting + debate rounds** hybrid, with the
+commitment-before-exchange sequencing this framework adds to reconcile debate
+with its independence-isolation rule. The automated search machinery (APO,
+influence-weighted softmax pruning, budget-constrained sampling) was **not
+ported** — Prometheus is a build-time design framework without eval-set access;
+the delivery guidance instead recommends a MASS-style staged search when the
+user has an eval set and production stakes.
 
 **"A Survey of Context Engineering for Large Language Models"** — Lingrui Mei,
 Jiayu Yao, Yuyao Ge, Yiwei Wang, Baolong Bi, Yujun Cai, Jiazhi Liu, Mingyu Li,
