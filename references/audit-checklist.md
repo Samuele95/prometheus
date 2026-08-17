@@ -293,6 +293,7 @@ Empirical multi-agent checks (from published swarm experiments; see `references/
 - **Independence isolation.** For voting and independent-judgment topologies, confirm judges cannot see each other's outputs (or prices/scores) before committing. Visible peer signals produce convergence and even collusion-like coordination without any explicit agreement channel.
 - **Epistemic vigilance.** Where agents act on other agents' reports, confirm either a verification norm (cross-check claims against observables, discount unverifiable or interested testimony) or an arbiter/referee role. Agents over-trust peer reports by default.
 - **Mutual awareness and resource ownership.** Agents sharing an environment know the others exist, what each owns, and how conflicts resolve. Co-tenants discovering each other through side effects assume interference and escalate.
+- **Topology earns its place.** The team was designed against a well-prompted single-agent baseline, each topology block traces to a named incremental value (staged-search evidence: most blocks in the design space fail to improve or degrade performance), and the compose-then-retune pass ran — role prompts were revisited inside the composition, not shipped as tuned-in-isolation. For production teams with an eval set, flag if block-level influence was never measured.
 
 ## O. Optional: empirical tests for high-stakes prompts
 

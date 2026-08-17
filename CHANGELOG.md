@@ -14,6 +14,29 @@ Status legend: **validated** = stress-tested or exercised on a real task;
 
 ---
 
+## [Unreleased] — MASS findings (August 2026)
+
+Single-source pass over Zhou et al., "Multi-Agent Design: Optimizing Agents with
+Better Prompts and Topologies" (arXiv:2502.02533, ICLR 2026). Findings adopted
+as Shape 7 design rules; the automated search machinery evaluated and not ported
+(build-time framework, no eval-set access). All items **source-backed, untested
+in this framework**.
+
+### Added
+- **Topology optimization ordering** section in `agent-team-topologies.md`:
+  single-agent baseline rule (prompt optimization beats agent scaling on token
+  effectiveness), topology-blocks-earn-their-place rule (beneficial topologies
+  are a small fraction of the design space), compose-then-retune rule (Stage 3
+  ≙ re-tuning under Principle 4 interference). — *mass*
+- **Compose-then-retune pass** as Shape 7 spine step 8. — *mass*
+- **Voting + debate rounds** hybrid with commitment-before-exchange sequencing,
+  reconciling debate with the independence-isolation failure-mode rule; round
+  cap required. — *mass; multiagent*
+- **"Topology earns its place"** check appended to audit §N. — *mass*
+- `CITATIONS.md` entry (partial disposition, machinery-not-ported stated). — *mass*
+
+---
+
 ## [Unreleased] — frontier-source pass II (August 2026)
 
 Source-driven incremental pass over eight newly supplied Anthropic primaries

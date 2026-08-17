@@ -49,6 +49,7 @@ considered, not ported; **rejected** = examined and declined.
 | Emergent Symbolic Mechanisms… | paper (Yang et al., ICML'25) | arXiv:2502.20332 | absorbed |
 | Unlocking Structured Thinking w/ Cognitive Prompting | paper (Kramer, Baumann) | arXiv:2410.02953 | partial |
 | A Survey of Context Engineering for LLMs | paper (Mei et al.) | arXiv:2507.13334 | evaluated |
+| Multi-Agent Design: Optimizing Agents with Better Prompts and Topologies | paper (Zhou et al., ICLR'26) | arXiv:2502.02533 | partial |
 | Self-Consistency… | paper (Wang et al.) | arXiv:2203.11171 | mentioned |
 | Tree of Thoughts | paper (Yao et al.) | arXiv:2305.10601 | mentioned |
 | Chain-of-Thought Prompting… | paper (Wei et al.) | arXiv:2201.11903 | background |
@@ -320,6 +321,28 @@ structured prompts (named sections, schemas, consistent ordering) outperform
 unstructured ones. Cited in `quantum-core.txt` and underpins the
 structure-related audit checks.
 
+**"Multi-Agent Design: Optimizing Agents with Better Prompts and Topologies"** —
+Han Zhou, Xingchen Wan, Ruoxi Sun, Hamid Palangi, Shariq Iqbal, Ivan Vulić,
+Anna Korhonen, Sercan Ö. Arık. arXiv:2502.02533 (2025; v2 2026), ICLR 2026.
+Evaluated and partially used — findings absorbed as design rules, machinery not
+ported. The MASS framework searches prompts and topologies jointly in three
+stages (block-level prompt optimization → influence-pruned topology search →
+workflow-level joint prompt re-tune). Licenses the **topology optimization
+ordering** section in `manage-agent-design.txt` and its three rules:
+the *single-agent baseline* (prompt-optimizing one agent is more token-effective
+than scaling agent count with default prompts; weakly-prompted scaling saturates
+early), *topology blocks must earn their place* (beneficial topologies are "a
+small fraction of the full design space"; some blocks actively degrade), and the
+*compose-then-retune pass* now closing Shape 7's spine (their Stage 3 — prompts
+tuned in isolation need re-tuning under composition interference, consistent
+with Principle 4). Also licenses the **voting + debate rounds** hybrid, with the
+commitment-before-exchange sequencing this framework adds to reconcile debate
+with its independence-isolation rule. The automated search machinery (APO,
+influence-weighted softmax pruning, budget-constrained sampling) was **not
+ported** — Prometheus is a build-time design framework without eval-set access;
+the delivery guidance instead recommends a MASS-style staged search when the
+user has an eval set and production stakes.
+
 **"A Survey of Context Engineering for Large Language Models"** — Lingrui Mei,
 Jiayu Yao, Yuyao Ge, Yiwei Wang, Baolong Bi, Yujun Cai, Jiazhi Liu, Mingyu Li,
 Zhong-Zhi Li, Duzhen Zhang, Chenlin Zhou, Jiayi Mao, Tianze Xia, Jiafeng Guo,
@@ -444,6 +467,29 @@ evidence rule applied to itself. Sources are catalogued in
 
 Status legend: **validated** = stress-tested or exercised on a real task;
 **source-backed** = grounded in a cited primary, not yet tested in this framework.
+
+---
+
+## [Unreleased] — MASS findings (August 2026)
+
+Single-source pass over Zhou et al., "Multi-Agent Design: Optimizing Agents with
+Better Prompts and Topologies" (arXiv:2502.02533, ICLR 2026). Findings adopted
+as Shape 7 design rules; the automated search machinery evaluated and not ported
+(build-time framework, no eval-set access). All items **source-backed, untested
+in this framework**.
+
+### Added
+- **Topology optimization ordering** section in `manage-agent-design.txt`:
+  single-agent baseline rule (prompt optimization beats agent scaling on token
+  effectiveness), topology-blocks-earn-their-place rule (beneficial topologies
+  are a small fraction of the design space), compose-then-retune rule (Stage 3
+  ≙ re-tuning under Principle 4 interference). — *mass*
+- **Compose-then-retune pass** as Shape 7 spine step 8. — *mass*
+- **Voting + debate rounds** hybrid with commitment-before-exchange sequencing,
+  reconciling debate with the independence-isolation failure-mode rule; round
+  cap required. — *mass; multiagent*
+- **"Topology earns its place"** check appended to audit §N. — *mass*
+- the provenance file entry (partial disposition, machinery-not-ported stated). — *mass*
 
 ---
 
