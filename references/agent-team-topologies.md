@@ -1,6 +1,6 @@
 # Agent-team topologies
 
-When a task is decomposed across multiple coordinated agents, the choice of *topology* — how the agents are arranged and how work flows between them — is the most consequential design decision. Wrong topology produces brittle systems regardless of how well individual prompts are written. This file documents four canonical topologies, when each applies, and the operator profile of each role within them.
+When a task is decomposed across multiple coordinated agents, the choice of *topology* — how the agents are arranged and how work flows between them — is the most consequential design decision. Wrong topology produces brittle systems regardless of how well individual prompts are written. This file documents five canonical topologies, when each applies, and the operator profile of each role within them — plus a catalog of empirically documented multi-agent failure modes that cut across topologies.
 
 These topologies are the structural primitives. Real systems often combine them (an orchestrator-workers system whose individual workers use parallelization-voting internally, etc.). The framework's audit phase checks that the chosen topology actually fits the task before committing to per-role drafting.
 
@@ -156,6 +156,62 @@ Input ──> Generator ──> Output ──> Evaluator ──> Final
 - **Convergence failure.** Loop never terminates; evaluator keeps finding things to critique. Fix: max-iterations cap, plus an evaluator instruction to approve once output meets the bar (perfectionism is a failure mode).
 - **Regression.** Iteration N fixes what iteration N-1 was flagged for, but breaks something iteration N-1 had right. Fix: evaluator tracks what was good across iterations; generator's prompt explicitly preserves approved aspects.
 
+## Topology 5: Swarm — shared-forum collective
+
+Many peer agents work the same open-ended objective concurrently, each with its own isolated workspace, coordinating through a **shared forum** (a common board/repository where agents post findings, claim territory, agree on protocols, and read each other's results). No central orchestrator decomposes the work; specialization emerges from the forum.
+
+```
+Agent 1 ──┐                    ┌── workspace 1
+Agent 2 ──┼──> Shared forum <──┼── workspace 2      ──> Arbiter/validators ──> Output
+  ...     │   (post/claim/     │      ...
+Agent N ──┘    protocol)       └── workspace N
+```
+
+**Source:** published multi-agent swarm experiments (vendor research on multiagent systems; the parallel-agents compiler project is the isolated-parallel baseline this improves on for discovery tasks).
+
+**When to use.** Open-ended *discovery* at scale, where the space of findings is large, findings are independently verifiable, and coverage benefits from diverse angles — vulnerability hunting, broad audit sweeps, idea-space exploration. The cited experiment found a forum-coordinated swarm surfaced an order of magnitude more verified findings than the same token budget spent on isolated parallel agents, with little overlap between the two methods' findings — the forum lets agents deduplicate, divide territory, and build on partial results instead of rediscovering them.
+
+**When not to use.** Convergent, taste-driven production — building one coherent artifact. The same research found merged-contribution rates *decline sharply* as swarm size grows on such tasks, and models "have poor taste" in self-organizing creative/product direction without human steer. If the task needs one good decision rather than many independent findings, use orchestrator-workers or evaluator-optimizer. Cost is also the highest of the five topologies; the finding-per-token math must justify it.
+
+### Role operator profiles
+
+**Peer agent (N instances, differentiated).**
+- Shape: Shape 1 (agentic loop) at small scale, or Shape 4 where the swarm runs under a harness.
+- Amplifies: autonomous exploration of an assigned or self-claimed angle; posting findings and claims to the forum early; reading the forum before starting work (dedup discipline).
+- Suppresses: silent solo work (a peer that never posts recreates the isolated-parallel baseline); re-verifying what a validator already verified.
+- Critical: **contexts must be differentiated** — by assigned angle, seed material, or role hint. Identical peer prompts produce conformity collapse (see failure modes below), not N independent explorers.
+
+**The forum (an artifact, not an agent).**
+- The forum is a designed interface: post format (structured claims with evidence pointers), claim/territory conventions, protocol-agreement space. Treat its specification with the rigor of a tool description — it is the medium every inter-agent operator passes through. Vendor guidance is explicit: "use something like a central forum in which agents can agree on best practices and protocols."
+
+**Arbiter / validator (one or more).**
+- Shape: LLM-as-judge (Shape 6), often with executable checks.
+- Amplifies: independent verification of posted findings against observables (reproduce the vulnerability, run the numbers, re-derive the result); discounting unverifiable or interested testimony; deduplication.
+- Suppresses: findings entering the output on a peer's say-so. Peer agents over-trust each other's reports by default; the arbiter is the topology's epistemic immune system.
+- A validator-heavy roster is not overhead. The published frontier-discovery runs weight validation heavily (independent re-derivation, cross-refereeing, formal or numerical checks, originality sweeps) — for discovery swarms, plan on validators being a substantial fraction of the roster, not an afterthought.
+
+### Common failure modes
+
+- **Conformity collapse.** Identically prompted peers converge on the same branch names, the same titles, the same project ideas — burning N budgets on one agent's worth of diversity. Fix: differentiate contexts per peer (see §Empirical failure modes).
+- **Forum flooding.** Peers post low-value updates at high frequency (the cited job-queue experiment: agents flooded the system with polling daemons — millions of requests for a hundred accepted jobs). Fix: post format with evidence requirements, and cadence rules matched to how fast the shared state actually changes.
+- **Say-so propagation.** One peer's unverified claim gets built upon by others before an arbiter checks it. Fix: findings are marked unverified until an arbiter clears them; building on unverified claims is explicitly deprioritized.
+
+## Empirical failure modes (cross-topology)
+
+Published multi-agent experiments document failure modes that recur across topologies. Each has a prompt-level cure; the agent-team audit (`references/audit-checklist.md` §N) checks for all five.
+
+**Conformity collapse (the low-variance problem).** Agents given identical or near-identical contexts converge on the same choices — in the cited experiments, most of a 30-agent cohort created the same git branch name, multiple agents titled independent fiction identically, and over half of "free choice" agents picked the same two project types. Multi-agent diversity is not free: it must be *designed in*. Cure: differentiate each agent's context — assigned angle, role, seed material, or explicit "your assigned perspective is X" operators. This generalizes the voting topology's existing rule (identical workers at temperature 0 make voting pointless) to every topology: **an undifferentiated swarm is one agent with extra steps.**
+
+**Hidden-profile information loss.** When decisive evidence is distributed (each agent holds a unique piece, shared evidence points the wrong way), group discussion converges on what everyone already knows; unshared facts are never volunteered, or not pressed once consensus forms. Groups scored far below the solo ceiling in the cited experiments. Cure: instruct agents to lead with information *others don't have*; instruct the synthesizer/discussion protocol to elicit unshared evidence and standing dissent *before* convergence is allowed; treat "everyone agrees early" as a warning sign, not a success signal.
+
+**Missing epistemic vigilance.** Agents act on other agents' reports without discounting for reliability — accuracy collapses as the rate of unreliable reports rises, even when cross-checking overlapping reports would expose the lies. Agents have no reputation to lose and no evolved disposition toward vigilance; the mechanisms humans rely on (reputation, courts that discount interested testimony, peer review) must be supplied by design. Cure: verification norms in every prompt that consumes peer reports ("cross-check claims against observables; treat unverifiable testimony as unverified"), arbiter/referee roles for consequential claims, and — where reports repeat over time — explicit tracking of per-source reliability.
+
+**Convergence-driven collusion.** Agents optimizing in a shared environment coordinate through visible signals alone — in pricing experiments, agents matched each other's prices "to the penny" via a public board without any private channel, and agreed on explicit floors within rounds when one existed. For any topology whose value depends on *independent* judgment (voting, parallel review, graded competition), visible peer outputs are a side channel. Cure: isolate judges until commitment — voters don't see other votes, reviewers don't see other reviews, scores are committed before disclosure.
+
+**Turf wars between mutually unaware co-tenants.** Agents sharing an environment without knowing of each other interpret others' side effects as sabotage and escalate — the cited experiments saw account lockouts, process-killing loops, and camouflage. Explicit mutual awareness plus a resolution protocol settles conflicts that blind co-tenancy escalates. Cure: every agent's prompt names the other tenants, what each owns, and the conflict-resolution path (a truce/negotiation channel, an escalation-to-human rule, or an agreed objective test — the cited runs settled durably when agents could negotiate a verifiable bake-off rather than fight). Never deploy agents with incompatible goals into a shared environment without mutual awareness — the framework treats that as a design defect, not an emergent surprise.
+
+These cures are prompt-level social technology — reputation, courts, peer review, property lines, rebuilt for actors that fork instantly and enter with nothing to lose. They compensate for dispositions the substrate doesn't reliably have, which is why the audit checks for their *presence in the prompts*, not for the substrate's good behavior.
+
 ## Hybrid topologies
 
 Real systems often combine these. A few common combinations:
@@ -178,5 +234,6 @@ Any role in an agent team with destructive capability (write access, shell acces
 | Parallelization-sectioning | Pre-defined, independent | Single pass | Multi-aspect tasks with focused-attention benefit |
 | Parallelization-voting | Identical workers | Aggregation rule | High-stakes single-task confidence |
 | Evaluator-optimizer | One task, iterated | Loop until acceptance | Tasks where revision improves output |
+| Swarm / shared-forum | Self-claimed, emergent | Arbiter-verified findings | Open-ended discovery at scale with verifiable findings |
 
-When in doubt, start with orchestrator-workers if subtasks are dynamic, parallelization-sectioning if they're static. Voting and evaluator-optimizer are specialized variants worth reaching for only when their specific properties match the task.
+When in doubt, start with orchestrator-workers if subtasks are dynamic, parallelization-sectioning if they're static. Voting and evaluator-optimizer are specialized variants worth reaching for only when their specific properties match the task. The swarm is the most expensive and least controllable topology — reach for it only for verifiable open-ended discovery, never for convergent production work.

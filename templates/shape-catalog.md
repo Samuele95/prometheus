@@ -19,7 +19,7 @@ Shape inference is Bayesian (§2.4): from the user's request, build a posterior 
 4. Stack / materials
 5. What to build
 6. Initial contracts (revisable)
-7. Procedure as checkpoints
+7. Procedure as checkpoints (order the plan by decision volatility: lead with the decisions the user is most likely to revise — data models, interfaces, UX flows — and bury mechanical, low-uncertainty work; volatile decisions surface early where review is cheap)
 8. Working memory (memory file structure, re-read trigger)
 9. Loading context as you go (just-in-time retrieval, sub-agents)
 10. Style rules (drop if generic)
@@ -29,7 +29,18 @@ Shape inference is Bayesian (§2.4): from the user's request, build a posterior 
 14. Worked example (one per mode)
 15. Done definition
 16. Start here
-17. Long-horizon operators, when the run warrants them (see `operators/section-operators.md` §Long-horizon operators): progress-claim grounding with the status contract; checkpoint policy + anti-early-stopping as one pause contract; memory-file conventions + deviations log in the memory specification; send-to-user pattern only if the harness defines the tool; lead-with-outcome on the final human-facing summary. Each must trace to a real long-run trigger (M5) — a short loop gets none of them.
+17. Long-horizon operators, when the run warrants them (see `operators/section-operators.md` §Long-horizon operators): progress-claim grounding with the status contract; checkpoint policy + anti-early-stopping as one pause contract; memory-file conventions + deviations log in the memory specification; send-to-user pattern only if the harness defines the tool; lead-with-outcome on the final human-facing summary; persistence / capability-prior correction only on open-ended discovery runs with strong verification. Each must trace to a real long-run trigger (M5) — a short loop gets none of them.
+
+**Trigger and stop taxonomy.** A loop is defined as much by what starts and stops it as by what it does. Establish both during the interview and encode them explicitly; each row changes the seed brief's contract sections:
+
+| Loop type | Trigger | Stop condition | Design consequences |
+|---|---|---|---|
+| Turn-based | A user message | Agent judges the turn's work done, or needs input | The default Shape 1 contract (checkpoints, suggested-next-message). Specific prompts and self-verification reduce iterations |
+| Goal-based | A stated goal | **Deterministic success condition + iteration cap** | The done definition must be checkable, quantitative where possible ("all tests pass," "score ≥ threshold"), never "improve X"; the cap ("stop after N attempts") bounds the run when the goal isn't reached |
+| Scheduled | A time interval | User cancels, or the run's work completes | Match the interval to how often the watched input actually changes — polling faster than the input moves burns budget on nothing. Each firing needs a standalone-complete prompt (no conversation to lean on) |
+| Proactive / event-driven | An external event or standing routine | Per-task goal conditions; the routine runs until disabled | Composes the other rows: a schedule checks for new inputs, a goal condition defines per-item completion, verification is encoded as checks the agent runs itself |
+
+Two cross-cutting rules from the same source guidance: encode verification as *quantitative checks the agent can execute* (run the tests, measure the score, screenshot and inspect) rather than qualitative self-assessment — "never report changes complete based on edit success alone"; and use scripts for deterministic sub-work instead of having the agent re-reason through mechanical steps each iteration — reasoning tokens are for the parts that need judgment.
 
 **Operator profile.** Role and project context are strongest operators (set the subspace). Procedure and contracts are mid-strength (define the projection sequence). Style and formatting are weak (commute with most content).
 
@@ -111,6 +122,8 @@ If hard-reasoning signals are absent (extraction, classification, summarization,
 
 **Operator profile.** Purpose-line is dominant — it's what the parent agent reads first when deciding to use the tool. Parameter descriptions are second. Anything beyond is supporting detail.
 
+**Interface design as operator.** The parameter space itself teaches usage: an expressive parameter name and a typed enumeration (`status: [pending, in_progress, completed]`) are operators that constrain how the parent agent uses the tool, at near-zero token cost and without the ambiguity surface examples carry (audit §C — every example teaches its silent judgment calls). On frontier-tier substrates, prefer designing the interface — names, types, enums, required-vs-optional — over adding usage examples; add examples only where the interface genuinely can't express the convention. On legacy tiers, examples retain more of their value.
+
 **Failure mode unique to this shape:** Bloated tool descriptions that overlap with other tools, creating ambiguity about which to call. Cure: minimal viable description focused on the tool's unique role.
 
 ## Shape 5: System persona / assistant prompt
@@ -175,7 +188,7 @@ If hard-reasoning signals are absent (extraction, classification, summarization,
 
 **Spine sections:**
 
-1. **Topology selection.** Which of the four canonical topologies (orchestrator-workers, parallelization-sectioning, parallelization-voting, evaluator-optimizer) or hybrid combination fits the task. See `references/agent-team-topologies.md` for the full catalog.
+1. **Topology selection.** Which of the five canonical topologies (orchestrator-workers, parallelization-sectioning, parallelization-voting, evaluator-optimizer, swarm/shared-forum) or hybrid combination fits the task. See `references/agent-team-topologies.md` for the full catalog.
 2. **Role roster.** For each role: name, scope (what it does and doesn't do), capability boundaries (what tools/actions it has access to), and which existing shape (1–6) its individual prompt will use. The orchestrator is usually a system persona (Shape 5); workers are usually sub-agent / tool prompts (Shape 4); evaluators are usually LLM-as-judge (Shape 6).
 3. **Interface contracts.** What the orchestrator passes to each worker (input schema), what each worker returns (output schema). These contracts are load-bearing — when broken, the system fails silently. Use the agent-consumability principles for output design (`references/agent-consumability.md`): structured output, greppable failure markers, explicit state transitions.
 4. **Capability lockdown per role.** For each role with destructive capability (write access, shell access, financial actions, anything irreversible), apply the layered lockdown pattern from Shape 5 — structural restrictions plus prose reinforcement, with attention to loophole tools (shell redirection can write files even in "read-only" roles). See Shape 5's third failure mode for the full pattern.
@@ -196,6 +209,8 @@ If hard-reasoning signals are absent (extraction, classification, summarization,
 *Interface drift.* Worker output formats drift from what the orchestrator expects, breaking the parsing layer silently. Output looks reasonable in isolation but the orchestrator can't act on it. Cure: every worker prompt specifies its output format with the rigor of a tool description (typed schema, examples, what the orchestrator will do with each field).
 
 *Capability lockdown failure.* A "read-only" worker uses shell redirection or another loophole to write files. Cure: layered lockdown (structural + prose), explicit handling of loophole tools, repeated prohibitions at top and bottom of the worker's prompt.
+
+*Empirically documented multi-agent failure modes* — conformity collapse under identical contexts, hidden-profile information loss, missing epistemic vigilance, convergence-driven collusion, and turf wars between mutually unaware co-tenants — are catalogued with cures in `references/agent-team-topologies.md` §Empirical failure modes, and audited via the agent-team checks in `references/audit-checklist.md` §N.
 
 ## Hybrid shapes
 

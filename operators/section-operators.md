@@ -55,6 +55,7 @@ These are projections within the subspace set by the strong operators.
 - **Strength:** mid. Each constraint is its own operator; total strength scales with count.
 - **Place after task definition.** Order constraints by importance (more important first).
 - **Commutation:** constraints often commute with each other when independent; cross-cutting constraints (e.g., "be concise" vs "show your reasoning") don't.
+- **Rationale-bearing constraints (Principle 10).** A load-bearing constraint should carry its one-line *because*. The rationale is part of the operator: the bare rule projects only on the cases it names, while the reason keeps projecting on inputs the author never anticipated. Prefer principle-plus-rationale over exhaustive enumeration — the enumeration both over-projects on capable substrates (Principle 9) and under-generalizes off-distribution.
 
 ### Initial contracts (engineering) / outline (writing) / methodology (research)
 
@@ -124,6 +125,7 @@ These are projections within the subspace set by the strong operators.
 - **Strength:** mid.
 - **Place near end** of prompt — high-attention position.
 - **Failure mode:** generic warnings ("don't make mistakes") waste tokens. Each DO NOT must address a specific known sharp edge.
+- **Priming cost (Principle 11):** every named prohibition partially amplifies the concept it names — interpretability work shows "don't think about X" still activates X internally. A specific sharp-edge DO NOT is net-positive (the warning outweighs the prime); a generic prohibition list is net-negative twice over. Where behavior-shaping is the goal, prefer the positive-framed equivalent; keep negation for lockdown and real sharp edges, compensated by repetition and rationale.
 
 ### Permission to abstain
 
@@ -162,7 +164,7 @@ The self-check is `examine_answer` applied to the conversation rather than to a 
 
 ### Long-horizon operators (Shape 1; some apply to Shape 4 workers on long tasks)
 
-Six compact operators for long-autonomy prompts, adapted from vendor guidance on long-run agent behavior. Each earns its place only when the run is genuinely long (M5 applies); a two-checkpoint task needs none of them.
+Compact operators for long-autonomy prompts, adapted from vendor guidance on long-run agent behavior. Each earns its place only when the run is genuinely long (M5 applies); a two-checkpoint task needs none of them.
 
 **Progress-claim grounding.**
 - **Amplifies:** evidence-backed status reporting — every progress claim auditable against a tool result from the session; unverified work reported as unverified; failures reported with output.
@@ -193,6 +195,14 @@ Six compact operators for long-autonomy prompts, adapted from vendor guidance on
 - **Amplifies:** mid-run delivery of content the user must see exactly as written (a partial deliverable, a direct answer to a mid-loop question, a progress update with specific numbers) via a dedicated tool whose input renders verbatim — tool inputs are never summarized.
 - **Suppresses:** burying verbatim-critical content inside summarizable narration.
 - **Strength:** weak-to-mid; only meaningful when the harness defines the tool. **Two-part operator:** the tool definition alone under-fires — pair it with elicitation language in the prompt ("when you have content the user must read verbatim, call send_to_user with it; not for narration or reasoning"). Flag as harness-dependent in delivery; omit entirely when the runtime has no such tool.
+
+**Persistence / capability-prior correction (open-ended discovery runs only).**
+- **Amplifies:** continuing past initial failure on genuinely hard, verifiable problems — treating early dead ends as exploration data rather than evidence of impossibility, and re-examining its own negative self-assessment before abandoning a line.
+- **Suppresses:** premature abandonment driven by the substrate's trained prior that famous hard problems are beyond it. Frontier-research experience reports this prior, not capability, was the binding constraint: the primary human intervention on a successful open-problem run was variants of "keep going," and hundreds of candidate ideas were discarded before the productive one.
+- **Strength:** mid; rises with problem difficulty.
+- **Gated on verification strength.** Only include when the run has strong verification (validator agents, tests, formal checks, numerical cross-checks) — persistence without verification amplifies confident wrong output instead of discovery. The operator licenses more *attempts*, never lower *evidence standards*.
+- **Place with the checkpoint / anti-early-stopping contract** — it is the discovery-run sibling of anti-early-stopping: that one stops the agent quitting a turn early; this one stops it quitting the problem early.
+- **M5:** requires an open-ended-discovery trigger (research loop, open problem, search over a large idea space with a strong verifier). A routine engineering loop gets none of it.
 
 **Lead-with-outcome (final summaries to humans).**
 - **Amplifies:** re-grounding the reader — the first sentence answers "what happened / what did you find"; supporting detail after; selectivity over compression (drop details that don't change what the reader does next, rather than compressing everything into fragments); session-local shorthand, arrow chains, and made-up labels dropped or re-introduced in plain language.

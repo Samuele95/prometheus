@@ -16,6 +16,8 @@ For every directive in the prompt, classify:
 
 Move every too-brittle and too-vague directive toward right altitude. If you can't, ask the user for the missing context.
 
+**The delegation ladder.** Altitude is chosen per directive, and vendor guidance names three usable rungs: delegate the *approach* (state the material and the outcome; the model selects methodology), delegate the *procedure* (reference an established procedure or skill; the model chooses sequencing and timing), delegate the *timing* (describe the recurring outcome; the model schedules the work). Pick the rung deliberately for each directive rather than defaulting to maximum specification; on frontier-tier substrates, default one rung higher than you would on legacy tiers (Principle 9). Context beats constraint at every rung: who the work is for, when it's needed, and what it accomplishes lets the model decide well in situations the directive's author didn't anticipate — a rule list alone only tells it what not to do.
+
 ## B. Smallest viable token set
 
 For every section, ask: what specific failure mode does this address, or what specific behavior does this enable? If the answer is unclear, strike the section.
@@ -25,6 +27,8 @@ Common waste:
 - Generic warnings the model already follows by default
 - Stylistic preferences nobody will check
 - Redundancy with other sections
+- **Redundancy across context layers.** The prompt is one layer of a context assembly (system prompt, tool descriptions, memory files, skills, references). Guidance duplicated across layers is waste with a failure mode attached: the copies drift, and the model receives conflicting versions. Say each thing once, in the layer that owns it — tool-usage guidance in the tool's description, repo gotchas in the memory file, procedure detail in the skill — and let the other layers point rather than repeat.
+- **Everything-upfront loading where progressive disclosure is available.** When the runtime supports selectively loaded context (skills, referenced files, deferred tool definitions, @-mentioned documents), detail that is only sometimes needed should live in a separately loaded artifact the model pulls on demand, not in the always-loaded prompt. The smallest-viable-token-set rule applies *at each moment*, not just to the artifact's total size: a lightweight always-on core naming where the detail lives outperforms a monolith. (Mechanistic support: the model's reasoning routes through a limited-capacity workspace — see Principle 5's note — so always-loaded bloat competes with the task for a scarce resource. Empirical support: a vendor removed the large majority of a production agent's system prompt for its frontier-tier models with no measured regression.)
 
 ## C. Examples present where rules are load-bearing
 
@@ -122,6 +126,8 @@ Trace through the loop. Each answer should be in the prompt or follow obviously:
 - What stops the loop?
 
 Ambiguous answers indicate gaps.
+
+**Stop conditions should be deterministic where the task allows.** "Improve performance" never terminates; "score ≥ the named threshold, stop after N attempts" does. For goal-seeking loops, confirm both halves are present: a checkable success condition (quantitative where possible — test counts, scores, validation passing) and an iteration cap that bounds the run when the goal isn't reached. A loop with a vague goal and no cap is the loop-shape version of the convergence failure documented for evaluator-optimizer topologies. For scheduled or event-triggered loops, also confirm the trigger cadence matches how often the watched input actually changes — a loop that polls faster than its input moves burns budget to rediscover that nothing happened (see the Shape 1 trigger/stop taxonomy in `templates/shape-catalog.md`).
 
 ## J. Tier the ceremony (loop shape only)
 
@@ -267,7 +273,7 @@ The rubric is the optimization target for any upstream agent that uses this judg
 
 **System persona.** Identity stable. Refusal patterns explicit. Drift resistance designed in.
 
-**Agent team.** Topology fits the task — orchestrator-workers for dynamic decomposition, parallelization-sectioning for independent aspects, parallelization-voting for high-stakes confidence, evaluator-optimizer for revision-driven tasks. Don't pick a topology because it sounds sophisticated; pick the simplest one that fits.
+**Agent team.** Topology fits the task — orchestrator-workers for dynamic decomposition, parallelization-sectioning for independent aspects, parallelization-voting for high-stakes confidence, evaluator-optimizer for revision-driven tasks, swarm/shared-forum for open-ended discovery at scale. Don't pick a topology because it sounds sophisticated; pick the simplest one that fits.
 
 Per-role checks:
 - Orchestrator delegates with specific context, never with vague "based on your findings" language. Each worker dispatch includes the *what specifically* (file paths, exact criteria, concrete expected output) — the orchestrator does the synthesis, not the worker.
@@ -280,6 +286,13 @@ Cross-role checks:
 - Output formats are agent-consumable per `references/agent-consumability.md`: structured, greppable failure markers, aggregate-first, visible state transitions. Workers' outputs feed another agent; they're not for human display.
 - Capability lockdown is consistent. If the orchestrator says "Worker A is read-only," Worker A's prompt enforces that. Inconsistency between orchestrator's belief and worker's actual capability is a fault line.
 - Failure handling is specified. When a worker fails, what happens? Retry? Fallback? Partial results? The orchestrator's prompt addresses this explicitly rather than hoping it doesn't come up.
+
+Empirical multi-agent checks (from published swarm experiments; see `references/agent-team-topologies.md` §Empirical failure modes):
+- **Context differentiation.** Agents meant to produce diverse work don't share near-identical prompts and contexts. Identical contexts produce behavioral convergence — duplicate outputs, naming collisions, redundant work — not independent exploration. Differentiate by role, assigned angle, or seed material; confirm the differentiation is in the prompts, not assumed.
+- **Unique-information elicitation.** Where evidence is distributed across agents, some prompt explicitly instructs agents to surface information *others don't have* and instructs the synthesizer/discussion to elicit unshared evidence and dissent before converging. Group discussion left to defaults converges on what everyone already knows.
+- **Independence isolation.** For voting and independent-judgment topologies, confirm judges cannot see each other's outputs (or prices/scores) before committing. Visible peer signals produce convergence and even collusion-like coordination without any explicit agreement channel.
+- **Epistemic vigilance.** Where agents act on other agents' reports, confirm either a verification norm (cross-check claims against observables, discount unverifiable or interested testimony) or an arbiter/referee role. Agents over-trust peer reports by default.
+- **Mutual awareness and resource ownership.** Agents sharing an environment know the others exist, what each owns, and how conflicts resolve. Co-tenants discovering each other through side effects assume interference and escalate.
 
 ## O. Optional: empirical tests for high-stakes prompts
 
