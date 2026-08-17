@@ -1,6 +1,6 @@
 # ship-manifest.md — Prometheus Gem package v2 (EN)
 
-Generated 2026-07-16T12:43:32Z; hashes for 6 files regenerated 2026-08-17 after the frontier-source pass II sync (see the changelog inside `knowledge/provenance.txt`). Languages: `[en]`. IT = declared follow-on run.
+Generated 2026-07-16T12:43:32Z; hashes regenerated 2026-08-17 after the frontier-source pass II + MASS syncs (see the changelog inside `knowledge/provenance.txt`). Languages: `[en]`. IT = declared follow-on run.
 Gem name: **Prometheus**. Framework carried: **prompt-architect v2** (the corpus
 names it that way verbatim; see the naming note in the setup guide).
 
@@ -23,14 +23,14 @@ knowledge/               -> shared across languages; upload all 8, do NOT rename
 | `en/setup-guide.md` | 3,374 | `f0a9b87e01064d6bcc82216ad8148c03ada370953e2b7337b7ae1ab337f341fd` |
 | `en/smoke-tests.md` | 5,444 | `d069338d514bb0b905a3e231633cf300a14a95b3334ad69de51fa9cde1f0808d` |
 | `en/dogfood-audit.md` | 5,867 | `b60c46eda2d28ab3d39368c001628356a2da7c562333a5397c727e5b08b3dd7c` |
-| `knowledge/manage-agent-design.txt` | 30,688 | `360a199078e4eed758462f0897d051a0c0d60fa4dc97e6fe98c3a644f1cf70e3` |
+| `knowledge/manage-agent-design.txt` | 34,025 | `8a4381aa30462ddff1252e1dd8ab81d4f753199ac1b63fb9bb6dec36c4febdec` |
 | `knowledge/manage-core.txt` | 35,172 | `10fe5fbd50116e004e9f569bd96b4a22f7bdcf9e974a979f93a51f19929258a5` |
 | `knowledge/manage-operators.txt` | 28,129 | `1e9e38af5e2644388fd686535d96c6e260cbd903fb2a89adb164adf47085366b` |
-| `knowledge/provenance.txt` | 46,489 | `365185347acce37ecee3403cc5b53d96155f6e1dd1fb1b144b591a34015882d4` |
+| `knowledge/provenance.txt` | 49,448 | `e1f7323440a3d523f0960f4dadfcce6ee7542e393e4633b3a49d8606aeaca4e4` |
 | `knowledge/quantum-core.txt` | 67,829 | `ae6ab185a0b1f04dd882a1f0600f3680fb40daddd9521d87de4b1c3db89e5453` |
 | `knowledge/refactor-mode.txt` | 15,842 | `fe95ae3f2c513a90e0a5bdcede54a024aa9b05c47e0faf493142e166442d437c` |
-| `knowledge/shapes-and-build.txt` | 50,913 | `1c2933b1075b4f02d9b96e2ec5557f08501698fd688d5ba573c775f08a0f8873` |
-| `knowledge/verifier-and-audit.txt` | 63,258 | `ad75186737ada52d9e40b43bcbaab84887a6470240ef6663151a73f69e669b49` |
+| `knowledge/shapes-and-build.txt` | 51,558 | `191f133ca0836e6a7644a51f8e096eeaa042ac380f65f17579670350f9be9888` |
+| `knowledge/verifier-and-audit.txt` | 63,730 | `56551ee9388731f5af686e0237ff59c8f97ab8a57d7d6ca1ad2fd320c23e667a` |
 
 ## Gate summary
 
