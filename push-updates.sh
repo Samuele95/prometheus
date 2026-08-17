@@ -63,10 +63,6 @@ Added (all source-backed, per CHANGELOG's per-task source map):
 
 Model-agnostic invariant held: vendor/model names only in CITATIONS, provenance,
 and pre-existing per-runtime footnotes.
-
-🤖 Generated with [Claude Code](https://claude.com/claude-code)
-
-https://claude.ai/code/session_01L4NHs52AvJc95BjoRbNXwr
 EOF
 )
 
