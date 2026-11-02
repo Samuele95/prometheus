@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+Disallow: /code-forge.html
+Disallow: /documentation-forge.html

@@ -1,0 +1,243 @@
+{
+  "package": "prometheus-gem",
+  "framework_version": "v3.3",
+  "generated": "2026-09-08T12:29:23Z",
+  "languages": [
+    "en"
+  ],
+  "sources": [
+    {
+      "source": "references/quantum-principles.md",
+      "origin": "skill v3.3",
+      "bytes": 17356,
+      "sha256": "38752554157b93f7321bdff6d98d6e6abdd020e2cdc84e0749b79ec95f65092e",
+      "lands_in": "quantum-principles.txt"
+    },
+    {
+      "source": "references/operators.md",
+      "origin": "skill v3.3",
+      "bytes": 11238,
+      "sha256": "e3823f141074a05d5dc073ed8f9db9921d31363b61d1e37a6d33fce13a2b7297",
+      "lands_in": "operators.txt"
+    },
+    {
+      "source": "references/shapes.md",
+      "origin": "skill v3.3",
+      "bytes": 17127,
+      "sha256": "aef8b87e45f4f5967b92a0ab3f0fb7f7c4be7311bd7c90cbd9bdd312b43bfd3a",
+      "lands_in": "shapes.txt"
+    },
+    {
+      "source": "references/loops.md",
+      "origin": "skill v3.3",
+      "bytes": 3803,
+      "sha256": "97383e0b0491973a15d1a5017beb4e2e8cd07a1bb0b9fcf4f264a2e1c434cfac",
+      "lands_in": "shapes.txt"
+    },
+    {
+      "source": "assets/minimum-viable-prompt.yaml",
+      "origin": "skill v3.3",
+      "bytes": 956,
+      "sha256": "7853e9cf6b1068a1f14b0dbd6f2ac0b71f15642d0def40204550690054ee9bb7",
+      "lands_in": "shapes.txt"
+    },
+    {
+      "source": "references/audit.md",
+      "origin": "skill v3.3",
+      "bytes": 18912,
+      "sha256": "735f88ec65be80f9a83d7a2b28d9ae89766f0aa966bc48bfdd2aafa2677976f4",
+      "lands_in": "audit.txt"
+    },
+    {
+      "source": "references/evals.md",
+      "origin": "skill v3.3",
+      "bytes": 10706,
+      "sha256": "98005ffaa9e49891a78de33fd5a3ed8cc19e8ab5b4ed8d2df3e4b28a46050170",
+      "lands_in": "evals.txt"
+    },
+    {
+      "source": "references/cognitive-tools.md",
+      "origin": "skill v3.3",
+      "bytes": 6358,
+      "sha256": "418b988c89f453e94b1356afff0736ed3d7bbcc4cfe6c224fd7a0c5a0d6cda54",
+      "lands_in": "cognitive-tools.txt"
+    },
+    {
+      "source": "assets/cognitive-tools.json",
+      "origin": "skill v3.3",
+      "bytes": 10949,
+      "sha256": "3808cc0b4c938502f620be65a43f37285b97e210add3ff71cb694938dd5cd89f",
+      "lands_in": "cognitive-tools.txt"
+    },
+    {
+      "source": "references/agent-teams.md",
+      "origin": "skill v3.3",
+      "bytes": 9581,
+      "sha256": "d07f13efc8a1bc658b7d97e17d7f0d72ba6b9467bfb8c7e6218de1e2ee627d93",
+      "lands_in": "agent-teams.txt"
+    },
+    {
+      "source": "references/agent-output.md",
+      "origin": "skill v3.3",
+      "bytes": 2458,
+      "sha256": "b750c424339c96bcc2081822359b0fba2d47edce4e0176294ee0cf77e6f029a2",
+      "lands_in": "agent-teams.txt"
+    },
+    {
+      "source": "references/refactor.md",
+      "origin": "skill v3.3",
+      "bytes": 7062,
+      "sha256": "36f7ee5dda96ce148450581716cefeae5355b5a5e57cef71692f32db9e4cea60",
+      "lands_in": "refactor.txt"
+    },
+    {
+      "source": "references/manage.md",
+      "origin": "skill v3.3",
+      "bytes": 19759,
+      "sha256": "bc7a80ee430e3d76d8be0c3b38a0028d850f423bf44f52b07258e51c3d60ed9b",
+      "lands_in": "manage.txt"
+    },
+    {
+      "source": "assets/manage/monitor.md",
+      "origin": "skill v3.3",
+      "bytes": 4514,
+      "sha256": "63d9ec3bc4a6a899e40d3ca5d895458a1ddd347dd9483a12fe3f004b90ccbdaf",
+      "lands_in": "manage.txt"
+    },
+    {
+      "source": "assets/manage/analyze.md",
+      "origin": "skill v3.3",
+      "bytes": 5332,
+      "sha256": "a967f14383ab68b3791cf53c2a02d9c905755abe3d8b4ec582b7855a863f08cf",
+      "lands_in": "manage.txt"
+    },
+    {
+      "source": "assets/manage/package-verifier.md",
+      "origin": "skill v3.3",
+      "bytes": 4488,
+      "sha256": "611229834baec8c88521a752e8abea414cb0a8cfbd66ba9315df566135f7c9fa",
+      "lands_in": "manage.txt"
+    },
+    {
+      "source": "assets/manage/replay-verifier.py",
+      "origin": "skill v3.3",
+      "bytes": 5423,
+      "sha256": "b28ba1d6f65e68864414303a9598ce0e8cbbbb7c9d270fe3aa21f2257c0b80b6",
+      "lands_in": "manage.txt"
+    },
+    {
+      "source": "CHANGELOG.md",
+      "origin": "skill v3.3",
+      "bytes": 41513,
+      "sha256": "cacc2ebdc8c853c7476bf1f120a870c4b3db6db74d87edf6e2a3ba6d9d8aa8b1",
+      "lands_in": "provenance.txt"
+    },
+    {
+      "source": "SKILL.md",
+      "origin": "skill v3.3",
+      "bytes": 10644,
+      "sha256": "f02debbcb604ce2ee0a0a6d55b01dc96023cdbc6db79314d5d8e3ef751323c6c",
+      "lands_in": "en/gem-instructions.md (ported, not carried verbatim)"
+    },
+    {
+      "source": "CITATIONS.md",
+      "origin": "repo root",
+      "bytes": 27481,
+      "sha256": "d5d127aef9b05d786c162afcc6f9359a1f185dbe8c9052e412797e360ce48fea",
+      "lands_in": "provenance.txt"
+    },
+    {
+      "source": "LICENSE",
+      "origin": "repo root",
+      "bytes": 1066,
+      "sha256": "fbf584e247a4508be8c23ab5003395b2f1d5046dadb36af7eefb7704610ae250",
+      "lands_in": "provenance.txt"
+    }
+  ],
+  "shipped": [
+    {
+      "file": "en/gem-instructions.md",
+      "bytes": 14386,
+      "chars": 14266,
+      "sha256": "2080ff20d77798df5d5efbc9fef758c8e8f8964103c971592c665f737b3ae6a3"
+    },
+    {
+      "file": "en/setup-guide.md",
+      "bytes": 5142,
+      "chars": 5124,
+      "sha256": "f32bbe52c0a5033eba261318d087caf3bd4ff313884c5b089b649b8f2f8859a6"
+    },
+    {
+      "file": "en/smoke-tests.md",
+      "bytes": 9183,
+      "chars": 9101,
+      "sha256": "22bfe89c2282c6cd6c71a740e9572a7f360ba07187e206fbeae7d335c1f1f826"
+    },
+    {
+      "file": "en/dogfood-audit.md",
+      "bytes": 9712,
+      "chars": 9661,
+      "sha256": "b3da83a2bc93aed23695063361f70e1f25fd5273fe74d33bd3e2abdbff094fdb"
+    },
+    {
+      "file": "knowledge/quantum-principles.txt",
+      "bytes": 18003,
+      "chars": 17845,
+      "sha256": "c42726a239a3c6c479c4a8a3864138e305ea8b149db3cd8ba7520a2f82708ffc"
+    },
+    {
+      "file": "knowledge/operators.txt",
+      "bytes": 11815,
+      "chars": 11741,
+      "sha256": "56131884ded8a701e75805103f0bc1a27fcd9c4dc664ed2a21084162ac1d3167"
+    },
+    {
+      "file": "knowledge/shapes.txt",
+      "bytes": 22809,
+      "chars": 22482,
+      "sha256": "19c29c1f78d062187f4b4799c63f452dea50b3c303d17fc9f17af965090f96fa"
+    },
+    {
+      "file": "knowledge/audit.txt",
+      "bytes": 19404,
+      "chars": 19250,
+      "sha256": "b82f571fcd99c3233c5420473b387c655dc0fec8a5a3a13e3154b760d320acbd"
+    },
+    {
+      "file": "knowledge/evals.txt",
+      "bytes": 11236,
+      "chars": 11091,
+      "sha256": "d42e8e60a44b419e50e23c60ea5eaf9f150f482351e0a2737272c8866e0831db"
+    },
+    {
+      "file": "knowledge/cognitive-tools.txt",
+      "bytes": 18187,
+      "chars": 18102,
+      "sha256": "bb03b303ae87ed2dcd42dfa57aef25518de6c7844760632ab603c34341a4a6f6"
+    },
+    {
+      "file": "knowledge/agent-teams.txt",
+      "bytes": 12874,
+      "chars": 12710,
+      "sha256": "abe64725ecd0eacbf61a94a15d32f13d9adea77c5fcb81e5d5d3cf72cd6cb732"
+    },
+    {
+      "file": "knowledge/refactor.txt",
+      "bytes": 7649,
+      "chars": 7559,
+      "sha256": "156c784f8f4b664f195e70fdff7fa90fb73e5dac397ce38d8edfb7d3a545c437"
+    },
+    {
+      "file": "knowledge/manage.txt",
+      "bytes": 40996,
+      "chars": 40737,
+      "sha256": "91b9bf8aec8a02342fe9d4343db1c56ba725de624fe3005a76cd53a91305061b"
+    },
+    {
+      "file": "knowledge/provenance.txt",
+      "bytes": 71093,
+      "chars": 70033,
+      "sha256": "d55b556986294000558681f0b14fe2d8e467b9cb9e6d132fcc8049a7dd7b8fb2"
+    }
+  ]
+}

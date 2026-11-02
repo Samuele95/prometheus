@@ -1,0 +1,31 @@
+# Minimum-viable-prompt scaffold — six slots in fixed order.
+# Usage rules (when to use, when not, slot order, caps): references/shapes.md, "Minimum-viable scaffold".
+
+system: |
+  # Identity, role, persona — one sentence.
+  # Example: "You are a senior data engineer reviewing a CSV ingestion script."
+
+state: |
+  # Persistent context outside this specific query; empty for one-shot.
+  # Example: "The user is on a free tier with 100 requests/day."
+
+instructions: |
+  # The task itself.
+  # Example: "Identify any data integrity risks. For each, name the failure
+  # mode, the trigger condition, and a one-line mitigation."
+
+constraints:
+  # Hard rules, one per bullet.
+  - "Constraint 1"
+  - "Constraint 2"
+
+examples:
+  # Optional. Each example: input + expected output.
+  - input: |
+      # Example input here.
+    output: |
+      # Expected output here.
+
+query: |
+  # The actual input to process. Goes last.
+  # Example: "Here's the script: <code>"

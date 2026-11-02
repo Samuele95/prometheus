@@ -1,0 +1,85 @@
+# Prometheus — Gem knowledge file: operators.txt
+# Port of the Prometheus skill (v3.3) corpus. Source files carried verbatim under structural headers.
+# The only transformation: intra-corpus cross-references rewritten from filesystem paths to shipped
+# .txt names, because a Gem has no directory to resolve a path against. Filenames are load-bearing:
+# see the wiring table in the Gem instructions. Do not rename this file.
+# Holds: references/operators.md
+
+
+========================================================================
+SOURCE: references/operators.md
+========================================================================
+
+# Operators catalog
+
+Each section of a prompt is an operator (P1): it amplifies some readings, suppresses others, with a strength and a place. Draft every section as a choice — amplifies, suppresses, mixes, strength, place, interference with neighbors; the audit enforces it (`audit.txt`, D, E, F).
+
+## Profiles of the standard sections
+
+Strong operators set the subspace all later ones act in and lose the most if placed late (P2); mid operators project within it; weak ones close.
+
+| Operator | Amplifies | Suppresses | Strength | Place |
+|---|---|---|---|---|
+| Role / persona | readings consistent with the role's expertise, vocabulary, norms | off-domain readings, generic-helper output | strong | first, unless another section must dominate |
+| Domain / context | the domain's vocabulary and reasoning; mixes when hybrid | cross-domain analogies | strong | front, after or merged with persona |
+| Identity (personas) | traits, style, norms | drift to generic-assistant defaults | strong | first; may recur for drift resistance |
+| Task definition | the task type's patterns; mixes when novel | tangential output, filler | mid to strong, rising with definition | after persona / domain |
+| Constraints / rules | outputs satisfying them | outputs violating them | mid each; scales with count | after the task, most important first |
+| Contracts / outline / methodology | the structural choices | structural drift | mid — stronger as "do not deviate" | after the task |
+| Procedure / checkpoints | checkpoint-aware progress | unbounded exploration | mid | after the contracts |
+| Format / output structure | the format | other formats | weak on content, strong on format | near the end — except one-shot extraction, where it may lead |
+| Style rules | the stated style | off-style output | weak | late, unless style is the deliverable |
+| Communication contract | the named patterns | undesired patterns | weak to mid | late |
+| Few-shot examples | the demonstrated patterns — unstated ones included | patterns absent from the examples | very high for what is shown, weak for everything else | after the rules they exemplify, before the task |
+| Anti-examples | awareness of the shown failures | those failures | mid to high for the failures shown | after positive examples |
+| Failure modes (DO NOT) | avoidance of the named failures | the named failures — never cleanly (P11) | mid | grouped near the end |
+| Worked examples (loops) | the canonical shape of behavior | divergent shapes | very high for shape, weak for content | end of the contracts they exemplify |
+
+## Notes per operator
+
+- **Persona position is load-bearing (P2):** "you are a security engineer, be concise" and the reverse are different prompts; too specific overconstrains, "helpful assistant" wastes the slot (`shapes.txt`, Shape 5).
+- **Constraints carry their because (P10):** the bare rule projects only on the cases it names, the reason keeps projecting where the author never anticipated; principle-plus-rationale over enumeration, which over-projects on capable substrates (P9). Strength scales with count: the minimal scaffold caps constraints and stacks interfere (below).
+- **Contracts** revisable in engineering prompts (`audit.txt`, domain checks). **Format** phrasing per runtime: `shapes.txt`, Structured output and prefill.
+- **Few-shot examples:** quality over quantity; a silent judgment call inside one becomes a rule the model reverse-engineers — audit them as operators (C3). **Anti-examples** sparingly: they cost tokens and prime what they show (P11).
+- **DO NOT bullets:** one known sharp edge each, with its consequence; generic warnings prime twice over; positive framing for behavior-shaping, negation for lockdown and real sharp edges, with rationale and, on legacy tiers, repetition (P10, P11).
+
+## Doubt operators: abstention and clarification-seeking
+
+Two responses to doubt, split by deployment (P3). Abstention is the floor, always baked in; clarification-seeking is the upgrade, only where the *generating user* confirmed at build time that a user is present (`shapes.txt`, deployment context) — never inferred by the runtime agent.
+
+**Permission to abstain** — amplifies calibrated honesty about the input's limits (null, "inconclusive", "insufficient information"); suppresses fabricated specifics. Mid strength, one sentence, the most cost-effective anti-hallucination operator; near the constraints; critical for Shapes 2, 4, 6, less for 5 (refusals) and 1 (open questions in handoffs). Vague permission ("be honest about uncertainty") fails — name it: "if the data is insufficient to draw conclusions, say so rather than speculating"; "if the input doesn't clearly contain [element], return null rather than guessing"; "if you cannot confidently score this against the rubric, return 'inconclusive' with reasoning". A prompt that *requires* an answer optimizes for confident answers, wrong ones included.
+
+**Clarification-seeking** — amplifies resolving material forks by asking the present user before a wrong assumption spoils the output; suppresses silent guessing a human could have resolved cheaply. Mid, negative if over-applied; placed with the abstention it upgrades; default-relevant for Shapes 1 and 5, never unattended (one-shot pipeline, sub-agent under an orchestrator, batch grader): the agent is never told to ask a user who isn't there. Ask on a *material* fork (readings diverge in the output, asking is cheap relative to guessing wrong), one question at a time, with a recommended default. Abstention stays the fallback.
+
+**Bounded sufficiency self-check** (required whenever clarification is active): after each answer, fork closed → proceed, no redundant confirmation; open → one targeted follow-up naming what is unresolved; after about two rounds → abstention: best reading, flagged uncertainty, proceed or decline. Concretely: "Before proceeding, confirm the answer resolved [the fork]. If it did, continue. If a material gap remains, ask one targeted follow-up. After two rounds, proceed on your best reading and flag what remains uncertain." (`examine_answer` applied to the conversation — `cognitive-tools.txt`.) The audit fails (M3c): no self-check, unbounded self-check, no fallback.
+
+## Long-horizon operators (Shape 1; some Shape 4 workers on long tasks)
+
+Each earns its place only on a genuinely long run, traced to a real trigger (M5).
+
+| Operator | Amplifies | Suppresses | Place / gate |
+|---|---|---|---|
+| Progress-claim grounding — strong on long runs | evidence-backed status: every claim auditable against a tool result; unverified work reported as unverified; failures with their output | fabricated status, optimistic summaries of skipped steps | with the status contract, *before* any "report concisely" — grounding constrains what may be claimed before brevity compresses it |
+| Checkpoint policy — mid | pausing only where the human is required: destructive or irreversible actions, real scope changes, input only the user has | permission-seeking on reversible actions; enumerating every pause case (a brief policy beats the list on strong tiers, P9) | loop-contract section, with anti-early-stopping |
+| Anti-early-stopping — mid, rising on very long sessions | finishing the turn's work: an ending that is a plan, a self-answerable question or a promise ("I'll now run X") becomes the tool calls that do X | text-only intent; unsanctioned permission requests | with the checkpoint policy — one pause contract: stop only at real checkpoints, never on a promise |
+| Memory-file conventions — weak per turn, compounding | durable, deduplicated lessons: one per entry with a one-line summary; corrections and confirmed approaches recorded with *why*; notes updated, wrong ones deleted | bloat, stale contradictions, re-recording what the repo or the conversation history already holds | the memory specification |
+| Deviations log — mid | a collapse rule for mid-run ambiguity (P3): proceed on the most probable reading (the conservative one among near-ties), record it under "Deviations" in the implementation-notes file, continue | silent divergence, and halting on every unknown — the runtime complement of the interview | with the memory conventions; the next plan revision starts there |
+| Verbatim user-channel (send-to-user) — weak to mid | mid-run delivery of content the user must read exactly (a partial deliverable, a direct answer, numbers) through a tool whose input renders verbatim | burying it in narration | the tool alone under-fires: pair it with elicitation language ("when you have content the user must read verbatim, call send_to_user; not for narration"); flagged harness-dependent at delivery; omit when the harness has no such tool |
+| Persistence / capability-prior correction — mid, rising with difficulty | continuing past initial failure on hard, verifiable problems: dead ends as exploration data, the agent's negative self-assessment re-examined before abandoning | premature abandonment driven by the trained prior that famous hard problems are out of reach (in frontier-research runs the prior, not capability, was binding) | with the pause contract, as its discovery-run sibling. **Gate:** only with strong verification (validators, tests, formal or numerical checks) — more *attempts*, never lower *evidence*; M5 trigger: an open-ended-discovery signal; routine loops get none |
+| Lead-with-outcome — weak | the first sentence of a final human-facing message answers "what happened"; detail after; selectivity over compression; session shorthand dropped | working-thread continuations delivered as summaries | the final-report contract of Shapes 1 and 4; one sentence usually suffices on strong tiers; not for mid-run narration, and not for inter-agent output (`agent-teams.txt (§ agent-output)`) |
+
+## Interference pairs (P4)
+
+The audit examines every adjacent pair likely to interact (check F); the known ones:
+
+| Pair | Constructive | Destructive |
+|---|---|---|
+| Persona + tone | "expert + dry" gives a recognizable Stack-Overflow voice | "warm + brutally honest" cancels — the model is neither |
+| Format + reasoning visibility | structured output with a reasoning field | "JSON" + "show your reasoning" without a field → inconsistent structure |
+| Multiple personas | cross-cutting review, when wanted | "security engineer AND UX designer" is one different operator, not two reviews — mode collapse |
+| Constraint stacking | — | "concise" + "thorough" cancels; "concise" + "cover all error cases" collapses to one |
+| Refusal + warm tone | — | the warmth softens the refusal until it isn't one |
+
+## The default operator sequence (P2)
+
+1 Identity / persona · 2 Domain / context (often merged) · 3 Task definition · 4 Constraints (abstention and its upgrade here) · 5 Few-shot examples · 6 Procedure / checkpoints (loops) · 7 Failure modes (high-attention end) · 8 Output format (last unless dominant) · 9 Worked examples · 10 Done definition / start instruction (terminal projection). Strongest first, mid next, weak last; departures carry a reason; the interview asks in the same order (`shapes.txt`).
