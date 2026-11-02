@@ -1,4 +1,4 @@
-import{t as n,i as H,m as N,s as S,a as x,b as B,c as O,o as R,d as w,e as U,l as j}from"./site.config-BLObtfzG.js";const G=e=>e.replace(/[&<>"]/g,t=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[t]),$="prometheus:runtime",V=new Set;let u=(()=>{try{return localStorage.getItem($)==="gem"?"gem":"agentic"}catch{return"agentic"}})();function D(){const e=document.createElement("fieldset");e.className="rr-pill",e.innerHTML=`
+import{t as n,i as H,m as N,s as S,a as x,b as B,c as O,o as R,d as w,e as U,l as j}from"./site.config-BjfUZenc.js";const G=e=>e.replace(/[&<>"]/g,t=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[t]),$="prometheus:runtime",V=new Set;let u=(()=>{try{return localStorage.getItem($)==="gem"?"gem":"agentic"}catch{return"agentic"}})();function D(){const e=document.createElement("fieldset");e.className="rr-pill",e.innerHTML=`
     <legend class="mono" data-i18n="rr.runtime">${n("rr.runtime")}</legend>
     <div class="rr-pill__opts">
       <label><input type="radio" name="runtime" value="agentic"><span data-i18n="rr.runtime.agentic">${n("rr.runtime.agentic")}</span></label>
