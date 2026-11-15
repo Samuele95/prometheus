@@ -18,7 +18,7 @@ Infer, never route: from the request's signals (verbs, nouns, scale markers, too
 
 ### Cap and conduct
 
-- **Six flat questions max**, disambiguation included: three universal plus 2–3 shape-specific; a seventh → default it, state the assumption in the collapse block.
+- **Six flat questions max**, disambiguation included: three universal (four on engineering requests, the verification budget asked first — SKILL.md, Phase 2) plus 2–3 shape-specific, the cap unchanged; a seventh → default it, state the assumption in the collapse block.
 - **Broadest first, narrowest last** — question order is operator order (P2). **One flat question per turn.**
 - **Skip the obvious.** What the user specified, by mention or clear inference, is not re-asked — that re-measures a collapsed state (P5): "production pipeline" → no reasoning visibility; "custom GPT" → conversational; "grader" / "1-N scale" → judge, structured output; "multi-stage" → chain. Every skipped question's assumption goes in the collapse block.
 - **Co-authoring passes (Shapes 3, 6, 7) don't count against the cap**: each replaces 1–2 flat questions with a structured exchange at one decision point and **proposes first, asks second** — a candidate (decomposition, roster, anchor) precedes any request to specify. Past ~4 turns, propose a default with confidence.
@@ -29,6 +29,8 @@ Infer, never route: from the request's signals (verbs, nouns, scale markers, too
 **Tool / runtime** — "Where will this run? (Claude Code, Gemini CLI, OpenAI API, Anthropic API, generic, other?)" Sets the memory-file name, message structure, affordances, the tier. Skip if named.
 
 **Done definition** — "How will you know it worked? Checkable, not vibe-based; 2–4 items." Becomes the rubric the draft is evaluated against; when familiarity is unstated and the task non-trivial, extend it ("…and your experience with this domain, so I know which assumptions to spell out?") rather than adding a question. Skip only if the user already gave checkable criteria.
+
+**Verification budget** (Engineering domain) — the universal question asked first, not last; text, skip and default in SKILL.md, Phase 2. Never merged into the done definition: a checkable *done* says what is verified at the end, not how often along the way. The answer sets the budget (SKILL.md, Universal drafting rules).
 
 **Deployment context** — whenever behavior under doubt matters: "When the agent hits an ambiguity it can't resolve from the input, is a user present to answer, or does it run unattended (pipeline, batch, called by another agent)? If present — ask on material forks, or best call and flag?" The one fact the framework can't infer and the runtime agent can't judge; the answer selects the doubt operators (`references/operators.md`; M3b). A contradiction with the runtime answer (clarification for a batch pipeline) is flagged, not silently resolved. Skip only when unambiguous (a batch grader, a tutor) — and still state the assumption.
 
@@ -115,7 +117,7 @@ A loop whose checkpoints use one-shot extraction prompts; a workflow ending in a
 
 ## Domain axis (orthogonal to shape)
 
-Domain modifies section *content*, not which sections exist. **Engineering**: concrete stack, revisable contracts, tooling failure modes. **Research**: source-quality rules, citations, methodology. **Writing**: voice / register / audience, exemplars, length anchors. **Ops**: safety boundaries, audit trails, rollback. **Generic**: minimal. Checks in `references/audit.md`.
+Domain modifies section *content*, not which sections exist. **Engineering**: concrete stack, revisable contracts, tooling failure modes, verification at the stated budget. **Research**: source-quality rules, citations, methodology. **Writing**: voice / register / audience, exemplars, length anchors. **Ops**: safety boundaries, audit trails, rollback. **Generic**: minimal. Checks in `references/audit.md`.
 
 ## Minimum-viable scaffold
 

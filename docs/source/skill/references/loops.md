@@ -21,7 +21,7 @@ Establish both in the interview (question 6) and encode them; each row changes t
 | Scheduled | a time interval | the user cancels, or the work completes | interval matched to how often the watched input changes; each firing needs a standalone-complete prompt |
 | Proactive / event-driven | an external event or standing routine | per-task goal conditions; runs until disabled | composes the rows above: a schedule checks for inputs, a goal condition defines completion, verification is checks the agent runs itself |
 
-Two cross-cutting rules: verification is *quantitative checks the agent can execute* (run the tests, measure, screenshot and inspect), never self-assessment — "never report changes complete on edit success alone"; deterministic sub-work goes to scripts.
+Two cross-cutting rules: verification is *quantitative checks the agent can execute* (run the tests, measure, screenshot and inspect), never self-assessment — "never report changes complete on edit success alone" — the rule fixes the *kind* of evidence, the verification budget (SKILL.md, Universal drafting rules) how often it is gathered: at *none* the status reads "unverified", and a goal-based stop then needs a non-test condition or the conflict is flagged in the collapse block; deterministic sub-work goes to scripts.
 
 ## Interview
 
@@ -30,4 +30,4 @@ Ask 2–3, broadest first (universal questions in `references/shapes.md`): 1 Sco
 ## Shape-specific rules
 
 - *Loop ceremony tax* — full ritual on every turn regardless of stakes; cured by the routine / boundary tiering (J).
-- Checks H, I, Ib, J, K, L and the Verify lines: `references/audit.md`; cognitive tools per checkpoint: `references/cognitive-tools.md`; the verifier-after-each-checkpoint loop: `references/evals.md`.
+- Checks H, I, Ib, J, K, L and the Verify lines: `references/audit.md`; cognitive tools per checkpoint: `references/cognitive-tools.md`; the runtime verifier loop and its cadence: `references/evals.md`.

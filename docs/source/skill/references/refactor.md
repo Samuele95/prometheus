@@ -36,6 +36,7 @@ No symptom + audit request → **A**. A localizable symptom → **B**. An explic
 | Workers overlap (Shape 7) | weak scope lockdown; weak contracts; vague dispatches |
 | Calibration collapse (Shape 6) | anchors missing at intermediate levels or too similar; reasoning after the score |
 | Output contradicts stated rules | destructive constraint stacking; rule buried mid-prompt |
+| Engineering workflow tests after every change, spending tokens and time the user did not ask for | no stated verification budget, so every checkpoint and gate verifies at maximum — treatment is **subtractive**: set the budget (SKILL.md, Universal drafting rules), strike the test steps and gates above it |
 | Authored for a weaker model, now over-triggers tools, over-structures, ignores its own defaults | over-specification: operators that corrected a failure the substrate no longer has now over-project (P9) — treatment is **subtractive**: strike-and-test, starting with intensity language ("CRITICAL/MUST use…" → "Use… when…") and enumerated lists replaceable by one general instruction |
 
 Per cause, one edit: **type** (add / modify / reorder / remove), **diff** (before and after), **rationale** (one sentence). Above ~20% of the prompt's length the framework has drifted into C — pause and ask.
