@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{{meta.title}}</title>
+    <meta name="description" content="{{meta.description}}" />
+    <meta name="theme-color" content="#05040b" />
+    <meta name="color-scheme" content="dark" />
+    <link rel="canonical" href="https://samuele95.github.io/prometheus/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Prometheus" />
+    <meta property="og:title" content="{{meta.og-title}}" />
+    <meta property="og:description" content="{{meta.og-description}}" />
+    <meta property="og:image" content="https://samuele95.github.io/prometheus/og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="{{meta.og-image-text}}" />
+    <meta property="og:url" content="https://samuele95.github.io/prometheus/" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <link rel="preload" href="./fonts/bodoni-moda-latin-opsz-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="./fonts/stix-two-text-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="./fonts/geist-mono-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <style>html{background:#05040b}</style>
+    <script type="module" src="./src/main.ts"></script>
+  </head>
+  <body class="site">
+    <a class="skip-link" href="#main" data-copy="nav.skip">{{nav.skip}}</a>
+
+    <div class="fx fx--intro" data-fx="intro" aria-hidden="true"><p class="intro__skip label" data-copy="intro.skip">{{intro.skip}}</p></div>
+    <div class="fx fx--rings" data-fx="rings" aria-hidden="true"></div>
+    <div class="grain" aria-hidden="true"></div>
+    <div class="vignette" aria-hidden="true"></div>
+
+    <div class="film" data-film hidden>
+      <div class="film__stage" data-film-stage aria-hidden="true"></div>
+      <div class="film__bars" aria-hidden="true"><span></span><span></span></div>
+      <div class="film__gate" data-film-gate>
+        <img class="film__gate-art" src="./brand/intro.svg" alt="" width="300" height="240" />
+        <div class="film__doors">
+          <button type="button" class="btn btn--primary" data-door="sound" data-copy="film.enter-sound">{{film.enter-sound}}</button>
+          <button type="button" class="btn btn--ghost" data-door="silent" data-copy="film.enter-silent">{{film.enter-silent}}</button>
+        </div>
+        <button type="button" class="film__link label" data-read-page data-copy="film.read-page">{{film.read-page}}</button>
+      </div>
+      <header class="film__hud">
+        <a class="film__home" href="#hero" data-film-home aria-label="Prometheus, back to the start"><img src="./brand/lockup-horizontal.svg" alt="" width="200" height="32" /></a>
+        <p class="film__chapter label" aria-live="polite"><span data-film-counter>01 / 06</span> <span data-film-chapter></span></p>
+        <div class="film__tools">
+          <button type="button" class="film__tool label" data-sound data-on="{{film.sound-on}}" data-off="{{film.sound-off}}" aria-pressed="false" data-copy="film.sound-off">{{film.sound-off}}</button>
+          <button type="button" class="film__tool label" data-read-page data-copy="film.read-page">{{film.read-page}}</button>
+          <a class="film__tool label" href="./docs.html" data-copy="nav.docs">{{nav.docs}}</a>
+        </div>
+      </header>
+      <main class="film__captions" data-film-captions aria-live="polite"></main>
+      <nav class="film__ticks" aria-label="Chapters">
+        <ol>
+          <li><button type="button" data-chapter="0"><span class="sr-only" data-copy="film.chapter-0">{{film.chapter-0}}</span></button></li>
+          <li><button type="button" data-chapter="1"><span class="sr-only" data-copy="film.chapter-1">{{film.chapter-1}}</span></button></li>
+          <li><button type="button" data-chapter="2"><span class="sr-only" data-copy="film.chapter-2">{{film.chapter-2}}</span></button></li>
+          <li><button type="button" data-chapter="3"><span class="sr-only" data-copy="film.chapter-3">{{film.chapter-3}}</span></button></li>
+          <li><button type="button" data-chapter="4"><span class="sr-only" data-copy="film.chapter-4">{{film.chapter-4}}</span></button></li>
+          <li><button type="button" data-chapter="5"><span class="sr-only" data-copy="film.chapter-5">{{film.chapter-5}}</span></button></li>
+        </ol>
+      </nav>
+      <p class="film__advance label" data-film-advance data-copy="film.advance">{{film.advance}}</p>
+      <ol class="film__lexicon" hidden aria-hidden="true">
+        <li data-k="request-label" data-copy="film.request-label">{{film.request-label}}</li>
+        <li data-k="request" data-copy="film.request">{{film.request}}</li>
+        <li data-k="reading-1" data-copy="film.reading-1">{{film.reading-1}}</li>
+        <li data-k="reading-2" data-copy="film.reading-2">{{film.reading-2}}</li>
+        <li data-k="reading-3" data-copy="film.reading-3">{{film.reading-3}}</li>
+        <li data-k="reading-4" data-copy="film.reading-4">{{film.reading-4}}</li>
+        <li data-k="reading-5" data-copy="film.reading-5">{{film.reading-5}}</li>
+        <li data-k="reading-6" data-copy="film.reading-6">{{film.reading-6}}</li>
+        <li data-k="alg-1" data-copy="film.alg-1">{{film.alg-1}}</li>
+        <li data-k="alg-2" data-copy="film.alg-2">{{film.alg-2}}</li>
+        <li data-k="alg-3" data-copy="film.alg-3">{{film.alg-3}}</li>
+        <li data-k="alg-4" data-copy="film.alg-4">{{film.alg-4}}</li>
+        <li data-k="f-1" data-copy="film.f-1">{{film.f-1}}</li>
+        <li data-k="f-2" data-copy="film.f-2">{{film.f-2}}</li>
+        <li data-k="f-3" data-copy="film.f-3">{{film.f-3}}</li>
+        <li data-k="f-4" data-copy="film.f-4">{{film.f-4}}</li>
+        <li data-k="f-5" data-copy="film.f-5">{{film.f-5}}</li>
+        <li data-k="f-6" data-copy="film.f-6">{{film.f-6}}</li>
+        <li data-k="f-7" data-copy="film.f-7">{{film.f-7}}</li>
+        <li data-k="chapter-card" data-copy="film.chapter-card">{{film.chapter-card}}</li>
+      </ol>
+      <div class="film__card" data-film-card aria-hidden="true"><p class="film__card-kicker label"></p><p class="film__card-num"></p><p class="film__card-name"></p></div>
+      <ol class="film__plates" hidden aria-hidden="true">
+        <li data-copy="film.plate-1">{{film.plate-1}}</li><li data-copy="film.plate-2">{{film.plate-2}}</li><li data-copy="film.plate-3">{{film.plate-3}}</li>
+        <li data-copy="film.plate-4">{{film.plate-4}}</li><li data-copy="film.plate-5">{{film.plate-5}}</li>
+        <li data-copy="film.plate-label">{{film.plate-label}}</li>
+      </ol>
+      <div class="film__cursor" aria-hidden="true"></div>
+    </div>
+
+    <header class="nav" data-fx-host="nav-state">
+      <a class="nav__home" href="#hero" aria-label="Prometheus, back to the start">
+        <img src="./brand/lockup-horizontal.svg" alt="" width="246" height="40" />
+      </a>
+      <nav class="nav__links" aria-label="Sections">
+        <a href="#thesis" data-copy="nav.link-1">{{nav.link-1}}</a>
+        <a href="#arcana" data-copy="nav.link-2">{{nav.link-2}}</a>
+        <a href="#rite" data-copy="nav.link-3">{{nav.link-3}}</a>
+        <a href="#modes" data-copy="nav.link-4">{{nav.link-4}}</a>
+        <a href="#ignite" data-copy="nav.link-5">{{nav.link-5}}</a>
+      </nav>
+      <button type="button" class="nav__film mono" data-watch-film hidden data-copy="film.watch-film">{{film.watch-film}}</button>
+      <a class="nav__docs mono" href="./docs.html" data-copy="nav.docs">{{nav.docs}}</a>
+    </header>
+
+    <main id="main" tabindex="-1">
+      <section id="hero" class="section hero" data-section="hero" aria-labelledby="hero-title">
+        <div class="fx fx--cloud" data-fx="point-cloud" aria-hidden="true">
+          <img class="hero__mark" src="./brand/mark.svg" alt="" width="520" height="520" />
+        </div>
+        <div class="hero__copy">
+          <p class="label" data-copy="hero.eyebrow">{{hero.eyebrow}}</p>
+          <h1 id="hero-title" class="display-xl">
+            <span class="line" data-copy="hero.title">{{hero.title}}</span>
+            <span class="line line--ember" data-copy="hero.title-2">{{hero.title-2}}</span>
+          </h1>
+          <p class="lead hero__body" data-copy="hero.body">{{hero.body}}</p>
+          <div class="hero__ctas">
+            <a class="btn btn--primary" href="#ignite" data-copy="hero.cta-primary">{{hero.cta-primary}}</a>
+            <a class="btn btn--ghost" href="./docs.html" data-copy="hero.cta-secondary">{{hero.cta-secondary}}</a>
+          </div>
+        </div>
+        <button type="button" class="hero__hint label" data-fx="measure-hint" data-copy="hero.hint">{{hero.hint}}</button>
+      </section>
+
+      <section id="thesis" class="section thesis" data-section="thesis" aria-labelledby="thesis-title">
+        <p class="label" data-copy="thesis.label">{{thesis.label}}</p>
+        <h2 id="thesis-title" class="display">
+          <span class="line" data-copy="thesis.title">{{thesis.title}}</span>
+          <span class="line" data-copy="thesis.title-2">{{thesis.title-2}}</span>
+        </h2>
+        <ol class="thesis__lines" data-fx="operator-lines">
+          <li class="lead" data-copy="thesis.line-1">{{thesis.line-1}}</li>
+          <li class="lead" data-copy="thesis.line-2">{{thesis.line-2}}</li>
+          <li class="lead" data-copy="thesis.line-3" data-holo-word="measured">{{thesis.line-3}}</li>
+        </ol>
+        <p class="thesis__coda" data-copy="thesis.coda">{{thesis.coda}}</p>
+      </section>
+
+      <section id="arcana" class="section arcana" data-section="arcana" aria-labelledby="arcana-title">
+        <p class="label" data-copy="arcana.label">{{arcana.label}}</p>
+        <h2 id="arcana-title" class="display">
+          <span class="line" data-copy="arcana.title">{{arcana.title}}</span>
+          <span class="line" data-copy="arcana.title-2">{{arcana.title-2}}</span>
+        </h2>
+        <p class="lead arcana__intro" data-copy="arcana.intro">{{arcana.intro}}</p>
+        <ol class="arcana__deck" data-fx="arcana-cards">
+          <li class="card">
+            <article class="card__inner" tabindex="0">
+              <div class="card__face card__front">
+                <p class="card__numeral" data-copy="arcana.card-1-numeral">{{arcana.card-1-numeral}}</p>
+                <svg class="card__glyph" viewBox="0 0 64 64" aria-hidden="true"><path d="M42 14.7A20 20 0 1 1 25.2 13.2"/><circle class="dot" cx="42" cy="14.7" r="2.4"/></svg>
+                <h3 class="card__name" data-copy="arcana.card-1-name">{{arcana.card-1-name}}</h3>
+                <p class="card__shape label" data-copy="arcana.card-1-shape">{{arcana.card-1-shape}}</p>
+              </div>
+              <div class="card__face card__back"><p data-copy="arcana.card-1-meaning">{{arcana.card-1-meaning}}</p></div>
+            </article>
+          </li>
+          <li class="card">
+            <article class="card__inner" tabindex="0">
+              <div class="card__face card__front">
+                <p class="card__numeral" data-copy="arcana.card-2-numeral">{{arcana.card-2-numeral}}</p>
+                <svg class="card__glyph" viewBox="0 0 64 64" aria-hidden="true"><path d="M32 8V56M26 15L32 8L38 15"/><circle cx="32" cy="35" r="6"/></svg>
+                <h3 class="card__name" data-copy="arcana.card-2-name">{{arcana.card-2-name}}</h3>
+                <p class="card__shape label" data-copy="arcana.card-2-shape">{{arcana.card-2-shape}}</p>
+              </div>
+              <div class="card__face card__back"><p data-copy="arcana.card-2-meaning">{{arcana.card-2-meaning}}</p></div>
+            </article>
+          </li>
+          <li class="card">
+            <article class="card__inner" tabindex="0">
+              <div class="card__face card__front">
+                <p class="card__numeral" data-copy="arcana.card-3-numeral">{{arcana.card-3-numeral}}</p>
+                <svg class="card__glyph" viewBox="0 0 64 64" aria-hidden="true"><path d="M32 19V27M32 37V45"/><circle cx="32" cy="14" r="5"/><circle cx="32" cy="32" r="5"/><circle cx="32" cy="50" r="5"/></svg>
+                <h3 class="card__name" data-copy="arcana.card-3-name">{{arcana.card-3-name}}</h3>
+                <p class="card__shape label" data-copy="arcana.card-3-shape">{{arcana.card-3-shape}}</p>
+              </div>
+              <div class="card__face card__back"><p data-copy="arcana.card-3-meaning">{{arcana.card-3-meaning}}</p></div>
+            </article>
+          </li>
+          <li class="card">
+            <article class="card__inner" tabindex="0">
+              <div class="card__face card__front">
+                <p class="card__numeral" data-copy="arcana.card-4-numeral">{{arcana.card-4-numeral}}</p>
+                <svg class="card__glyph" viewBox="0 0 64 64" aria-hidden="true"><path d="M12 26A20 20 0 0 0 52 26"/><circle cx="32" cy="27" r="6"/><path d="M32 41V52"/></svg>
+                <h3 class="card__name" data-copy="arcana.card-4-name">{{arcana.card-4-name}}</h3>
+                <p class="card__shape label" data-copy="arcana.card-4-shape">{{arcana.card-4-shape}}</p>
+              </div>
+              <div class="card__face card__back"><p data-copy="arcana.card-4-meaning">{{arcana.card-4-meaning}}</p></div>
+            </article>
+          </li>
+          <li class="card">
+            <article class="card__inner" tabindex="0">
+              <div class="card__face card__front">
+                <p class="card__numeral" data-copy="arcana.card-5-numeral">{{arcana.card-5-numeral}}</p>
+                <svg class="card__glyph" viewBox="0 0 64 64" aria-hidden="true"><circle cx="25" cy="32" r="13"/><circle cx="39" cy="32" r="13"/><path d="M8 32H56"/></svg>
+                <h3 class="card__name" data-copy="arcana.card-5-name">{{arcana.card-5-name}}</h3>
+                <p class="card__shape label" data-copy="arcana.card-5-shape">{{arcana.card-5-shape}}</p>
+              </div>
+              <div class="card__face card__back"><p data-copy="arcana.card-5-meaning">{{arcana.card-5-meaning}}</p></div>
+            </article>
+          </li>
+          <li class="card">
+            <article class="card__inner" tabindex="0">
+              <div class="card__face card__front">
+                <p class="card__numeral" data-copy="arcana.card-6-numeral">{{arcana.card-6-numeral}}</p>
+                <svg class="card__glyph" viewBox="0 0 64 64" aria-hidden="true"><path d="M32 12V54M22 54H42M10 18H54M12 18V30M52 18V30M5 30A7 7 0 0 0 19 30ZM45 30A7 7 0 0 0 59 30Z"/></svg>
+                <h3 class="card__name" data-copy="arcana.card-6-name">{{arcana.card-6-name}}</h3>
+                <p class="card__shape label" data-copy="arcana.card-6-shape">{{arcana.card-6-shape}}</p>
+              </div>
+              <div class="card__face card__back"><p data-copy="arcana.card-6-meaning">{{arcana.card-6-meaning}}</p></div>
+            </article>
+          </li>
+          <li class="card">
+            <article class="card__inner" tabindex="0">
+              <div class="card__face card__front">
+                <p class="card__numeral" data-copy="arcana.card-7-numeral">{{arcana.card-7-numeral}}</p>
+                <svg class="card__glyph" viewBox="0 0 64 64" aria-hidden="true"><circle class="faint" cx="32" cy="32" r="19"/><circle class="dot" cx="32" cy="32" r="3.4"/><circle class="dot" cx="32" cy="13" r="2.6"/><circle class="dot" cx="48.5" cy="22.5" r="2.6"/><circle class="dot" cx="48.5" cy="41.5" r="2.6"/><circle class="dot" cx="32" cy="51" r="2.6"/><circle class="dot" cx="15.5" cy="41.5" r="2.6"/><circle class="dot" cx="15.5" cy="22.5" r="2.6"/></svg>
+                <h3 class="card__name" data-copy="arcana.card-7-name">{{arcana.card-7-name}}</h3>
+                <p class="card__shape label" data-copy="arcana.card-7-shape">{{arcana.card-7-shape}}</p>
+              </div>
+              <div class="card__face card__back"><p data-copy="arcana.card-7-meaning">{{arcana.card-7-meaning}}</p></div>
+            </article>
+          </li>
+        </ol>
+        <p class="arcana__hint label" data-copy="arcana.hint">{{arcana.hint}}</p>
+      </section>
+
+      <section id="rite" class="section rite" data-section="rite" aria-labelledby="rite-title">
+        <p class="label" data-copy="rite.label">{{rite.label}}</p>
+        <h2 id="rite-title" class="display">
+          <span class="line" data-copy="rite.title">{{rite.title}}</span>
+          <span class="line" data-copy="rite.title-2">{{rite.title-2}}</span>
+        </h2>
+        <div class="rite__stage">
+          <div class="fx fx--arc" data-fx="rite-procession" aria-hidden="true"></div>
+          <ol class="rite__stations">
+            <li class="station"><span class="station__num mono">01</span><h3 class="station__name" data-copy="rite.station-1-name">{{rite.station-1-name}}</h3><p data-copy="rite.station-1-line">{{rite.station-1-line}}</p></li>
+            <li class="station"><span class="station__num mono">02</span><h3 class="station__name" data-copy="rite.station-2-name">{{rite.station-2-name}}</h3><p data-copy="rite.station-2-line">{{rite.station-2-line}}</p></li>
+            <li class="station"><span class="station__num mono">03</span><h3 class="station__name" data-copy="rite.station-3-name">{{rite.station-3-name}}</h3><p data-copy="rite.station-3-line">{{rite.station-3-line}}</p></li>
+            <li class="station"><span class="station__num mono">04</span><h3 class="station__name" data-copy="rite.station-4-name">{{rite.station-4-name}}</h3><p data-copy="rite.station-4-line">{{rite.station-4-line}}</p></li>
+            <li class="station"><span class="station__num mono">05</span><h3 class="station__name" data-copy="rite.station-5-name">{{rite.station-5-name}}</h3><p data-copy="rite.station-5-line">{{rite.station-5-line}}</p></li>
+            <li class="station station--verify"><span class="station__num mono">06</span><h3 class="station__name" data-copy="rite.station-6-name">{{rite.station-6-name}}</h3><p data-copy="rite.station-6-line">{{rite.station-6-line}}</p></li>
+          </ol>
+        </div>
+        <div class="verify">
+          <p class="label" data-copy="rite.verify-label">{{rite.verify-label}}</p>
+          <ul class="verify__layers">
+            <li data-copy="rite.verify-1">{{rite.verify-1}}</li>
+            <li data-copy="rite.verify-2">{{rite.verify-2}}</li>
+            <li data-copy="rite.verify-3">{{rite.verify-3}}</li>
+          </ul>
+        </div>
+      </section>
+
+      <section id="modes" class="section modes" data-section="modes" aria-labelledby="modes-title">
+        <p class="label" data-copy="modes.label">{{modes.label}}</p>
+        <h2 id="modes-title" class="display">
+          <span class="line" data-copy="modes.title">{{modes.title}}</span>
+          <span class="line" data-copy="modes.title-2">{{modes.title-2}}</span>
+        </h2>
+        <ol class="modes__triptych" data-fx="modes-triptych">
+          <li class="mode"><p class="mode__numeral" data-copy="modes.mode-1-numeral">{{modes.mode-1-numeral}}</p><h3 class="mode__name" data-copy="modes.mode-1-name">{{modes.mode-1-name}}</h3><p data-copy="modes.mode-1-line">{{modes.mode-1-line}}</p></li>
+          <li class="mode"><p class="mode__numeral" data-copy="modes.mode-2-numeral">{{modes.mode-2-numeral}}</p><h3 class="mode__name" data-copy="modes.mode-2-name">{{modes.mode-2-name}}</h3><p data-copy="modes.mode-2-line">{{modes.mode-2-line}}</p></li>
+          <li class="mode"><p class="mode__numeral" data-copy="modes.mode-3-numeral">{{modes.mode-3-numeral}}</p><h3 class="mode__name" data-copy="modes.mode-3-name">{{modes.mode-3-name}}</h3><p data-copy="modes.mode-3-line">{{modes.mode-3-line}}</p></li>
+        </ol>
+      </section>
+
+      <section id="ignite" class="section ignite" data-section="ignite" aria-labelledby="ignite-title">
+        <p class="label" data-copy="ignite.label">{{ignite.label}}</p>
+        <h2 id="ignite-title" class="display">
+          <span class="line" data-copy="ignite.title">{{ignite.title}}</span>
+          <span class="line line--ember" data-copy="ignite.title-2">{{ignite.title-2}}</span>
+        </h2>
+        <ol class="ignite__steps">
+          <li data-copy="ignite.step-1">{{ignite.step-1}}</li>
+          <li data-copy="ignite.step-2">{{ignite.step-2}}</li>
+          <li data-copy="ignite.step-3">{{ignite.step-3}}</li>
+        </ol>
+        <div class="terminal" data-fx="ignite-command">
+          <pre class="terminal__pre" tabindex="0"><code data-copy="ignite.command">{{ignite.command}}</code></pre>
+          <button type="button" class="terminal__copy mono" data-copy="ignite.copy" data-copied="{{ignite.copied}}">{{ignite.copy}}</button>
+        </div>
+        <div class="runtimes">
+          <p class="label" data-copy="ignite.runtimes-label">{{ignite.runtimes-label}}</p>
+          <ul class="runtimes__list mono">
+            <li data-copy="ignite.runtime-1">{{ignite.runtime-1}}</li>
+            <li data-copy="ignite.runtime-2">{{ignite.runtime-2}}</li>
+            <li data-copy="ignite.runtime-3">{{ignite.runtime-3}}</li>
+            <li data-copy="ignite.runtime-4">{{ignite.runtime-4}}</li>
+            <li data-copy="ignite.runtime-5">{{ignite.runtime-5}}</li>
+          </ul>
+          <p class="runtimes__note" data-copy="ignite.gem-note">{{ignite.gem-note}}</p>
+        </div>
+        <div class="ignite__ctas">
+          <a class="btn btn--primary" href="https://github.com/Samuele95/prometheus/releases/latest/download/prometheus-skill.zip" data-copy="ignite.download">{{ignite.download}}</a>
+          <a class="btn btn--ghost" href="./docs.html" data-copy="ignite.docs">{{ignite.docs}}</a>
+        </div>
+      </section>
+    </main>
+
+    <footer id="colophon" class="colophon" data-section="colophon">
+      <img class="colophon__lockup" src="./brand/lockup-stacked.svg" alt="Prometheus" width="200" height="160" />
+      <p class="colophon__line" data-copy="colophon.line">{{colophon.line}}</p>
+      <ul class="colophon__links mono">
+        <li><a href="https://github.com/Samuele95/prometheus" rel="noopener" data-copy="colophon.repo">{{colophon.repo}}</a></li>
+        <li><a href="https://github.com/Samuele95/prometheus/blob/main/LICENSE" rel="noopener" data-copy="colophon.license">{{colophon.license}}</a></li>
+        <li><a href="./docs.html" data-copy="colophon.docs">{{colophon.docs}}</a></li>
+        <li><span data-copy="colophon.year">{{colophon.year}}</span></li>
+      </ul>
+    </footer>
+  </body>
+</html>

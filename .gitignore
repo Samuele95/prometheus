@@ -19,3 +19,8 @@ run-evidence/*.local.json
 **/memory/
 .env
 .env.*
+site/node_modules/
+site/dist/
+site-design/checks/
+site-design/movie/
+site-design/film-reel.jpg

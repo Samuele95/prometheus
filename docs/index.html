@@ -3,73 +3,322 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Prometheus — designs, audits and ships your agent’s prompt</title>
-    <link rel="preload" href="./assets/manrope-var-D34N9SOn.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="preload" href="./assets/fraunces-var-D35A2ec1.woff2" as="font" type="font/woff2" crossorigin />
-    <meta
-      name="description"
-      data-i18n-attr="content:meta.description"
-      content="For developers building agents: Prometheus interviews you, then designs and audits your agent's prompt, and ships it as ready-to-install files with a verifier."
-    />
-    <meta name="theme-color" content="#07060a" />
+    <title>Prometheus — a prompt is an operator</title>
+    <meta name="description" content="Prometheus is a build-time skill for coding agents. It interviews you, designs and audits your agent's prompt, and ships it as ready-to-install files with a verifier." />
+    <meta name="theme-color" content="#05040b" />
+    <meta name="color-scheme" content="dark" />
     <link rel="canonical" href="https://samuele95.github.io/prometheus/" />
     <meta property="og:type" content="website" />
-    <meta property="og:locale" content="en_US" />
-    <meta property="og:locale:alternate" content="it_IT" />
     <meta property="og:site_name" content="Prometheus" />
-    <meta property="og:title" content="Prometheus — your agent’s prompt, designed and audited" />
-    <meta
-      property="og:description"
-      content="A prompt isn’t a key. Each section is an operator. Prometheus interviews you, designs and audits your agent’s prompt, and ships it as ready-to-install files with a verifier."
-    />
-    <meta property="og:image" content="https://samuele95.github.io/prometheus/og.jpg" />
+    <meta property="og:title" content="Prometheus — a prompt is an operator" />
+    <meta property="og:description" content="Describe what your agent should do. Prometheus interviews you, designs the prompt section by section, audits it, and ships it with a verifier." />
+    <meta property="og:image" content="https://samuele95.github.io/prometheus/og.png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="A prompt is an operator, not a key." />
     <meta property="og:url" content="https://samuele95.github.io/prometheus/" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Prometheus — your agent’s prompt, designed and audited" />
-    <meta name="twitter:description" content="A prompt isn’t a key. Each section is an operator." />
-    <meta name="twitter:image" content="https://samuele95.github.io/prometheus/og.jpg" />
-    <meta name="color-scheme" content="dark" />
     <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
-    <style>
-      /* pre-boot shell: paints before any JS (values resolved from the slot at build time) */
-      html { background: #07060a; }
-      .preboot {
-        position: fixed; inset: 0; z-index: 80; display: grid; place-content: center;
-        background: #07060a; color: #b3a79b;
-        font: 12px/1.5 'JetBrains Mono', 'JetBrains Mono Fallback', 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: 0.22em;
-        text-transform: uppercase;
-      }
-      .preboot b { color: #ff7a1a; font-weight: 400; }
-      @media (prefers-reduced-motion: reduce) { .preboot { display: none; } }
-    </style>
-    <script type="module" crossorigin src="./assets/index-BTKWfaY6.js"></script>
-    <link rel="modulepreload" crossorigin href="./assets/site.config-BjfUZenc.js">
-    <link rel="modulepreload" crossorigin href="./assets/motion-HcuoLYGZ.js">
-    <link rel="stylesheet" crossorigin href="./assets/site-C3P1yoRr.css">
-    <link rel="stylesheet" crossorigin href="./assets/index-BDa205h5.css">
+    <link rel="preload" href="./fonts/bodoni-moda-latin-opsz-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="./fonts/stix-two-text-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="./fonts/geist-mono-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <style>html{background:#05040b}</style>
+    <script type="module" crossorigin src="./assets/index-Cpl-AmPk.js"></script>
+    <link rel="modulepreload" crossorigin href="./assets/base-CcLaH-W3.js">
+    <link rel="stylesheet" crossorigin href="./assets/base-21tCNjss.css">
+    <link rel="stylesheet" crossorigin href="./assets/index-CtZv2ei1.css">
   </head>
-  <body>
-    <div class="preboot" aria-hidden="true">
-      <span><b>●</b> PROMETHEUS</span>
-    </div>
-    <a class="skip-link" href="#main" data-i18n="hud.skip">Skip to content</a>
-    <div class="scene-layer" aria-hidden="true">
-      <div class="poster"></div>
-      <div class="lite-sweep"></div>
-    </div>
-    <main id="main" tabindex="-1"></main>
-    <noscript>
-      <div class="noscript">
-        <h1>Prometheus</h1>
-        <p>
-          For developers building agents: Prometheus interviews you, then designs and audits your agent’s
-          prompt, and ships it as ready-to-install files with a verifier. It is a skill you add to your coding
-          agent; what it produces, it never runs. The full documentation is in the
-          <a href="./docs.html">reading room</a>. This cinematic page needs JavaScript.
-        </p>
+  <body class="site">
+    <a class="skip-link" href="#main" data-copy="nav.skip">Skip to content</a>
+
+    <div class="fx fx--intro" data-fx="intro" aria-hidden="true"><p class="intro__skip label" data-copy="intro.skip">Press any key to skip</p></div>
+    <div class="fx fx--rings" data-fx="rings" aria-hidden="true"></div>
+    <div class="grain" aria-hidden="true"></div>
+    <div class="vignette" aria-hidden="true"></div>
+
+    <div class="film" data-film hidden>
+      <div class="film__stage" data-film-stage aria-hidden="true"></div>
+      <div class="film__bars" aria-hidden="true"><span></span><span></span></div>
+      <div class="film__gate" data-film-gate>
+        <img class="film__gate-art" src="./brand/intro.svg" alt="" width="300" height="240" />
+        <div class="film__doors">
+          <button type="button" class="btn btn--primary" data-door="sound" data-copy="film.enter-sound">Enter with sound</button>
+          <button type="button" class="btn btn--ghost" data-door="silent" data-copy="film.enter-silent">Enter in silence</button>
+        </div>
+        <button type="button" class="film__link label" data-read-page data-copy="film.read-page">Read as a page</button>
       </div>
-    </noscript>
+      <header class="film__hud">
+        <a class="film__home" href="#hero" data-film-home aria-label="Prometheus, back to the start"><img src="./brand/lockup-horizontal.svg" alt="" width="200" height="32" /></a>
+        <p class="film__chapter label" aria-live="polite"><span data-film-counter>01 / 06</span> <span data-film-chapter></span></p>
+        <div class="film__tools">
+          <button type="button" class="film__tool label" data-sound data-on="Sound on" data-off="Sound off" aria-pressed="false" data-copy="film.sound-off">Sound off</button>
+          <button type="button" class="film__tool label" data-read-page data-copy="film.read-page">Read as a page</button>
+          <a class="film__tool label" href="./docs.html" data-copy="nav.docs">Reading room</a>
+        </div>
+      </header>
+      <main class="film__captions" data-film-captions aria-live="polite"></main>
+      <nav class="film__ticks" aria-label="Chapters">
+        <ol>
+          <li><button type="button" data-chapter="0"><span class="sr-only" data-copy="film.chapter-0">Superposition</span></button></li>
+          <li><button type="button" data-chapter="1"><span class="sr-only" data-copy="film.chapter-1">The principle</span></button></li>
+          <li><button type="button" data-chapter="2"><span class="sr-only" data-copy="film.chapter-2">The seven shapes</span></button></li>
+          <li><button type="button" data-chapter="3"><span class="sr-only" data-copy="film.chapter-3">The rite</span></button></li>
+          <li><button type="button" data-chapter="4"><span class="sr-only" data-copy="film.chapter-4">The three modes</span></button></li>
+          <li><button type="button" data-chapter="5"><span class="sr-only" data-copy="film.chapter-5">Ignite</span></button></li>
+        </ol>
+      </nav>
+      <p class="film__advance label" data-film-advance data-copy="film.advance">Scroll, swipe or press the arrow keys</p>
+      <ol class="film__lexicon" hidden aria-hidden="true">
+        <li data-k="request-label" data-copy="film.request-label">Example request · illustrative</li>
+        <li data-k="request" data-copy="film.request">summarise support tickets for the on-call engineer</li>
+        <li data-k="reading-1" data-copy="film.reading-1">a one-shot digest</li>
+        <li data-k="reading-2" data-copy="film.reading-2">a triage loop</li>
+        <li data-k="reading-3" data-copy="film.reading-3">a ranked list</li>
+        <li data-k="reading-4" data-copy="film.reading-4">an alert filter</li>
+        <li data-k="reading-5" data-copy="film.reading-5">a shift handoff</li>
+        <li data-k="reading-6" data-copy="film.reading-6">a trend report</li>
+        <li data-k="alg-1" data-copy="film.alg-1">A request arrives in superposition: every reading it could carry, held at once.</li>
+        <li data-k="alg-2" data-copy="film.alg-2">Each section is a matrix on that space. It stretches the readings it amplifies and flattens the ones it suppresses.</li>
+        <li data-k="alg-3" data-copy="film.alg-3">Run the same two sections in both orders and the state lands in two places. The gap between them is the commutator.</li>
+        <li data-k="alg-4" data-copy="film.alg-4">Sections combine by interference, not addition. Some readings reinforce each other, others cancel out.</li>
+        <li data-k="f-1" data-copy="film.f-1">|ψ⟩ = Σ_k c_k |k⟩</li>
+        <li data-k="f-2" data-copy="film.f-2">|ψ′⟩ = Ô |ψ⟩</li>
+        <li data-k="f-3" data-copy="film.f-3">Ô = diag(λ_1, …, λ_n)</li>
+        <li data-k="f-4" data-copy="film.f-4">ÂB̂ ≠ B̂Â</li>
+        <li data-k="f-5" data-copy="film.f-5">[Â, B̂] = ÂB̂ − B̂Â ≠ 0</li>
+        <li data-k="f-6" data-copy="film.f-6">|Âψ + B̂ψ|² ≠ |Âψ|² + |B̂ψ|²</li>
+        <li data-k="f-7" data-copy="film.f-7">P(k) = |⟨k|ψ⟩|²</li>
+        <li data-k="chapter-card" data-copy="film.chapter-card">Chapter</li>
+      </ol>
+      <div class="film__card" data-film-card aria-hidden="true"><p class="film__card-kicker label"></p><p class="film__card-num"></p><p class="film__card-name"></p></div>
+      <ol class="film__plates" hidden aria-hidden="true">
+        <li data-copy="film.plate-1">Identity</li><li data-copy="film.plate-2">Context</li><li data-copy="film.plate-3">Task</li>
+        <li data-copy="film.plate-4">Constraints</li><li data-copy="film.plate-5">Format</li>
+        <li data-copy="film.plate-label">Operator</li>
+      </ol>
+      <div class="film__cursor" aria-hidden="true"></div>
+    </div>
+
+    <header class="nav" data-fx-host="nav-state">
+      <a class="nav__home" href="#hero" aria-label="Prometheus, back to the start">
+        <img src="./brand/lockup-horizontal.svg" alt="" width="246" height="40" />
+      </a>
+      <nav class="nav__links" aria-label="Sections">
+        <a href="#thesis" data-copy="nav.link-1">Principle</a>
+        <a href="#arcana" data-copy="nav.link-2">Shapes</a>
+        <a href="#rite" data-copy="nav.link-3">Rite</a>
+        <a href="#modes" data-copy="nav.link-4">Modes</a>
+        <a href="#ignite" data-copy="nav.link-5">Install</a>
+      </nav>
+      <button type="button" class="nav__film mono" data-watch-film hidden data-copy="film.watch-film">Watch the film</button>
+      <a class="nav__docs mono" href="./docs.html" data-copy="nav.docs">Reading room</a>
+    </header>
+
+    <main id="main" tabindex="-1">
+      <section id="hero" class="section hero" data-section="hero" aria-labelledby="hero-title">
+        <div class="fx fx--cloud" data-fx="point-cloud" aria-hidden="true">
+          <img class="hero__mark" src="./brand/mark.svg" alt="" width="520" height="520" />
+        </div>
+        <div class="hero__copy">
+          <p class="label" data-copy="hero.eyebrow">A meta-prompting framework for agentic systems</p>
+          <h1 id="hero-title" class="display-xl">
+            <span class="line" data-copy="hero.title">A prompt is not a key.</span>
+            <span class="line line--ember" data-copy="hero.title-2">It is an operator.</span>
+          </h1>
+          <p class="lead hero__body" data-copy="hero.body">Describe what your agent should do. Prometheus interviews you, designs the prompt section by section, audits it, and ships it as files you install, with a verifier.</p>
+          <div class="hero__ctas">
+            <a class="btn btn--primary" href="#ignite" data-copy="hero.cta-primary">Install the skill</a>
+            <a class="btn btn--ghost" href="./docs.html" data-copy="hero.cta-secondary">Enter the reading room</a>
+          </div>
+        </div>
+        <button type="button" class="hero__hint label" data-fx="measure-hint" data-copy="hero.hint">Scroll to measure</button>
+      </section>
+
+      <section id="thesis" class="section thesis" data-section="thesis" aria-labelledby="thesis-title">
+        <p class="label" data-copy="thesis.label">I · The principle</p>
+        <h2 id="thesis-title" class="display">
+          <span class="line" data-copy="thesis.title">Meaning is not retrieved.</span>
+          <span class="line" data-copy="thesis.title-2">It is constructed.</span>
+        </h2>
+        <ol class="thesis__lines" data-fx="operator-lines">
+          <li class="lead" data-copy="thesis.line-1">Each section of a prompt is an operator. It amplifies some readings of your intent and suppresses others.</li>
+          <li class="lead" data-copy="thesis.line-2">Operators do not commute. The same sections in another order are another prompt.</li>
+          <li class="lead" data-copy="thesis.line-3" data-holo-word="measured">Ambiguity is not a defect. It is a superposition, held open until it is measured, and the interview is where you measure it.</li>
+        </ol>
+        <p class="thesis__coda" data-copy="thesis.coda">Prometheus designs that sequence deliberately, then checks it.</p>
+      </section>
+
+      <section id="arcana" class="section arcana" data-section="arcana" aria-labelledby="arcana-title">
+        <p class="label" data-copy="arcana.label">II · The seven shapes</p>
+        <h2 id="arcana-title" class="display">
+          <span class="line" data-copy="arcana.title">Seven shapes.</span>
+          <span class="line" data-copy="arcana.title-2">Every prompt is one of them.</span>
+        </h2>
+        <p class="lead arcana__intro" data-copy="arcana.intro">Prometheus infers the shape from what you ask for, then drafts on that shape's spine.</p>
+        <ol class="arcana__deck" data-fx="arcana-cards">
+          <li class="card">
+            <article class="card__inner" tabindex="0">
+              <div class="card__face card__front">
+                <p class="card__numeral" data-copy="arcana.card-1-numeral">I</p>
+                <svg class="card__glyph" viewBox="0 0 64 64" aria-hidden="true"><path d="M42 14.7A20 20 0 1 1 25.2 13.2"/><circle class="dot" cx="42" cy="14.7" r="2.4"/></svg>
+                <h3 class="card__name" data-copy="arcana.card-1-name">The Loop</h3>
+                <p class="card__shape label" data-copy="arcana.card-1-shape">Agentic loop</p>
+              </div>
+              <div class="card__face card__back"><p data-copy="arcana.card-1-meaning">Work that returns to itself until the condition is met. Memory outlives the turn.</p></div>
+            </article>
+          </li>
+          <li class="card">
+            <article class="card__inner" tabindex="0">
+              <div class="card__face card__front">
+                <p class="card__numeral" data-copy="arcana.card-2-numeral">II</p>
+                <svg class="card__glyph" viewBox="0 0 64 64" aria-hidden="true"><path d="M32 8V56M26 15L32 8L38 15"/><circle cx="32" cy="35" r="6"/></svg>
+                <h3 class="card__name" data-copy="arcana.card-2-name">The Arrow</h3>
+                <p class="card__shape label" data-copy="arcana.card-2-shape">One-shot task</p>
+              </div>
+              <div class="card__face card__back"><p data-copy="arcana.card-2-meaning">One call, one answer, the format fixed before the first word.</p></div>
+            </article>
+          </li>
+          <li class="card">
+            <article class="card__inner" tabindex="0">
+              <div class="card__face card__front">
+                <p class="card__numeral" data-copy="arcana.card-3-numeral">III</p>
+                <svg class="card__glyph" viewBox="0 0 64 64" aria-hidden="true"><path d="M32 19V27M32 37V45"/><circle cx="32" cy="14" r="5"/><circle cx="32" cy="32" r="5"/><circle cx="32" cy="50" r="5"/></svg>
+                <h3 class="card__name" data-copy="arcana.card-3-name">The Chain</h3>
+                <p class="card__shape label" data-copy="arcana.card-3-shape">Workflow chain</p>
+              </div>
+              <div class="card__face card__back"><p data-copy="arcana.card-3-meaning">Stages that hand a file to the next. What is lost early cannot be recovered late.</p></div>
+            </article>
+          </li>
+          <li class="card">
+            <article class="card__inner" tabindex="0">
+              <div class="card__face card__front">
+                <p class="card__numeral" data-copy="arcana.card-4-numeral">IV</p>
+                <svg class="card__glyph" viewBox="0 0 64 64" aria-hidden="true"><path d="M12 26A20 20 0 0 0 52 26"/><circle cx="32" cy="27" r="6"/><path d="M32 41V52"/></svg>
+                <h3 class="card__name" data-copy="arcana.card-4-name">The Hand</h3>
+                <p class="card__shape label" data-copy="arcana.card-4-shape">Sub-agent or tool</p>
+              </div>
+              <div class="card__face card__back"><p data-copy="arcana.card-4-meaning">A capability another agent reaches for. Its first line is the whole of its name.</p></div>
+            </article>
+          </li>
+          <li class="card">
+            <article class="card__inner" tabindex="0">
+              <div class="card__face card__front">
+                <p class="card__numeral" data-copy="arcana.card-5-numeral">V</p>
+                <svg class="card__glyph" viewBox="0 0 64 64" aria-hidden="true"><circle cx="25" cy="32" r="13"/><circle cx="39" cy="32" r="13"/><path d="M8 32H56"/></svg>
+                <h3 class="card__name" data-copy="arcana.card-5-name">The Mask</h3>
+                <p class="card__shape label" data-copy="arcana.card-5-shape">System persona</p>
+              </div>
+              <div class="card__face card__back"><p data-copy="arcana.card-5-meaning">A voice that holds under pressure and knows what it refuses.</p></div>
+            </article>
+          </li>
+          <li class="card">
+            <article class="card__inner" tabindex="0">
+              <div class="card__face card__front">
+                <p class="card__numeral" data-copy="arcana.card-6-numeral">VI</p>
+                <svg class="card__glyph" viewBox="0 0 64 64" aria-hidden="true"><path d="M32 12V54M22 54H42M10 18H54M12 18V30M52 18V30M5 30A7 7 0 0 0 19 30ZM45 30A7 7 0 0 0 59 30Z"/></svg>
+                <h3 class="card__name" data-copy="arcana.card-6-name">The Scales</h3>
+                <p class="card__shape label" data-copy="arcana.card-6-shape">LLM-as-judge</p>
+              </div>
+              <div class="card__face card__back"><p data-copy="arcana.card-6-meaning">Reasoning before the verdict, anchors at every level, and the honesty to say inconclusive.</p></div>
+            </article>
+          </li>
+          <li class="card">
+            <article class="card__inner" tabindex="0">
+              <div class="card__face card__front">
+                <p class="card__numeral" data-copy="arcana.card-7-numeral">VII</p>
+                <svg class="card__glyph" viewBox="0 0 64 64" aria-hidden="true"><circle class="faint" cx="32" cy="32" r="19"/><circle class="dot" cx="32" cy="32" r="3.4"/><circle class="dot" cx="32" cy="13" r="2.6"/><circle class="dot" cx="48.5" cy="22.5" r="2.6"/><circle class="dot" cx="48.5" cy="41.5" r="2.6"/><circle class="dot" cx="32" cy="51" r="2.6"/><circle class="dot" cx="15.5" cy="41.5" r="2.6"/><circle class="dot" cx="15.5" cy="22.5" r="2.6"/></svg>
+                <h3 class="card__name" data-copy="arcana.card-7-name">The Council</h3>
+                <p class="card__shape label" data-copy="arcana.card-7-shape">Agent team</p>
+              </div>
+              <div class="card__face card__back"><p data-copy="arcana.card-7-meaning">Roles with walls between them, contracts on every door, one place where the state lives.</p></div>
+            </article>
+          </li>
+        </ol>
+        <p class="arcana__hint label" data-copy="arcana.hint">Turn a card</p>
+      </section>
+
+      <section id="rite" class="section rite" data-section="rite" aria-labelledby="rite-title">
+        <p class="label" data-copy="rite.label">III · The rite</p>
+        <h2 id="rite-title" class="display">
+          <span class="line" data-copy="rite.title">Six phases.</span>
+          <span class="line" data-copy="rite.title-2">Nothing ships unaudited.</span>
+        </h2>
+        <div class="rite__stage">
+          <div class="fx fx--arc" data-fx="rite-procession" aria-hidden="true"></div>
+          <ol class="rite__stations">
+            <li class="station"><span class="station__num mono">01</span><h3 class="station__name" data-copy="rite.station-1-name">Shape</h3><p data-copy="rite.station-1-line">Infer which of the seven shapes you are asking for, without a routing question.</p></li>
+            <li class="station"><span class="station__num mono">02</span><h3 class="station__name" data-copy="rite.station-2-name">Interview</h3><p data-copy="rite.station-2-line">Ask only what the request leaves open, one question at a time, broadest first.</p></li>
+            <li class="station"><span class="station__num mono">03</span><h3 class="station__name" data-copy="rite.station-3-name">Draft</h3><p data-copy="rite.station-3-line">Write each section as an operator, ordered by strength, checked for interference.</p></li>
+            <li class="station"><span class="station__num mono">04</span><h3 class="station__name" data-copy="rite.station-4-name">Audit</h3><p data-copy="rite.station-4-line">Run the checklist. Fix what fails, or ship with the gap named.</p></li>
+            <li class="station"><span class="station__num mono">05</span><h3 class="station__name" data-copy="rite.station-5-name">Score</h3><p data-copy="rite.station-5-line">Score the draft honestly on token economy, task fit and coherence.</p></li>
+            <li class="station station--verify"><span class="station__num mono">06</span><h3 class="station__name" data-copy="rite.station-6-name">Deliver</h3><p data-copy="rite.station-6-line">Ship the files, the usage notes and the verifier, checked in a fresh context first.</p></li>
+          </ol>
+        </div>
+        <div class="verify">
+          <p class="label" data-copy="rite.verify-label">Every artifact ships with a verifier</p>
+          <ul class="verify__layers">
+            <li data-copy="rite.verify-1">Static — properties of the artifact itself.</li>
+            <li data-copy="rite.verify-2">Single-run — properties of one output.</li>
+            <li data-copy="rite.verify-3">Cross-run — patterns visible only across many, where regressions hide.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section id="modes" class="section modes" data-section="modes" aria-labelledby="modes-title">
+        <p class="label" data-copy="modes.label">IV · The three modes</p>
+        <h2 id="modes-title" class="display">
+          <span class="line" data-copy="modes.title">Build it, fix it,</span>
+          <span class="line" data-copy="modes.title-2">keep it alive.</span>
+        </h2>
+        <ol class="modes__triptych" data-fx="modes-triptych">
+          <li class="mode"><p class="mode__numeral" data-copy="modes.mode-1-numeral">I</p><h3 class="mode__name" data-copy="modes.mode-1-name">From scratch</h3><p data-copy="modes.mode-1-line">You describe the task. Prometheus produces the prompt, the agent or the workflow.</p></li>
+          <li class="mode"><p class="mode__numeral" data-copy="modes.mode-2-numeral">II</p><h3 class="mode__name" data-copy="modes.mode-2-name">Refactor</h3><p data-copy="modes.mode-2-line">You bring a prompt. Prometheus audits it, patches it, or rewrites it.</p></li>
+          <li class="mode"><p class="mode__numeral" data-copy="modes.mode-3-numeral">III</p><h3 class="mode__name" data-copy="modes.mode-3-name">Manage</h3><p data-copy="modes.mode-3-line">You point at a running agent. Prometheus monitors, analyzes, adapts and restarts it, as a MAPE-K loop.</p></li>
+        </ol>
+      </section>
+
+      <section id="ignite" class="section ignite" data-section="ignite" aria-labelledby="ignite-title">
+        <p class="label" data-copy="ignite.label">V · Ignite</p>
+        <h2 id="ignite-title" class="display">
+          <span class="line" data-copy="ignite.title">Install it once.</span>
+          <span class="line line--ember" data-copy="ignite.title-2">Describe what you need.</span>
+        </h2>
+        <ol class="ignite__steps">
+          <li data-copy="ignite.step-1">Clone the repository.</li>
+          <li data-copy="ignite.step-2">Copy it onto your agent's skill path.</li>
+          <li data-copy="ignite.step-3">Describe a prompt, an agent or a workflow. The host routes to Prometheus on its own.</li>
+        </ol>
+        <div class="terminal" data-fx="ignite-command">
+          <pre class="terminal__pre" tabindex="0"><code data-copy="ignite.command">git clone https://github.com/Samuele95/prometheus.git &amp;&amp; cp -a prometheus ~/.claude/skills/prometheus</code></pre>
+          <button type="button" class="terminal__copy mono" data-copy="ignite.copy" data-copied="Copied">Copy</button>
+        </div>
+        <div class="runtimes">
+          <p class="label" data-copy="ignite.runtimes-label">Works with</p>
+          <ul class="runtimes__list mono">
+            <li data-copy="ignite.runtime-1">Claude Code</li>
+            <li data-copy="ignite.runtime-2">OpenAI Codex</li>
+            <li data-copy="ignite.runtime-3">Cursor</li>
+            <li data-copy="ignite.runtime-4">opencode</li>
+            <li data-copy="ignite.runtime-5">Gemini Gem</li>
+          </ul>
+          <p class="runtimes__note" data-copy="ignite.gem-note">Gemini has no filesystem, so the framework ships as a Gem port: one instruction and eight knowledge files.</p>
+        </div>
+        <div class="ignite__ctas">
+          <a class="btn btn--primary" href="https://github.com/Samuele95/prometheus/releases/latest/download/prometheus-skill.zip" data-copy="ignite.download">Download the skill</a>
+          <a class="btn btn--ghost" href="./docs.html" data-copy="ignite.docs">Enter the reading room</a>
+        </div>
+      </section>
+    </main>
+
+    <footer id="colophon" class="colophon" data-section="colophon">
+      <img class="colophon__lockup" src="./brand/lockup-stacked.svg" alt="Prometheus" width="200" height="160" />
+      <p class="colophon__line" data-copy="colophon.line">Prometheus runs at build time. What it produces, it never runs.</p>
+      <ul class="colophon__links mono">
+        <li><a href="https://github.com/Samuele95/prometheus" rel="noopener" data-copy="colophon.repo">Source on GitHub</a></li>
+        <li><a href="https://github.com/Samuele95/prometheus/blob/main/LICENSE" rel="noopener" data-copy="colophon.license">MIT license</a></li>
+        <li><a href="./docs.html" data-copy="colophon.docs">Reading room</a></li>
+        <li><span data-copy="colophon.year">2026</span></li>
+      </ul>
+    </footer>
   </body>
 </html>

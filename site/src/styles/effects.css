@@ -1,0 +1,113 @@
+/* Live states. Everything here is added on top of the complete static page by src/effects. */
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* hint button */
+.hero__hint { background: none; border: 0; padding: 0.75rem 0; cursor: pointer; display: inline-flex; align-items: center; gap: 0.9rem; transition: opacity var(--motion-duration-short) linear; }
+.hero__hint::after { content: ''; width: 1px; height: 2.25rem; background: var(--color-brass); transform-origin: top; }
+.is-live .hero__hint::after { animation: tick 2.4s var(--motion-ease-inout) infinite; }
+@keyframes tick { 0% { transform: scaleY(0); } 45% { transform: scaleY(1); transform-origin: top; } 55% { transform: scaleY(1); transform-origin: bottom; } 100% { transform: scaleY(0); transform-origin: bottom; } }
+.hero__hint[hidden] { display: none; }
+.is-live .hero { cursor: crosshair; }
+.is-live .hero a, .is-live .hero button { cursor: pointer; }
+
+/* intro */
+.fx--intro { background: var(--color-void); place-items: center; align-content: center; gap: 2.5rem; }
+.fx--intro.is-on { display: grid; pointer-events: auto; cursor: pointer; }
+.fx--intro.is-leaving { opacity: 0; transition: opacity var(--motion-duration-medium) var(--motion-ease-out); }
+.intro__art { width: min(300px, 60vw); height: auto; }
+.intro__skip { display: none; color: var(--color-muted); }
+.fx--intro.is-on .intro__skip { display: block; }
+
+/* rings */
+.fx--rings { display: grid; place-items: center end; padding-right: 4vw; transition: opacity 0.2s linear; }
+.rings { width: min(130vh, 92vw); height: auto; aspect-ratio: 1; margin-right: -24vh; overflow: visible; }
+.ring { transform-origin: 0 0; transform-box: view-box; will-change: transform; }
+.ring__line { fill: none; stroke: var(--color-brass); stroke-width: 0.25; }
+.ring__line--major { stroke-width: 0.5; }
+.ring__ticks { fill: none; stroke: var(--color-brass-dim); stroke-width: 0.22; }
+.ring__ticks--major { stroke: var(--color-brass); }
+.ring__num { fill: var(--color-brass); font-family: var(--font-mono); font-size: 3px; letter-spacing: 0.1em; text-anchor: middle; dominant-baseline: middle; }
+.ring__body { fill: var(--color-brass); }
+.ring__body--ember { fill: var(--color-ember); }
+.is-static .fx--rings { opacity: 0.22; }
+@media (max-width: 899px) { .fx--rings { place-items: center; padding: 0; } .rings { width: 150vw; margin: 0; } }
+
+/* thesis: the holo word ignites when its line arrives */
+.is-live .holo-word:not(.is-lit) { -webkit-text-fill-color: var(--color-bone); }
+.holo-word.is-lit { background-size: 200% 100%; animation: holo-sweep 1.6s var(--motion-ease-out) both; }
+@keyframes holo-sweep { from { background-position: 100% 0; } to { background-position: 0 0; } }
+
+/* arcana: tilt and flip */
+.arcana__deck.is-live .card__inner {
+  grid-template-rows: 1fr; transform-style: preserve-3d; cursor: pointer;
+  transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transition: transform var(--effects-arcana-flip-ms) var(--motion-ease-inout), border-color var(--motion-duration-short) var(--motion-ease-out), box-shadow var(--motion-duration-short) var(--motion-ease-out);
+}
+.arcana__deck.is-live .card__inner:hover, .arcana__deck.is-live .card__inner:focus-visible {
+  border-color: var(--color-brass);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-brass) 25%, transparent), 0 30px 60px -30px color-mix(in srgb, var(--color-ember) 35%, transparent);
+}
+.arcana__deck.is-live .card__inner:focus-visible { --rx: -3deg; --ry: 4deg; }
+.arcana__deck.is-live .card__inner.is-flipped { transform: rotateX(var(--rx, 0deg)) rotateY(calc(var(--ry, 0deg) + 180deg)); }
+.arcana__deck.is-live .card__face { grid-area: 1 / 1; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.arcana__deck.is-live .card__front::after { /* light that follows the pointer */
+  content: ''; position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity var(--motion-duration-short) linear;
+  background: radial-gradient(circle at var(--gx, 50%) var(--gy, 50%), color-mix(in srgb, var(--color-brass) 14%, transparent), transparent 55%);
+}
+.arcana__deck.is-live .card__inner:hover .card__front::after { opacity: 1; }
+.arcana__deck.is-live .card__back { transform: rotateY(180deg); justify-content: center; align-items: center; text-align: center; padding: 2.5rem 1.9rem; background: var(--color-ink-2); }
+.arcana__deck.is-live .card__back p { border-top: 0; padding-top: 0; font-size: var(--type-scale-lead); line-height: 1.35; }
+.arcana__deck.is-live .card__back::before { content: ''; position: absolute; top: 2.25rem; left: 50%; width: 2.5rem; height: 1px; background: var(--color-ember); transform: translateX(-50%); }
+.arcana__deck.is-live ~ .arcana__hint { display: block; text-align: center; }
+@media (max-width: 899px) {
+  .arcana__deck.is-live { flex-wrap: nowrap; justify-content: flex-start; overflow-x: auto; scroll-snap-type: x mandatory; margin: 0 calc(var(--space-gutter) * -1); padding: 0.5rem var(--space-gutter) 1.5rem; scrollbar-width: none; }
+  .arcana__deck.is-live .card { flex: 0 0 76vw; scroll-snap-align: center; }
+}
+
+/* rite: the procession */
+.rite.is-live .rite__stage { padding-top: clamp(110px, 17vw, 200px); }
+.rite.is-live .fx--arc { inset: 0 0 auto 0; height: clamp(110px, 17vw, 200px); }
+.rite__arc { width: 100%; height: 100%; overflow: visible; }
+.rite__base { fill: none; stroke: var(--color-brass-dim); stroke-width: 1; stroke-dasharray: 2 5; }
+.rite__progress { fill: none; stroke: var(--color-brass); stroke-width: 1.5; }
+.rite__holo { fill: none; stroke: url(#riteHolo); stroke-width: 3; opacity: 0; transition: opacity var(--motion-duration-medium) var(--motion-ease-out); }
+.rite__arc.is-verified .rite__holo { opacity: 1; }
+.rite__stop { fill: var(--color-void); stroke: var(--color-brass-dim); stroke-width: 1.5; transition: fill var(--motion-duration-short) linear, stroke var(--motion-duration-short) linear; }
+.rite__stop.is-lit { fill: var(--color-ember); stroke: var(--color-ember); }
+.rite__stop-num { fill: var(--color-brass); font-family: var(--font-mono); font-size: 13px; letter-spacing: 0.15em; text-anchor: middle; }
+.rite__marker-dot { fill: var(--color-bone); }
+.rite.is-live .station { transition: opacity var(--motion-duration-medium) var(--motion-ease-out); }
+.rite.is-live .station:not(.is-lit) { opacity: 0.32; }
+.rite.is-live .station.is-lit .station__num { color: var(--color-ember); }
+.rite.is-live .station.is-lit { border-top-color: var(--color-brass); }
+.rite.is-live .station--verify:not(.is-lit) { border-image: none; border-top-color: var(--color-brass-dim); }
+@media (max-width: 899px) {
+  .rite.is-live .rite__stage { padding-top: 0; padding-left: 1.75rem; }
+  .rite.is-live .fx--arc { inset: 0 auto 0 0; width: 1px; height: auto; }
+  .rite__rail { position: absolute; inset: 0; background: var(--color-brass-dim); }
+  .rite__rail-fill { position: absolute; inset: 0; background: var(--color-brass); transform-origin: top; transform: scaleY(0); }
+  .rite__marker { position: absolute; left: 50%; width: 9px; height: 9px; border-radius: 50%; background: var(--color-bone); transform: translate(-50%, -50%); }
+}
+
+/* modes: the centred mode widens, the others narrow to their numeral */
+.modes__triptych.is-live { display: flex; }
+.modes__triptych.is-live .mode { flex: 1 1 0; min-width: 0; transition: flex-grow var(--motion-duration-long) var(--motion-ease-out), border-color var(--motion-duration-medium) var(--motion-ease-out); }
+.modes__triptych.is-live .mode.is-active { flex-grow: 2.4; border-color: var(--color-brass); }
+.modes__triptych.is-live .mode > :not(.mode__numeral) { transition: opacity var(--motion-duration-medium) var(--motion-ease-out); }
+.modes__triptych.is-live .mode:not(.is-active) > :not(.mode__numeral) { opacity: 0.14; }
+.modes__triptych.is-live .mode.is-active .mode__numeral { color: var(--color-ember); }
+
+/* ignite: caret */
+.caret { display: inline-block; width: 0.6em; height: 1.1em; margin-left: 2px; vertical-align: text-bottom; background: var(--color-ember); animation: blink 1.05s steps(1) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+
+/* grain moves; vignette lighter on small screens */
+.is-live .grain { inset: -50%; animation: grain 0.9s steps(6) infinite; }
+@keyframes grain { 0% { transform: translate(0, 0); } 20% { transform: translate(-6%, 4%); } 40% { transform: translate(5%, -7%); } 60% { transform: translate(-3%, 8%); } 80% { transform: translate(7%, 2%); } 100% { transform: translate(0, 0); } }
+@media (max-width: 899px) { .vignette { opacity: 0.6; } }
+
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; } }
+
+/* reveals */
+.is-live .rv { opacity: 0; transform: translateY(32px); transition: opacity var(--motion-duration-long) var(--motion-ease-out), transform var(--motion-duration-long) var(--motion-ease-out); transition-delay: calc(var(--rv-i, 0) * 90ms); }
+.is-live .rv.is-in { opacity: 1; transform: none; }

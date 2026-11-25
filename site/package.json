@@ -1,0 +1,26 @@
+{
+  "name": "prometheus-site",
+  "private": true,
+  "version": "2.0.0",
+  "type": "module",
+  "scripts": {
+    "tokens": "node scripts/tokens-to-css.mjs",
+    "predev": "npm run tokens",
+    "dev": "vite",
+    "prebuild": "npm run tokens",
+    "build": "tsc --noEmit && vite build",
+    "publish:docs": "node scripts/publish.mjs",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "gsap": "3.15.1",
+    "three": "0.187.0"
+  },
+  "devDependencies": {
+    "@types/three": "0.187.0",
+    "lighthouse": "11.7.1",
+    "puppeteer-core": "25.18.1",
+    "typescript": "5.9.3",
+    "vite": "6.4.6"
+  }
+}

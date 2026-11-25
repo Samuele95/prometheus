@@ -1,0 +1,107 @@
+{
+  "round": 2,
+  "hard": [
+    {
+      "name": "tokens-only",
+      "reasoning": "no hex literals in 19 source files outside the generated tokens",
+      "passed": true,
+      "evidence": ""
+    },
+    {
+      "name": "js-budget",
+      "reasoning": "total JS 226 KB gzipped across 9 files (budget 400 KB)",
+      "passed": true,
+      "evidence": ""
+    },
+    {
+      "name": "deploy-output",
+      "reasoning": "docs/index.html and docs/docs.html reference ./assets with relative paths; docs/ is the Pages root",
+      "passed": true,
+      "evidence": ""
+    },
+    {
+      "name": "copy-fidelity",
+      "reasoning": "120/120 keys match copy.md verbatim",
+      "passed": true,
+      "evidence": ""
+    },
+    {
+      "name": "sections-present",
+      "reasoning": "DOM order hero > thesis > arcana > rite > modes > ignite > colophon (intro is an overlay, exempt)",
+      "passed": true,
+      "evidence": ""
+    },
+    {
+      "name": "reduced-motion",
+      "reasoning": "reduced motion shows the page, never the film (page); empty sections: none; console errors: 0",
+      "passed": true,
+      "evidence": "reduced-full.png"
+    },
+    {
+      "name": "console-clean",
+      "reasoning": "film (enter, 4 steps, read-as-page) and reading room (EN/IT switch) at 390/900/1440: no errors, no failed requests",
+      "passed": true,
+      "evidence": ""
+    },
+    {
+      "name": "docs-restyled",
+      "reasoning": "11 sections, heading font \"Bodoni Moda Variable\", 11 rail links, #setup anchor true, old assets 0",
+      "passed": true,
+      "evidence": "docs-1440.png"
+    },
+    {
+      "name": "logo-integrated",
+      "reasoning": "favicon, og.png, horizontal lockup (nav, HUD, reading room), stacked lockup (colophon), intro (gate); ledger holds APPROVED: logo mark",
+      "passed": true,
+      "evidence": ""
+    },
+    {
+      "name": "performance",
+      "reasoning": "Lighthouse desktop, software GL (SwiftShader), 3 runs on the main page: 100/100/100, TBT 0 ms, LCP 0.6 s; reading room 99, TBT 0 ms. Lighthouse never opens the gate, so the film's own cost is measured separately: door click to first frame 1102 ms with long tasks of 754 and 1439 ms under software GL (shader compile and texture upload); a hardware GPU will be much faster but was not available to measure. JS 224 KB gz (budget 400).",
+      "passed": true,
+      "evidence": "site-design/checks/grade-2/lh-index-run1.json; scripts/enter-latency.mjs"
+    },
+    {
+      "name": "accessibility",
+      "reasoning": "Lighthouse accessibility 100 on both pages. Keyboard: arrows, PageUp/Down, Space, Home/End advance the film; chapter ticks are buttons; 'Read as a page' is in the HUD and at the gate; the hero measure is the first advance. Reduced motion never shows the film.",
+      "passed": true,
+      "evidence": "lighthouse-*.json; grade.mjs console-clean run"
+    },
+    {
+      "name": "effects-present",
+      "reasoning": "Film rows: gate, world (flame points, armillary, dial, starfield, cards, stations, holo arc), director (27 steps, 6 chapters), post (bloom, aberration shock, vignette, grain), HUD, audio (verified: no context before gesture; running after 'Enter with sound'; toggle off persists), cursor. Scroll rows remain on the page path (verified after 'Read as a page'). Deviations logged.",
+      "passed": true,
+      "evidence": "checks/film-1440-final/, checks/film-390/, scripts/audio-check.mjs"
+    }
+  ],
+  "qualitative": [
+    {
+      "name": "signature-collapse",
+      "score": 4,
+      "reasoning": "The first advance collapses the drifting cloud into the flame with the wave channel and the collapse point legible (film step 01); timing and easing per tokens. Held from 5 because the opening superposition, while visible, is a quiet starfield rather than an overwhelming volume around the camera; it could be denser near the lens."
+    },
+    {
+      "name": "rings",
+      "score": 5,
+      "reasoning": "The armillary is a real 3D instrument: five inclined brass rings with engraved ticks and a numeral dial, assembling, swapping, flattening into the logo alignment and spinning per mode (steps 02-05, 21-24)."
+    },
+    {
+      "name": "arcana",
+      "score": 4,
+      "reasoning": "Seven cards orbit the flame; each step brings one forward and it flips to its meaning; glyphs drawn from the page's own SVG. Held from 5: neighbours read as faint slabs at the edges and the card text glows a little under bloom."
+    },
+    {
+      "name": "bible-fidelity",
+      "score": 4,
+      "reasoning": "Palette, type and holo restraint hold (holo only in collapse flicker, 'measured', the verifier arc). The film mode is a revision the owner asked for and is written into the bible. Held from 5 because bloom pushes ember toward red-orange glow beyond the flat token in some shots."
+    },
+    {
+      "name": "cinematic-coherence",
+      "score": 4,
+      "reasoning": "One world, one camera, one easing; letterbox, HUD, aberration shock and swell on every cut. Held from 5: the rite station shots sit close to a glowing marker and one frame shows a lens-like streak behind the caption."
+    }
+  ],
+  "overall": "pass",
+  "note": "Graded by the same session that built the site, so the qualitative scores are a self-assessment, not an independent verdict; the owner's eye is the real gate for them.",
+  "actionable_feedback": []
+}

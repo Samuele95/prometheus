@@ -1,0 +1,14 @@
+import puppeteer from 'puppeteer-core';
+const b = await puppeteer.launch({ executablePath: '/usr/bin/google-chrome', headless: true, args: ['--no-sandbox', '--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--autoplay-policy=user-gesture-required'] });
+const t = await b.newPage(); const errs = [];
+t.on('pageerror', (e) => errs.push(String(e))); t.on('console', (m) => m.type() === 'error' && errs.push(m.text()));
+await t.evaluateOnNewDocument(() => { const O = window.AudioContext; window.__ctxs = []; window.AudioContext = class extends O { constructor(...a) { super(...a); window.__ctxs.push(this); } }; });
+await t.goto('http://localhost:4173/prometheus/index.html', { waitUntil: 'networkidle0' });
+const before = await t.evaluate(() => window.__ctxs.length);
+await new Promise((r) => setTimeout(r, 3400)); await t.click('[data-door="sound"]'); await new Promise((r) => setTimeout(r, 2500));
+const after = await t.evaluate(() => ({ n: window.__ctxs.length, state: window.__ctxs[0]?.state, label: document.querySelector('[data-sound]').textContent, pressed: document.querySelector('[data-sound]').getAttribute('aria-pressed') }));
+await t.keyboard.press('ArrowDown'); await new Promise((r) => setTimeout(r, 2000));
+await t.click('[data-sound]'); await new Promise((r) => setTimeout(r, 500));
+const off = await t.evaluate(() => ({ label: document.querySelector('[data-sound]').textContent, pressed: document.querySelector('[data-sound]').getAttribute('aria-pressed'), pref: localStorage.getItem('prometheus:sound') }));
+console.log(JSON.stringify({ contextsBeforeGesture: before, afterSoundDoor: after, afterToggle: off, errors: errs }));
+await b.close();

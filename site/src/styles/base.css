@@ -1,0 +1,119 @@
+/* Base: fonts, reset, type. Colors, sizes and durations come only from tokens.css. */
+@font-face {
+  font-family: 'Bodoni Moda Variable';
+  src: url('/fonts/bodoni-moda-latin-opsz-normal.woff2') format('woff2-variations');
+  font-weight: 400 900; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Bodoni Moda Variable';
+  src: url('/fonts/bodoni-moda-latin-opsz-italic.woff2') format('woff2-variations');
+  font-weight: 400 900; font-style: italic; font-display: swap;
+}
+@font-face {
+  font-family: 'STIX Two Text Variable';
+  src: url('/fonts/stix-two-text-latin-wght-normal.woff2') format('woff2-variations');
+  font-weight: 400 700; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'STIX Two Text Variable';
+  src: url('/fonts/stix-two-text-latin-wght-italic.woff2') format('woff2-variations');
+  font-weight: 400 700; font-style: italic; font-display: swap;
+}
+@font-face {
+  font-family: 'STIX Two Math';
+  src: url('/fonts/stix-two-math-latin-400-normal.woff2') format('woff2');
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Geist Mono Variable';
+  src: url('/fonts/geist-mono-latin-wght-normal.woff2') format('woff2-variations');
+  font-weight: 100 900; font-style: normal; font-display: swap;
+}
+
+:root {
+  --font-serif: 'Bodoni Moda Variable', 'Bodoni 72', Didot, 'Times New Roman', serif;
+  --font-mono: 'Geist Mono Variable', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-math: 'STIX Two Math', 'Cambria Math', 'Latin Modern Math', serif;
+  --font-text: 'STIX Two Text Variable', 'STIX Two Text', Georgia, serif;
+  --nav-h: 4.5rem;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-padding-top: var(--nav-h); }
+body {
+  margin: 0;
+  background: var(--color-void);
+  color: var(--color-bone);
+  font-family: var(--font-text); /* reading text: a sturdy text face; Bodoni is kept for display */
+  font-size: var(--type-scale-body);
+  line-height: var(--type-leading-body);
+  font-optical-sizing: auto;
+  text-rendering: optimizeLegibility;
+  font-optical-sizing: auto;
+  -webkit-font-smoothing: antialiased;
+}
+img, svg { display: block; max-width: 100%; }
+a { color: inherit; }
+button { font: inherit; color: inherit; }
+h1, h2, h3, p, ol, ul, figure { margin: 0; }
+ol, ul { padding: 0; list-style: none; }
+::selection { background: var(--color-ember); color: var(--color-void); }
+
+:focus-visible { outline: 1px solid var(--color-brass); outline-offset: 4px; }
+
+.skip-link {
+  position: fixed; left: var(--space-gutter); top: 0.75rem; z-index: 100;
+  padding: 0.6rem 1rem; background: var(--color-bone); color: var(--color-void);
+  font-family: var(--font-mono); font-size: var(--type-scale-label); letter-spacing: var(--type-tracking-label); text-transform: uppercase;
+  transform: translateY(-200%);
+}
+.skip-link:focus { transform: none; }
+
+.mono { font-family: var(--font-mono); }
+.label {
+  font-family: var(--font-mono); font-weight: 500;
+  font-size: var(--type-scale-label); letter-spacing: var(--type-tracking-label);
+  text-transform: uppercase; color: var(--color-brass); line-height: var(--type-leading-mono);
+}
+.display-xl, .display {
+  font-weight: var(--type-weight-display); line-height: var(--type-leading-display);
+  letter-spacing: var(--type-tracking-display);
+  font-optical-sizing: auto;
+  text-wrap: balance;
+}
+.display-xl { font-size: var(--type-scale-display-xl); }
+.display { font-size: var(--type-scale-display); max-width: var(--space-measure-display); }
+.display-xl .line, .display .line { display: block; }
+.line--ember { color: var(--color-ember); font-style: italic; }
+.lead { font-size: var(--type-scale-lead); line-height: 1.45; color: var(--color-bone); max-width: var(--space-measure); }
+
+code { font-family: var(--font-mono); font-size: 0.92em; }
+
+.btn {
+  background: none; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.6em;
+  min-height: 3rem; padding: 0 1.6rem; border-radius: var(--radius-button);
+  font-family: var(--font-mono); font-weight: 500; font-size: var(--type-scale-label);
+  letter-spacing: var(--type-tracking-label); text-transform: uppercase; text-decoration: none;
+  transition: background-color var(--motion-duration-short) var(--motion-ease-out),
+              color var(--motion-duration-short) var(--motion-ease-out),
+              border-color var(--motion-duration-short) var(--motion-ease-out);
+}
+.btn--primary { background: var(--color-ember); color: var(--color-void); border: 1px solid var(--color-ember); }
+.btn--primary:hover { background: var(--color-bone); border-color: var(--color-bone); }
+.btn--ghost { border: 1px solid var(--color-brass-dim); color: var(--color-bone); }
+.btn--ghost:hover { border-color: var(--color-brass); color: var(--color-brass); }
+
+.grain, .vignette { position: fixed; inset: 0; pointer-events: none; z-index: 60; }
+.grain {
+  opacity: var(--effects-grain-opacity);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1.2 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+  mix-blend-mode: overlay;
+}
+.vignette {
+  background: radial-gradient(ellipse at center, transparent 55%, color-mix(in srgb, var(--color-void) calc(var(--effects-vignette-strength) * 100%), transparent) 100%);
+}
+
+/* display type stays Bodoni Moda: titles, names, numerals, epigraphs */
+h1, h2, h3, h4, .display, .display-xl, .cap__title, .card__name, .card__numeral, .station__name, .mode__name, .mode__numeral,
+.film__card-name, .rr-h, .rr-cover__title, .rr-epigraph p, .rr-opener__num, .colophon__line, .thesis__coda { font-family: var(--font-serif); }
