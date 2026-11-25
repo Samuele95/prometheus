@@ -59,7 +59,7 @@ jobs:
               "manage/replay-verifier.py",
               "gem/en/gem-instructions.md",
               "assets/social-preview.png",
-              "docs/og-image.png",
+              "docs/og.png",
               "docs/index.html",
           ]
           missing = [p for p in required if not pathlib.Path(p).exists()]

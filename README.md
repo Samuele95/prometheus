@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="assets/banner.png" alt="Prometheus — prompts as operators" width="100%">
+<img src="assets/banner.png" alt="Prometheus: the flame breaking out of a calibrated ring, and the line “A prompt is an operator, not a key.”" width="100%">
 
 <h1>Prometheus</h1>
 
@@ -9,24 +9,24 @@ It designs, audits, and *maintains* prompts, agents, and agentic workflows —
 each shipped with a verifier that proves it works.
 
 <p>
-  <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-ff7a2f?style=flat-square"></a>
-  <a href="https://github.com/Samuele95/prometheus/releases/latest"><img alt="Latest release" src="https://img.shields.io/github/v/release/Samuele95/prometheus?style=flat-square&color=ff7a2f&logo=github&label=release"></a>
-  <a href="https://github.com/Samuele95/prometheus/stargazers"><img alt="Stars" src="https://img.shields.io/github/stars/Samuele95/prometheus?style=flat-square&color=4a4550&logo=github"></a>
-  <img alt="Dependencies: none" src="https://img.shields.io/badge/dependencies-none-4a4550?style=flat-square">
-  <img alt="Runs at build time" src="https://img.shields.io/badge/runs-build--time-4a4550?style=flat-square">
+  <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-ff6b1f?style=flat-square&labelColor=05040b"></a>
+  <a href="https://github.com/Samuele95/prometheus/releases/latest"><img alt="Latest release" src="https://img.shields.io/github/v/release/Samuele95/prometheus?style=flat-square&color=ff6b1f&labelColor=05040b&logo=github&logoColor=c9a35b&label=release"></a>
+  <a href="https://github.com/Samuele95/prometheus/stargazers"><img alt="Stars" src="https://img.shields.io/github/stars/Samuele95/prometheus?style=flat-square&color=c9a35b&labelColor=05040b&logo=github&logoColor=c9a35b"></a>
+  <img alt="Dependencies: none" src="https://img.shields.io/badge/dependencies-none-17122b?style=flat-square&labelColor=05040b">
+  <img alt="Runs at build time" src="https://img.shields.io/badge/runs-build--time-17122b?style=flat-square&labelColor=05040b">
 </p>
 
 <p><sub><b>Works with</b></sub><br>
-  <img alt="Claude Code" src="https://img.shields.io/badge/Claude_Code-3a3340?style=flat-square&logo=anthropic&logoColor=e8853f">
-  <img alt="OpenAI Codex" src="https://img.shields.io/badge/Codex-3a3340?style=flat-square&logo=openai&logoColor=e8853f">
-  <img alt="Cursor" src="https://img.shields.io/badge/Cursor-3a3340?style=flat-square&logo=cursor&logoColor=e8853f">
-  <img alt="Gemini Gem" src="https://img.shields.io/badge/Gemini_Gem-3a3340?style=flat-square&logo=googlegemini&logoColor=e8853f">
+  <img alt="Claude Code" src="https://img.shields.io/badge/Claude_Code-0e0b1c?style=flat-square&logo=anthropic&logoColor=ff6b1f">
+  <img alt="OpenAI Codex" src="https://img.shields.io/badge/Codex-0e0b1c?style=flat-square&logo=openai&logoColor=ff6b1f">
+  <img alt="Cursor" src="https://img.shields.io/badge/Cursor-0e0b1c?style=flat-square&logo=cursor&logoColor=ff6b1f">
+  <img alt="Gemini Gem" src="https://img.shields.io/badge/Gemini_Gem-0e0b1c?style=flat-square&logo=googlegemini&logoColor=ff6b1f">
 </p>
 
 <p>
   <a href="#-quick-start"><b>Quick start</b></a> &nbsp;·&nbsp;
-  <a href="https://samuele95.github.io/prometheus/">Website</a> &nbsp;·&nbsp;
-  <a href="https://samuele95.github.io/prometheus/documentation-forge.html">Documentation</a> &nbsp;·&nbsp;
+  <a href="https://samuele95.github.io/prometheus/">Watch the film</a> &nbsp;·&nbsp;
+  <a href="https://samuele95.github.io/prometheus/docs.html">Reading room</a> &nbsp;·&nbsp;
   <a href="https://github.com/Samuele95/prometheus/releases/latest/download/prometheus-skill.zip">Download the skill</a>
 </p>
 
@@ -129,7 +129,7 @@ which is why the discipline scales from a one-line instruction to a lifecycle-ma
 system.
 
 <div align="center">
-  <img src="assets/readme-operators.svg" width="82%" alt="A prompt drawn as a stack of operators acting on the raw task: Role & framing (amplify), Context operators (mix), Constraints (suppress), Reasoning scaffold (amplify), and Collapse (measure and commit to one reading). Order is load-bearing.">
+  <img src="assets/readme-operators.png" width="82%" alt="A prompt drawn as a stack of operators acting on the raw task: Role & framing (amplify), Context operators (mix), Constraints (suppress), Reasoning scaffold (amplify), and Collapse (measure and commit to one reading). Order is load-bearing.">
 </div>
 
 ## What it builds
@@ -139,13 +139,13 @@ into three layers, the way a network stacks: raw instructions in, **agents in th
 middle**, judgement on the way out.
 
 <div align="center">
-  <img src="assets/readme-layers.svg" width="100%" alt="Three layers. 01 Prompts: system prompts and single-call instructions, plus cognitive-tool scaffolds (a system prompt with ready-to-register tool definitions). 02 Agents & workflows: full agentic loops with persona, tool contracts and a memory discipline, plus multi-step agentic workflows with ordered stages, hand-offs and stop conditions. 03 Evaluators: LLM-as-judge graders, and a verifier shipped with every deliverable.">
+  <img src="assets/readme-layers.png" width="100%" alt="Three layers. 01 Prompts: system prompts and single-call instructions, plus cognitive-tool scaffolds (a system prompt with ready-to-register tool definitions). 02 Agents & workflows: full agentic loops with persona, tool contracts and a memory discipline, plus multi-step agentic workflows with ordered stages, hand-offs and stop conditions. 03 Evaluators: LLM-as-judge graders, and a verifier shipped with every deliverable.">
 </div>
 
 ## Three modes
 
 <div align="center">
-  <img src="assets/readme-modes.svg" width="100%" alt="Three modes. From-scratch: design a new prompt, agent, or workflow from a description. Refactor: improve an existing one via audit-only (A), surgical diff (B), or wholesale rewrite (C). Manage: a MAPE-K loop that keeps a deployed agent healthy over its lifetime.">
+  <img src="assets/readme-modes.png" width="100%" alt="Three modes. From-scratch: design a new prompt, agent, or workflow from a description. Refactor: improve an existing one via audit-only (A), surgical diff (B), or wholesale rewrite (C). Manage: a MAPE-K loop that keeps a deployed agent healthy over its lifetime.">
 </div>
 
 ### Manage mode — a MAPE-K loop over a live agent
@@ -174,7 +174,7 @@ phases. Data flows forward; a single feedback edge returns a failing audit from
 Phase&nbsp;4 to Phase&nbsp;3 — the only loop in the pipeline.
 
 <div align="center">
-  <img src="assets/readme-pipeline.svg" width="100%" alt="The Fabrication Cycle: six phases — Shape, Interview, Draft, Audit, Score, Deliver — with a single feedback edge from Audit back to Draft.">
+  <img src="assets/readme-pipeline.png" width="100%" alt="The Fabrication Cycle: six phases — Shape, Interview, Draft, Audit, Score, Deliver — with a single feedback edge from Audit back to Draft.">
 </div>
 
 | # | Phase | What it does |
@@ -257,8 +257,10 @@ operators/       # the operator catalog
 templates/       # interview branches, output templates
 manage/          # manage-mode MAPE-K loop, operators, and replay-verifier.py
 gem/             # the Gemini Gem port (+ GEM-DESCRIPTION.md)
-docs/            # the documentation site (GitHub Pages)
-assets/          # figures, banner, social preview
+docs/            # the published site: the film and the reading room (GitHub Pages)
+site/            # the site's source (Vite + three.js); builds into docs/
+site-design/     # the site's design bible, tokens, copy deck and decision ledger
+assets/          # README figures, banner, social preview
 CITATIONS.md     # every technique traced to a primary source
 ```
 
@@ -267,13 +269,15 @@ standard library.
 
 ## Documentation
 
-The full documentation — the operator model, the seven shapes, the three modes, the
-manage-mode loop, the audit checklist, and per-runtime install guides — is published
-from `docs/`:
+The site has two rooms. **The film** is a scene-by-scene journey through the framework:
+the prompt as an operator, the seven shapes, the six phases, the three modes. **The
+reading room** holds the full documentation — the operator model, the seven shapes, the
+three modes, the manage-mode loop, the audit checklist, and per-runtime install guides —
+in English and Italian. Both are published from `docs/`:
 
 <div align="center">
 
-### [→ Read the documentation](https://samuele95.github.io/prometheus/documentation-forge.html)
+### [→ Enter the reading room](https://samuele95.github.io/prometheus/docs.html) &nbsp;·&nbsp; [Watch the film](https://samuele95.github.io/prometheus/)
 
 </div>
 

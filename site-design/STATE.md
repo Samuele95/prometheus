@@ -44,3 +44,4 @@ ROUND: grade 3/3 — pass (series after revision 3: hard 9/9; Lighthouse main 10
 DEVIATION: stage-01 — owner revision 6 ("the reading page theme does not properly match the website"); bible revision 6: reading room rebuilt in the film's grammar (letterbox HUD and chapter ticks, no boxes, Roman openers, gate-like cover)
 OK: stage-04 — revision 6 built; reading room console-clean at 390 and 1440
 ROUND: grade 1/3 — pass (series after revision 5: hard 9/9; reading room Lighthouse 99/100/100)
+WROTE: README restyled to the site — assets/ banner, cards, four diagrams and social preview re-rendered from site-design/readme-art/art.html (node site/scripts/readme-art.mjs); badges in the site palette; links to the film and the reading room; old SVG figures retired; CI inventory now checks docs/og.png (docs/og-image.png never existed)
